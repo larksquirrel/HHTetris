@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>俄罗斯方块 - 竖屏版</title>
+    <title>俄罗斯方块 - 黑粉色系</title>
     <style>
         * {
             margin: 0;
@@ -17,75 +17,60 @@
             background: linear-gradient(135deg, #0f0b1e 0%, #1a0f2e 100%);
             color: #fff;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
             min-height: 100vh;
             padding: 10px;
-            overflow: hidden;
+            overflow-x: hidden;
         }
 
-        /* 竖屏容器 */
-        .portrait-container {
-            display: flex;
-            flex-direction: column;
-            width: 100%;
-            height: 100vh;
-            max-width: 500px;
-            background: linear-gradient(145deg, rgba(20, 10, 30, 0.95), rgba(30, 15, 40, 0.95));
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(255, 122, 179, 0.2);
-        }
-
-        /* 头部 */
-        .game-header {
-            padding: 12px 15px;
+        .header {
             text-align: center;
-            border-bottom: 1px solid rgba(255, 122, 179, 0.2);
-            background: linear-gradient(to right, rgba(255, 42, 143, 0.1), rgba(255, 122, 179, 0.1));
+            margin: 10px 0 15px;
+            width: 100%;
         }
 
-        .game-title {
-            font-size: 1.4rem;
-            margin-bottom: 3px;
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 5px;
             background: linear-gradient(to right, #ff2a8f, #ff7eb3);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            text-shadow: 0 2px 8px rgba(255, 42, 143, 0.3);
+            text-shadow: 0 2px 10px rgba(255, 42, 143, 0.3);
         }
 
-        .game-subtitle {
-            font-size: 0.75rem;
+        .subtitle {
             color: #ff9ec9;
-            opacity: 0.8;
+            font-size: 0.9rem;
+            opacity: 0.9;
         }
 
-        /* 主要内容区 */
-        .main-content {
-            flex: 1;
+        .main-container {
             display: flex;
-            min-height: 0;
-            padding: 10px;
-            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
         }
 
-        /* 左侧游戏区 */
+        /* 游戏区 - 左上方最大面积 */
         .game-area {
-            flex: 3;
+            flex: 2;
+            min-width: 300px;
+            max-width: 600px;
             display: flex;
             flex-direction: column;
-            min-width: 0;
         }
 
         .game-board-container {
-            flex: 1;
             position: relative;
-            background: rgba(10, 5, 20, 0.9);
-            border-radius: 10px;
-            border: 2px solid rgba(255, 122, 179, 0.3);
-            overflow: hidden;
-            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+            background: linear-gradient(145deg, rgba(20, 10, 30, 0.9), rgba(30, 15, 40, 0.9));
+            border-radius: 12px;
+            padding: 12px;
+            box-shadow: 0 8px 20px rgba(255, 42, 143, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 122, 179, 0.2);
         }
 
         .game-board {
@@ -93,82 +78,146 @@
             grid-template-columns: repeat(10, 1fr);
             grid-template-rows: repeat(20, 1fr);
             width: 100%;
-            height: 100%;
+            height: 560px;
+            max-height: 70vh;
+            background-color: rgba(10, 5, 20, 0.9);
+            border: 2px solid rgba(255, 122, 179, 0.3);
+            border-radius: 6px;
+            overflow: hidden;
+            transition: background-color 0.5s, filter 0.5s;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
         }
 
-        /* 右侧面板 */
-        .side-panel {
+        /* 右侧信息区 */
+        .info-sidebar {
             flex: 1;
-            min-width: 120px;
-            position: relative;
-        }
-
-        /* 默认面板（游戏开始前显示） */
-        .default-panel {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            min-width: 250px;
+            max-width: 300px;
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            opacity: 1;
-            transition: opacity 0.3s ease;
+            gap: 15px;
         }
 
-        /* 道具面板（游戏开始后显示） */
-        .item-panel {
-            position: absolute;
-            top: 0;
-            left: 0;
+        /* 底部控制区 */
+        .bottom-controls {
             width: 100%;
-            height: 100%;
             display: flex;
             flex-direction: column;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
+            align-items: center;
+            gap: 15px;
+            margin-top: 15px;
         }
 
-        .game-started .default-panel {
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .game-started .item-panel {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        /* 面板通用样式 */
-        .panel-section {
-            background: linear-gradient(145deg, rgba(25, 12, 35, 0.9), rgba(35, 17, 45, 0.9));
-            border-radius: 10px;
-            padding: 12px;
+        /* 折叠道具栏 */
+        .items-sidebar {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 180px;
+            background: linear-gradient(145deg, rgba(20, 10, 30, 0.95), rgba(30, 15, 40, 0.95));
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 8px 20px rgba(255, 42, 143, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 122, 179, 0.2);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            z-index: 100;
+            transition: all 0.3s ease;
+            transform: translateX(0);
         }
 
-        .section-title {
-            font-size: 0.9rem;
-            margin-bottom: 8px;
+            .items-sidebar.collapsed {
+                transform: translateX(calc(100% - 40px));
+            }
+
+        .items-sidebar-toggle {
+            position: absolute;
+            left: -30px;
+            top: 15px;
+            width: 30px;
+            height: 40px;
+            background: linear-gradient(145deg, rgba(40, 20, 50, 0.9), rgba(30, 15, 40, 0.9));
+            border-radius: 8px 0 0 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: 1px solid rgba(255, 122, 179, 0.2);
+            border-right: none;
             color: #ff7eb3;
+            font-size: 1.2rem;
+        }
+
+            .items-sidebar-toggle:hover {
+                background: linear-gradient(145deg, rgba(50, 25, 60, 0.9), rgba(40, 20, 50, 0.9));
+            }
+
+        /* 夜幕降临效果 - 全黑 */
+        .night-fall {
+            background-color: #000 !important;
+            filter: brightness(0.1);
+        }
+
+        /* 冤魂效果 - 黑色方块 */
+        .yuan-ghost .cell.filled.i,
+        .yuan-ghost .cell.filled.j,
+        .yuan-ghost .cell.filled.l,
+        .yuan-ghost .cell.filled.o,
+        .yuan-ghost .cell.filled.s,
+        .yuan-ghost .cell.filled.t,
+        .yuan-ghost .cell.filled.z {
+            background-color: #000000 !important;
+            border-color: #444444 !important;
+        }
+
+        /* 流血天气效果 - 红色方块 */
+        .blood-weather .cell.filled.i,
+        .blood-weather .cell.filled.j,
+        .blood-weather .cell.filled.l,
+        .blood-weather .cell.filled.o,
+        .blood-weather .cell.filled.s,
+        .blood-weather .cell.filled.t,
+        .blood-weather .cell.filled.z {
+            background-color: #ff2a2a !important;
+            border-color: #ff7a7a !important;
+        }
+
+        /* 当冤魂和流血天气同时存在时，优先显示冤魂（黑色） */
+        .yuan-ghost.blood-weather .cell.filled.i,
+        .yuan-ghost.blood-weather .cell.filled.j,
+        .yuan-ghost.blood-weather .cell.filled.l,
+        .yuan-ghost.blood-weather .cell.filled.o,
+        .yuan-ghost.blood-weather .cell.filled.s,
+        .yuan-ghost.blood-weather .cell.filled.t,
+        .yuan-ghost.blood-weather .cell.filled.z {
+            background-color: #000000 !important;
+            border-color: #444444 !important;
+        }
+
+        .info-panel {
+            background: linear-gradient(145deg, rgba(20, 10, 30, 0.9), rgba(30, 15, 40, 0.9));
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 4px 15px rgba(255, 42, 143, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 122, 179, 0.2);
+        }
+
+        .info-title {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: #ff7eb3;
+            text-align: center;
             font-weight: 600;
-            text-align: center;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
         }
 
-        /* 分数显示 */
         .score-display {
-            font-size: 1.8rem;
-            font-weight: bold;
+            font-size: 2.5rem;
             text-align: center;
+            font-weight: bold;
             color: #ff4d9e;
-            text-shadow: 0 2px 6px rgba(255, 77, 158, 0.5);
-            padding: 5px 0;
+            margin: 5px 0;
+            text-shadow: 0 2px 8px rgba(255, 77, 158, 0.5);
         }
 
-        /* 下一个方块预览 */
         .next-piece-container {
             display: flex;
             flex-direction: column;
@@ -179,100 +228,38 @@
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             grid-template-rows: repeat(4, 1fr);
-            width: 80px;
-            height: 80px;
+            width: 120px;
+            height: 120px;
             background-color: rgba(10, 5, 20, 0.9);
             border-radius: 6px;
+            margin-top: 5px;
             border: 1px solid rgba(255, 122, 179, 0.3);
         }
 
-        /* 操作按键 */
-        .control-buttons {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            grid-template-rows: repeat(2, 1fr);
-            gap: 8px;
-            height: 120px;
-        }
-
-        .control-btn {
-            background: linear-gradient(145deg, rgba(40, 20, 50, 0.9), rgba(30, 15, 40, 0.9));
-            border: 2px solid rgba(255, 122, 179, 0.4);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.4rem;
-            color: #ff7eb3;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            user-select: none;
-            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
-        }
-
-            .control-btn:active {
-                background: linear-gradient(145deg, rgba(50, 25, 60, 0.9), rgba(40, 20, 50, 0.9));
-                transform: scale(0.95);
-                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-            }
-
-            .control-btn.rotate {
-                grid-column: 1 / span 2;
-                font-size: 1.2rem;
-            }
-
-        /* 道具栏 */
-        .items-title {
-            font-size: 1rem;
-            margin-bottom: 10px;
-            color: #ff7eb3;
-            font-weight: 600;
-            text-align: center;
-            padding-bottom: 5px;
-            border-bottom: 1px solid rgba(255, 122, 179, 0.2);
-        }
-
-        .items-list {
+        .items-panel {
             display: flex;
             flex-direction: column;
-            gap: 8px;
-            flex: 1;
-            overflow-y: auto;
-            padding-right: 3px;
+            gap: 12px;
         }
-
-            .items-list::-webkit-scrollbar {
-                width: 3px;
-            }
-
-            .items-list::-webkit-scrollbar-track {
-                background: rgba(255, 122, 179, 0.1);
-                border-radius: 2px;
-            }
-
-            .items-list::-webkit-scrollbar-thumb {
-                background: rgba(255, 122, 179, 0.5);
-                border-radius: 2px;
-            }
 
         .item {
             display: flex;
-            flex-direction: column;
-            padding: 10px;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 15px;
             background: linear-gradient(145deg, rgba(30, 15, 40, 0.9), rgba(20, 10, 30, 0.9));
-            border-radius: 8px;
-            border-left: 3px solid;
+            border-radius: 10px;
+            border-left: 4px solid;
             position: relative;
             overflow: hidden;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-            min-height: 65px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
         }
 
             .item:hover {
                 transform: translateY(-2px);
-                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
             }
 
             .item:active {
@@ -286,25 +273,28 @@
                 pointer-events: none;
             }
 
-        .item-header {
+        .item-content {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            margin-bottom: 6px;
+            justify-content: space-between;
+            width: 100%;
+            z-index: 2;
         }
 
         .item-name {
             font-weight: bold;
-            font-size: 0.9rem;
+            font-size: 1.1rem;
             color: #fff;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
         }
 
         .item-count {
-            font-size: 1.1rem;
+            font-size: 1.4rem;
             font-weight: bold;
-            color: #ff7eb3;
-            min-width: 25px;
+            min-width: 35px;
             text-align: center;
+            color: #ff7eb3;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
         }
 
         .item-recovery {
@@ -314,108 +304,174 @@
             height: 100%;
             z-index: 1;
             transition: width 0.1s linear;
-            border-radius: 5px;
+            border-radius: 6px;
         }
 
-        /* 道具颜色 */
+        /* 道具恢复进度条颜色 */
+        .item.mojing .item-recovery {
+            background: linear-gradient(90deg, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.5));
+        }
+
+        .item.haitang .item-recovery {
+            background: linear-gradient(90deg, rgba(255, 64, 129, 0.3), rgba(255, 64, 129, 0.5));
+        }
+
+        .item.sodawater .item-recovery {
+            background: linear-gradient(90deg, rgba(33, 150, 243, 0.3), rgba(33, 150, 243, 0.5));
+        }
+
+        .item.qingjunce .item-recovery {
+            background: linear-gradient(90deg, rgba(255, 193, 7, 0.3), rgba(255, 193, 7, 0.5));
+        }
+
+        /* 道具颜色调整 */
         .item.mojing {
-            border-left-color: #333333;
+            border-left-color: #000000; /* 墨镜 - 黑色 */
         }
-
-            .item.mojing .item-recovery {
-                background: linear-gradient(90deg, rgba(100, 100, 100, 0.3), rgba(70, 70, 70, 0.5));
-            }
 
         .item.haitang {
-            border-left-color: #ff4081;
+            border-left-color: #ff4081; /* 海棠 - 粉色 */
         }
-
-            .item.haitang .item-recovery {
-                background: linear-gradient(90deg, rgba(255, 64, 129, 0.3), rgba(255, 20, 100, 0.5));
-            }
 
         .item.sodawater {
-            border-left-color: #2196f3;
+            border-left-color: #2196f3; /* 苏打水 - 蓝色 */
         }
-
-            .item.sodawater .item-recovery {
-                background: linear-gradient(90deg, rgba(33, 150, 243, 0.3), rgba(25, 120, 200, 0.5));
-            }
 
         .item.qingjunce {
-            border-left-color: #ffc107;
+            border-left-color: #ffc107; /* 清君侧 - 黄色 */
         }
 
-            .item.qingjunce .item-recovery {
-                background: linear-gradient(90deg, rgba(255, 193, 7, 0.3), rgba(230, 170, 0, 0.5));
-            }
-
-        /* 底部按钮 */
-        .bottom-buttons {
+        .buttons-row {
             display: flex;
-            gap: 10px;
-            padding: 15px;
-            border-top: 1px solid rgba(255, 122, 179, 0.2);
-            background: linear-gradient(to right, rgba(255, 42, 143, 0.05), rgba(255, 122, 179, 0.05));
+            justify-content: center;
+            gap: 20px;
+            width: 100%;
+            margin-bottom: 10px;
         }
 
-        .action-button {
-            flex: 1;
+        .game-button {
             background: linear-gradient(to bottom, #ff2a8f, #ff4d9e);
             color: white;
             border: none;
             border-radius: 50px;
-            padding: 14px 0;
-            font-size: 1rem;
+            padding: 16px 28px;
+            font-size: 1.2rem;
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s ease;
             box-shadow: 0 5px 15px rgba(255, 42, 143, 0.3);
-            min-height: 48px;
+            flex: 1;
+            max-width: 200px;
+            min-width: 150px;
+            position: relative;
+            overflow: hidden;
         }
 
-            .action-button:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 7px 18px rgba(255, 42, 143, 0.4);
+            .game-button::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+                transition: left 0.5s;
             }
 
-            .action-button:active {
-                transform: translateY(0);
+            .game-button:hover::after {
+                left: 100%;
             }
 
-            .action-button.pause {
+            .game-button:hover, .game-button:active {
+                transform: translateY(-3px);
+                box-shadow: 0 8px 20px rgba(255, 42, 143, 0.4);
+            }
+
+            .game-button:active {
+                transform: translateY(1px);
+            }
+
+            .game-button.pause {
                 background: linear-gradient(to bottom, #ff7eb3, #ff9ec9);
             }
 
-            .action-button.restart {
-                background: linear-gradient(to bottom, #666666, #444444);
-            }
-
-        /* 游戏状态 */
-        .game-status {
-            text-align: center;
-            font-size: 0.9rem;
-            font-weight: bold;
-            height: 20px;
-            color: #ff7eb3;
-            margin-top: 5px;
+        .touch-controls {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 10px;
+            height: 180px;
+            width: 100%;
+            max-width: 300px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
-        /* 方块样式 */
+        .touch-btn {
+            background: linear-gradient(145deg, rgba(40, 20, 50, 0.9), rgba(30, 15, 40, 0.9));
+            border: 2px solid rgba(255, 122, 179, 0.4);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: #ff7eb3;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+            .touch-btn:active {
+                background: linear-gradient(145deg, rgba(50, 25, 60, 0.9), rgba(40, 20, 50, 0.9));
+                transform: scale(0.95);
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            }
+
+            .touch-btn.rotate {
+                grid-column: 2;
+                grid-row: 1;
+            }
+
+            .touch-btn.left {
+                grid-column: 1;
+                grid-row: 2;
+            }
+
+            .touch-btn.down {
+                grid-column: 2;
+                grid-row: 2;
+            }
+
+            .touch-btn.right {
+                grid-column: 3;
+                grid-row: 2;
+            }
+
+            .touch-btn.drop {
+                grid-column: 2;
+                grid-row: 3;
+            }
+
         .cell {
             width: 100%;
             height: 100%;
-            border: 0.5px solid rgba(255, 255, 255, 0.05);
-            transition: background-color 0.3s;
+            border: 1px solid rgba(255, 122, 179, 0.1);
+            transition: background-color 0.3s, transform 0.2s;
         }
+
+            .cell:hover {
+                transform: scale(1.05);
+            }
 
         .filled {
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 2px;
-            box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 3px;
+            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.3);
         }
 
-        /* 经典俄罗斯方块颜色 */
+        /* 方块颜色 - 经典俄罗斯方块颜色 */
         .i {
             background-color: #00bcd4;
         }
@@ -445,7 +501,18 @@
         }
         /* Z型 - 红色 */
 
-        /* 事件弹窗样式（保持原有） */
+
+        .game-status {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            height: 30px;
+            color: #ff7eb3;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+        }
+
+        /* 事件弹窗样式 */
         .event-modal {
             position: fixed;
             top: 0;
@@ -470,9 +537,9 @@
         .event-content {
             background: linear-gradient(145deg, rgba(25, 12, 35, 0.95), rgba(35, 17, 45, 0.95));
             border-radius: 16px;
-            padding: 25px;
-            max-width: 90%;
-            width: 400px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
             text-align: center;
             box-shadow: 0 15px 35px rgba(255, 42, 143, 0.2);
             border: 2px solid rgba(255, 122, 179, 0.3);
@@ -485,20 +552,26 @@
         }
 
         .event-title {
-            font-size: 1.6rem;
-            margin-bottom: 10px;
+            font-size: 2rem;
+            margin-bottom: 15px;
             color: #ff7eb3;
-            text-shadow: 0 2px 8px rgba(255, 126, 179, 0.5);
+            text-shadow: 0 2px 10px rgba(255, 126, 179, 0.5);
         }
 
         .event-type {
             display: inline-block;
-            padding: 5px 15px;
+            padding: 6px 18px;
             border-radius: 20px;
-            font-size: 0.8rem;
+            font-size: 0.9rem;
             font-weight: bold;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
+
+            .event-type.item {
+                background: linear-gradient(to right, #ff4d9e, #ff2a8f);
+                color: white;
+                box-shadow: 0 3px 8px rgba(255, 77, 158, 0.3);
+            }
 
             .event-type.story {
                 background: linear-gradient(to right, #ff7eb3, #ff4d9e);
@@ -507,31 +580,32 @@
             }
 
         .event-description {
-            font-size: 0.95rem;
-            line-height: 1.5;
-            margin-bottom: 20px;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 25px;
             color: #ff9ec9;
         }
 
         .event-effect {
             background: rgba(255, 122, 179, 0.1);
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            border-left: 3px solid #ff7eb3;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            border-left: 4px solid #ff7eb3;
         }
 
         .event-effect-title {
             font-weight: bold;
             color: #ff7eb3;
-            margin-bottom: 5px;
-            font-size: 0.9rem;
+            margin-bottom: 8px;
         }
 
         .event-actions {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
         }
 
         .event-button {
@@ -539,8 +613,8 @@
             color: white;
             border: none;
             border-radius: 50px;
-            padding: 10px 20px;
-            font-size: 0.9rem;
+            padding: 12px 24px;
+            font-size: 1rem;
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -552,217 +626,423 @@
                 box-shadow: 0 6px 16px rgba(255, 42, 143, 0.4);
             }
 
-        /* 响应式调整 */
-        @media (max-width: 400px) {
-            .game-title {
-                font-size: 1.2rem;
+            .event-button.consume {
+                background: linear-gradient(to bottom, #ff4d9e, #ff2a8f);
             }
 
-            .game-board-container {
-                border-width: 1px;
+            .event-button.cancel {
+                background: linear-gradient(to bottom, #666666, #444444);
             }
 
-            .panel-section {
-                padding: 10px;
+        .yuan-character {
+            font-size: 8rem;
+            color: #000000;
+            text-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+            font-family: 'SimHei', 'Microsoft YaHei', sans-serif;
+            margin: 20px 0;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
+
+            50% {
+                transform: scale(1.1);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
+        }
+
+        .confirm-button {
+            background: linear-gradient(to bottom, #ff2a8f, #ff4d9e);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 12px 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(255, 42, 143, 0.3);
+        }
+
+            .confirm-button:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 20px rgba(255, 42, 143, 0.4);
+            }
+
+        .input-container {
+            margin: 20px 0;
+        }
+
+        .input-text {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: #ff9ec9;
+        }
+
+        .text-input {
+            width: 100%;
+            padding: 12px;
+            font-size: 1.1rem;
+            border: 2px solid #ff2a8f;
+            border-radius: 8px;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            text-align: center;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+            .text-input:focus {
+                outline: none;
+                border-color: #ff7eb3;
+                box-shadow: 0 0 15px rgba(255, 126, 179, 0.5);
+                background-color: rgba(255, 255, 255, 0.15);
+            }
+
+        .instructions {
+            margin-top: 15px;
+            max-width: 600px;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #ff9ec9;
+            line-height: 1.5;
+            padding: 0 15px;
+        }
+
+        .control-instructions {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 10px;
+            background: rgba(255, 122, 179, 0.1);
+            padding: 12px;
+            border-radius: 10px;
+            max-width: 500px;
+            border: 1px solid rgba(255, 122, 179, 0.2);
+        }
+
+        .control-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            color: #ff9ec9;
+        }
+
+        .control-icon {
+            background: rgba(255, 122, 179, 0.2);
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            min-width: 40px;
+            text-align: center;
+            color: #ff7eb3;
+        }
+
+        .key {
+            font-weight: bold;
+            color: #ff9ec9;
+        }
+
+        .freeze-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(139, 69, 19, 0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            border-radius: 4px;
+            pointer-events: none;
+        }
+
+        .freeze-text {
+            font-size: 2rem;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+            animation: pulse 1s infinite;
+            background-color: rgba(139, 69, 19, 0.7);
+            padding: 10px 20px;
+            border-radius: 10px;
+        }
+
+        .night-warning {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2rem;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
+            z-index: 101;
+            text-align: center;
+            width: 100%;
+        }
+
+        .item-added {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(to right, #ff4d9e, #ff2a8f);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: bold;
+            z-index: 999;
+            animation: slideIn 0.5s, fadeOut 0.5s 2s forwards;
+            box-shadow: 0 5px 15px rgba(255, 77, 158, 0.4);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+            }
+        }
+
+        .brass-box-special {
+            position: relative;
+            border: 2px solid #ffd700 !important;
+            background: linear-gradient(145deg, rgba(50, 35, 10, 0.9), rgba(70, 50, 20, 0.9)) !important;
+            animation: glow 1.5s infinite alternate;
+        }
+
+        @keyframes glow {
+            from {
+                box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+            }
+
+            to {
+                box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+            }
+        }
+
+        .footer {
+            margin-top: 15px;
+            margin-bottom: 10px;
+            color: #ff9ec9;
+            font-size: 0.8rem;
+            text-align: center;
+            opacity: 0.7;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .game-area, .info-sidebar {
+                width: 100%;
+                max-width: 100%;
+            }
+
+            .game-board {
+                height: 400px;
+            }
+
+            .items-sidebar {
+                position: relative;
+                top: auto;
+                right: auto;
+                width: 100%;
+                margin-top: 15px;
+                transform: none !important;
+            }
+
+            .items-sidebar-toggle {
+                display: none;
             }
 
             .score-display {
-                font-size: 1.5rem;
+                font-size: 2.2rem;
             }
 
             .next-piece-board {
-                width: 70px;
-                height: 70px;
-            }
-
-            .control-buttons {
+                width: 100px;
                 height: 100px;
-                gap: 6px;
             }
 
-            .control-btn {
-                font-size: 1.2rem;
+            .game-button {
+                padding: 14px 20px;
+                font-size: 1.1rem;
+                min-width: 140px;
             }
 
-            .item {
-                padding: 8px;
-                min-height: 60px;
-            }
-
-            .action-button {
-                padding: 12px 0;
-                font-size: 0.9rem;
-            }
-        }
-
-        @media (max-height: 600px) {
-            .portrait-container {
-                height: 95vh;
-            }
-
-            .main-content {
-                padding: 8px;
-                gap: 8px;
-            }
-
-            .panel-section {
-                padding: 8px;
+            .touch-controls {
+                height: 150px;
+                max-width: 250px;
             }
 
             .item {
-                min-height: 55px;
-                padding: 6px;
-            }
-
-            .bottom-buttons {
-                padding: 10px;
+                padding: 10px 12px;
             }
         }
 
-        /* 横屏提示 */
-        @media (orientation: landscape) {
-            body::before {
-                content: "请将设备竖屏以获得最佳游戏体验";
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: linear-gradient(135deg, #0f0b1e 0%, #1a0f2e 100%);
-                display: flex;
-                justify-content: center;
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .game-board {
+                height: 350px;
+            }
+
+            .buttons-row {
+                flex-direction: column;
                 align-items: center;
-                font-size: 1.2rem;
-                text-align: center;
-                padding: 20px;
-                color: #ff7eb3;
-                z-index: 9999;
+                gap: 10px;
             }
-        }
 
-        /* 夜间效果等特殊样式（保持原有） */
-        .night-fall {
-            background-color: #000 !important;
-            filter: brightness(0.1);
-        }
+            .game-button {
+                width: 90%;
+                max-width: none;
+            }
 
-        .yuan-ghost .cell.filled.i,
-        .yuan-ghost .cell.filled.j,
-        .yuan-ghost .cell.filled.l,
-        .yuan-ghost .cell.filled.o,
-        .yuan-ghost .cell.filled.s,
-        .yuan-ghost .cell.filled.t,
-        .yuan-ghost .cell.filled.z {
-            background-color: #000000 !important;
-            border-color: #444444 !important;
-        }
+            .touch-controls {
+                height: 130px;
+                max-width: 220px;
+            }
 
-        .blood-weather .cell.filled.i,
-        .blood-weather .cell.filled.j,
-        .blood-weather .cell.filled.l,
-        .blood-weather .cell.filled.o,
-        .blood-weather .cell.filled.s,
-        .blood-weather .cell.filled.t,
-        .blood-weather .cell.filled.z {
-            background-color: #ff2a2a !important;
-            border-color: #ff7a7a !important;
+            .info-panel {
+                padding: 12px;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- 竖屏容器 -->
-    <div class="portrait-container" id="game-container">
-        <!-- 头部 -->
-        <div class="game-header">
-            <h1 class="game-title">俄罗斯方块 - 竖屏版</h1>
-            <div class="game-subtitle">点击道具直接使用 | 单界面设计</div>
-        </div>
+    <div class="header">
+        <h1>俄罗斯方块 - 黑粉色系</h1>
+        <div class="subtitle">点击道具直接使用 | 黑粉配色 | 手机优化</div>
+    </div>
 
-        <!-- 主要内容区 -->
-        <div class="main-content">
-            <!-- 左侧游戏区 -->
-            <div class="game-area">
-                <div class="game-board-container">
-                    <div class="game-board" id="game-board"></div>
-                </div>
+    <div class="main-container">
+        <!-- 左上方游戏区 -->
+        <div class="game-area">
+            <div class="game-board-container">
+                <div class="game-board" id="game-board"></div>
                 <div class="game-status" id="game-status">准备开始</div>
             </div>
+        </div>
 
-            <!-- 右侧面板 -->
-            <div class="side-panel">
-                <!-- 默认面板（游戏开始前） -->
-                <div class="default-panel">
-                    <div class="panel-section">
-                        <div class="section-title">分数</div>
-                        <div class="score-display" id="score">0</div>
-                    </div>
+        <!-- 右侧信息区 -->
+        <div class="info-sidebar">
+            <div class="info-panel">
+                <div class="info-title">分数</div>
+                <div class="score-display" id="score">0</div>
+            </div>
 
-                    <div class="panel-section">
-                        <div class="section-title">下一个方块</div>
-                        <div class="next-piece-container">
-                            <div class="next-piece-board" id="next-piece-board"></div>
-                        </div>
-                    </div>
+            <div class="info-panel">
+                <div class="info-title">下一个方块</div>
+                <div class="next-piece-container">
+                    <div class="next-piece-board" id="next-piece-board"></div>
+                </div>
+            </div>
 
-                    <div class="panel-section">
-                        <div class="section-title">操作按键</div>
-                        <div class="control-buttons">
-                            <div class="control-btn rotate" id="rotate-btn">旋转 ↻</div>
-                            <div class="control-btn left" id="left-btn">←</div>
-                            <div class="control-btn down" id="down-btn">↓</div>
-                            <div class="control-btn right" id="right-btn">→</div>
-                        </div>
-                    </div>
+            <div class="info-panel">
+                <div class="info-title">操作按键</div>
+                <div class="touch-controls">
+                    <div class="touch-btn rotate" id="rotate-btn">↻</div>
+                    <div class="touch-btn left" id="left-btn">←</div>
+                    <div class="touch-btn down" id="down-btn">↓</div>
+                    <div class="touch-btn right" id="right-btn">→</div>
+                    <div class="touch-btn drop" id="drop-btn">↓</div>
                 </div>
 
-                <!-- 道具面板（游戏开始后） -->
-                <div class="item-panel">
-                    <div class="panel-section" style="height: 100%; display: flex; flex-direction: column;">
-                        <div class="items-title">道具栏 (点击使用)</div>
-                        <div class="items-list">
-                            <!-- 道具顺序：墨镜 → 海棠 → 苏打水 → 清君侧 -->
-                            <div class="item mojing" id="mojing-item">
-                                <div class="item-recovery" id="mojing-recovery"></div>
-                                <div class="item-header">
-                                    <span class="item-name">墨镜</span>
-                                    <span class="item-count" id="mojing-count">0</span>
-                                </div>
-                            </div>
-
-                            <div class="item haitang" id="haitang-item">
-                                <div class="item-recovery" id="haitang-recovery"></div>
-                                <div class="item-header">
-                                    <span class="item-name">海棠</span>
-                                    <span class="item-count" id="haitang-count">0</span>
-                                </div>
-                            </div>
-
-                            <div class="item sodawater" id="sodawater-item">
-                                <div class="item-recovery" id="sodawater-recovery"></div>
-                                <div class="item-header">
-                                    <span class="item-name">苏打水</span>
-                                    <span class="item-count" id="sodawater-count">0</span>
-                                </div>
-                            </div>
-
-                            <div class="item qingjunce" id="qingjunce-item">
-                                <div class="item-recovery" id="qingjunce-recovery"></div>
-                                <div class="item-header">
-                                    <span class="item-name">清君侧</span>
-                                    <span class="item-count" id="qingjunce-count">0</span>
-                                </div>
-                            </div>
-                        </div>
+                <div class="control-instructions">
+                    <div class="control-item">
+                        <span class="control-icon">✨</span>
+                        <span>点击道具文字直接使用！进度条满即可用</span>
+                    </div>
+                    <div class="control-item">
+                        <span class="control-icon">📱</span>
+                        <span>专为手机屏幕优化设计</span>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- 底部按钮 -->
-        <div class="bottom-buttons">
-            <button class="action-button" id="start-pause-button">开始游戏</button>
-            <button class="action-button restart" id="restart-button" disabled>重新开始</button>
+        <!-- 底部控制区 -->
+        <div class="bottom-controls">
+            <div class="buttons-row">
+                <button class="game-button" id="start-restart-button">开始游戏</button>
+                <button class="game-button pause" id="pause-resume-button" disabled>暂停</button>
+            </div>
+
+            <div class="instructions">
+                游戏目标：移动、旋转和放置下落的方块，形成完整的水平行来得分。每次消除都会触发随机剧情，点击道具可直接使用！
+            </div>
         </div>
+    </div>
+
+    <!-- 折叠道具栏 -->
+    <div class="items-sidebar collapsed" id="items-sidebar">
+        <div class="items-sidebar-toggle" id="items-toggle">▶</div>
+        <div class="info-title">道具栏 (点击使用)</div>
+        <div class="items-panel">
+            <div class="item mojing" id="mojing-item">
+                <div class="item-recovery" id="mojing-recovery"></div>
+                <div class="item-content">
+                    <span class="item-name">墨镜</span>
+                    <span class="item-count" id="mojing-count">0</span>
+                </div>
+            </div>
+
+            <div class="item haitang" id="haitang-item">
+                <div class="item-recovery" id="haitang-recovery"></div>
+                <div class="item-content">
+                    <span class="item-name">海棠</span>
+                    <span class="item-count" id="haitang-count">0</span>
+                </div>
+            </div>
+
+            <div class="item sodawater" id="sodawater-item">
+                <div class="item-recovery" id="sodawater-recovery"></div>
+                <div class="item-content">
+                    <span class="item-name">苏打水</span>
+                    <span class="item-count" id="sodawater-count">0</span>
+                </div>
+            </div>
+
+            <div class="item qingjunce" id="qingjunce-item">
+                <div class="item-recovery" id="qingjunce-recovery"></div>
+                <div class="item-content">
+                    <span class="item-name">清君侧</span>
+                    <span class="item-count" id="qingjunce-count">0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        俄罗斯方块 © 2023 | 黑粉色系 | 点击道具使用
     </div>
 
     <!-- 事件弹窗 -->
@@ -778,6 +1058,20 @@
                 <div id="event-effect-desc"></div>
             </div>
             <div id="event-actions"></div>
+        </div>
+    </div>
+
+    <!-- 道具选择弹窗 -->
+    <div class="event-modal" id="item-select-modal">
+        <div class="event-content">
+            <h2 class="event-title">选择道具</h2>
+            <div class="event-description">
+                请选择要使用的道具：
+            </div>
+            <div id="item-options" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
+                <!-- 道具选项将动态生成 -->
+            </div>
+            <button class="confirm-button" id="cancel-item-button">取消</button>
         </div>
     </div>
 
@@ -1028,6 +1322,8 @@
         const gameStatusElement = document.getElementById('game-status');
         const startRestartButton = document.getElementById('start-restart-button');
         const pauseResumeButton = document.getElementById('pause-resume-button');
+        const itemsSidebar = document.getElementById('items-sidebar');
+        const itemsToggle = document.getElementById('items-toggle');
 
         // 道具数量显示元素和道具项
         const mojingCountElement = document.getElementById('mojing-count');
@@ -1066,6 +1362,12 @@
         const downBtn = document.getElementById('down-btn');
         const dropBtn = document.getElementById('drop-btn');
 
+        // 折叠道具栏控制
+        function toggleItemsSidebar() {
+            itemsSidebar.classList.toggle('collapsed');
+            itemsToggle.textContent = itemsSidebar.classList.contains('collapsed') ? '▶' : '◀';
+        }
+
         // 初始化剧情系统
         function initStorySystem() {
             // 重置剧情系统
@@ -1083,8 +1385,6 @@
                     STORIES[key].hasAppeared = false;
                 }
             }
-
-            console.log(`剧情系统初始化，第${storyRound}轮`);
         }
 
         // 获取下一个随机剧情（保证不重复）
@@ -1127,8 +1427,6 @@
 
                 // 打乱顺序（确保每轮顺序不同）
                 shuffleArray(availableStories);
-
-                console.log(`进入第${storyRound}轮剧情，打乱顺序`);
             }
 
             // 从可用剧情中随机选择一个
@@ -1145,8 +1443,6 @@
                 STORIES[storyKey].canAppear = false;
             }
 
-            console.log(`选择剧情: ${STORIES[storyKey].name}，剩余可用: ${availableStories.length}，总触发: ${storyCount}`);
-
             return STORIES[storyKey];
         }
 
@@ -1161,8 +1457,6 @@
 
         // 清除所有现有效果（被新剧情覆盖）
         function clearAllEffects() {
-            console.log("清除所有现有效果");
-
             // 清除夜幕降临效果
             if (activeEffects.nightFall) {
                 gameBoardElement.classList.remove('night-fall');
@@ -1909,7 +2203,6 @@
         // 处理食君之禄剧情
         function handleShijunzhilu() {
             // 这个函数不会被直接调用，因为食君之禄有特殊的弹窗处理
-            console.log("食君之禄剧情处理");
         }
 
         // 处理冤魂效果（没有海棠的情况）
@@ -1961,7 +2254,6 @@
         // 处理夜幕降临剧情（有墨镜消耗）
         function handleNightFall() {
             // 这个函数不会被直接调用，因为夜幕降临有特殊的弹窗处理
-            console.log("夜幕降临剧情处理");
         }
 
         // 处理夜幕降临（没有墨镜的情况）
@@ -2127,7 +2419,6 @@
         // 机票效果 - 需要输入正确文本（已在showStoryModal中处理）
         function activateTicket() {
             // 效果在showStoryModal中处理，这里只需记录
-            console.log("机票剧情激活");
         }
 
         // 易拉罐风车效果 - 随机消除3块已经存在的方块
@@ -2233,6 +2524,12 @@
             } else {
                 resetGame();
                 startGame();
+            }
+
+            // 开始游戏时折叠道具栏
+            if (!itemsSidebar.classList.contains('collapsed')) {
+                itemsSidebar.classList.add('collapsed');
+                itemsToggle.textContent = '▶';
             }
         }
 
@@ -2424,6 +2721,9 @@
 
         // 设置触摸控制和道具点击
         function setupTouchControls() {
+            // 折叠道具栏切换
+            itemsToggle.addEventListener('click', toggleItemsSidebar);
+
             // 旋转按钮
             rotateBtn.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -2486,6 +2786,46 @@
             sodawaterItemElement.addEventListener('click', () => {
                 if (useItem('sodawater')) {
                     ITEMS.SODAWATER.effectFunc();
+                }
+            });
+
+            mojingItemElement.addEventListener('click', () => {
+                if (useItem('mojing')) {
+                    // 墨镜的特殊效果
+                    if (activeEffects.nightFall) {
+                        activeEffects.nightFall = false;
+                        gameBoardElement.classList.remove('night-fall');
+                        const warning = document.querySelector('.night-warning');
+                        if (warning && warning.parentNode) {
+                            warning.remove();
+                        }
+                        gameStatusElement.textContent = "墨镜生效！夜幕被驱散";
+                        setTimeout(() => {
+                            if (!gameOver && !isPaused && gameStarted) {
+                                gameStatusElement.textContent = "游戏中";
+                            }
+                        }, 2000);
+                    }
+                }
+            });
+
+            haitangItemElement.addEventListener('click', () => {
+                if (useItem('haitang')) {
+                    // 海棠的特殊效果
+                    if (activeEffects.yuanGhost) {
+                        activeEffects.yuanGhost = false;
+                        if (effectTimers.yuanGhost) {
+                            clearTimeout(effectTimers.yuanGhost);
+                            effectTimers.yuanGhost = null;
+                        }
+                        drawBoard();
+                        gameStatusElement.textContent = "海棠生效！冤魂被安抚";
+                        setTimeout(() => {
+                            if (!gameOver && !isPaused && gameStarted) {
+                                gameStatusElement.textContent = "游戏中";
+                            }
+                        }, 2000);
+                    }
                 }
             });
 
