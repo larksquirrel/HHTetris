@@ -1320,9 +1320,251 @@
                 max-width: none;
             }
         }
+
+        /* ========== 横屏相关样式 ========== */
+
+        /* 横屏提示样式 */
+        #landscape-warning {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0f0b1e 0%, #1a0f2e 100%);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+
+        .landscape-content {
+            text-align: center;
+            padding: 30px;
+            max-width: 400px;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .rotate-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            animation: rotate 3s infinite ease-in-out;
+        }
+
+        .landscape-content h2 {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            color: #ff7eb3;
+        }
+
+        .landscape-content p {
+            font-size: 1.2rem;
+            line-height: 1.5;
+            color: #ff9ec9;
+            margin-bottom: 30px;
+        }
+
+        .phone-icon {
+            width: 120px;
+            height: 120px;
+            border: 3px solid #ff7eb3;
+            border-radius: 20px;
+            margin: 0 auto;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: pulse 2s infinite;
+        }
+
+        .arrow {
+            font-size: 3rem;
+            color: #ff7eb3;
+            animation: rotate-arrow 1.5s infinite ease-in-out;
+        }
+
+        @keyframes rotate {
+            0%, 100% {
+                transform: rotate(0deg);
+            }
+
+            50% {
+                transform: rotate(90deg);
+            }
+        }
+
+        @keyframes rotate-arrow {
+            0%, 100% {
+                transform: rotate(0deg);
+            }
+
+            50% {
+                transform: rotate(-90deg);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        /* 强制横屏布局 */
+        @media screen and (orientation: portrait) and (max-width: 768px) {
+            .game-container,
+            .header,
+            .footer {
+                display: none !important;
+            }
+
+            #landscape-warning {
+                display: flex !important;
+            }
+        }
+
+        @media screen and (orientation: landscape) and (max-width: 900px) {
+            body {
+                overflow: hidden;
+                padding: 5px;
+                height: 100vh;
+            }
+
+            .game-container {
+                width: 100%;
+                height: calc(100vh - 80px);
+                max-width: none;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+            }
+
+            .main-game {
+                display: flex;
+                flex-direction: row;
+                flex: 1;
+                gap: 10px;
+                align-items: flex-start;
+                max-height: 70vh;
+                min-height: 300px;
+            }
+
+            .game-board-container {
+                flex: 1.5;
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+            }
+
+            .game-board {
+                width: 100% !important;
+                height: auto !important;
+                min-height: 300px;
+                aspect-ratio: 1/2;
+                max-width: 280px;
+                max-height: 560px;
+            }
+
+            .game-info {
+                flex: 1;
+                min-width: 180px;
+                max-width: 200px;
+                height: 100%;
+                overflow-y: auto;
+            }
+
+            .items-panel {
+                max-height: none;
+                overflow-y: auto;
+            }
+
+            .info-panel {
+                margin-bottom: 10px;
+                padding: 12px;
+            }
+
+            .next-piece-board {
+                width: 100px;
+                height: 100px;
+            }
+
+            .controls-container {
+                max-width: none;
+                width: 100%;
+                margin-top: 10px;
+                padding-bottom: 10px;
+            }
+
+            .touch-controls {
+                max-width: none;
+                width: 300px;
+                height: 150px;
+                margin: 0 auto;
+            }
+
+            .buttons-row {
+                justify-content: center;
+                gap: 10px;
+                margin-bottom: 5px;
+            }
+
+            .game-button {
+                min-width: 120px;
+                padding: 12px 15px;
+                font-size: 1rem;
+            }
+
+            #landscape-warning {
+                display: none !important;
+            }
+        }
+
+        /* 小屏幕横屏进一步优化 */
+        @media screen and (orientation: landscape) and (max-height: 450px) {
+            .main-game {
+                max-height: 65vh;
+            }
+
+            .game-board {
+                max-height: 90%;
+            }
+
+            .info-panel {
+                padding: 8px;
+            }
+
+            .item-content {
+                padding: 8px 10px;
+            }
+
+            .score-display {
+                font-size: 1.8rem;
+            }
+
+            .controls-container {
+                margin-top: 5px;
+            }
+        }
+
+        /* 强制游戏区域适应屏幕 */
+        @media screen and (orientation: landscape) {
+            html, body {
+                overflow: hidden;
+                width: 100vw;
+                height: 100vh;
+                position: fixed;
+            }
+        }
     </style>
 </head>
 <body>
+    <!-- 在 <div class="header"> 之前添加 -->
+    <div id="landscape-warning" style="display: none;"></div>
+
     <div class="header">
         <h1>黑黑花花的俄罗斯方块</h1>
         <div class="subtitle">🕶️ 黑眼镜 · 🎮  · 解雨臣 🌸</div>
@@ -1619,7 +1861,7 @@
             name: "✈️ 机票",
             type: "剧情",
             description: "类似于回去的机票都买不起的那种卑微。",
-            effect: "💓 卑微的_____",
+            effect: "💓 输入正确答案后方可继续游戏",
             effectFunc: activateTicket,
             canAppear: true
         },
@@ -1844,25 +2086,127 @@
         }
     }
 
-    // 初始化剧情系统
-    function initStorySystem() {
-        // 重置剧情系统
-        availableStories = [];
-        usedStories = [];
-        storyRound = 1;
-        storyCount = 0;
+    // 横屏检测和强制旋转函数
+    function checkOrientation() {
+        const isPortrait = window.innerHeight > window.innerWidth;
 
-        // 重置所有剧情的出现状态（除了黄铜箱子）
-        for (const key in STORIES) {
-            if (key !== 'BRASS_BOX') {
-                STORIES[key].canAppear = true;
-            } else {
-                STORIES[key].canAppear = false; // 初始不可出现
-                STORIES[key].hasAppeared = false;
-            }
+        if (isPortrait && window.innerWidth < 768) {
+            // 如果是竖屏且是手机，显示横屏提示
+            showLandscapeWarning();
+            return false;
+        }
+        return true;
+    }
+
+    function showLandscapeWarning() {
+        // 移除旧的提示
+        const oldWarning = document.getElementById('landscape-warning');
+        if (oldWarning) {
+            oldWarning.remove();
         }
 
-        console.log(`剧情系统初始化，第${storyRound}轮`);
+        // 创建横屏提示层
+        const warning = document.createElement('div');
+        warning.id = 'landscape-warning';
+        warning.innerHTML = `
+        <div class="landscape-content">
+            <div class="rotate-icon">📱</div>
+            <h2>请横屏游玩</h2>
+            <p>为了获得最佳游戏体验<br>请将手机旋转至横屏模式</p>
+            <div class="phone-icon">
+                <div class="arrow">↻</div>
+            </div>
+        </div>
+    `;
+
+        document.body.appendChild(warning);
+
+        // 监听横屏变化
+        const handleOrientationChange = () => {
+            if (!(window.innerHeight > window.innerWidth && window.innerWidth < 768)) {
+                warning.remove();
+                window.removeEventListener('orientationchange', handleOrientationChange);
+                window.removeEventListener('resize', handleOrientationChange);
+            }
+        };
+
+        window.addEventListener('orientationchange', handleOrientationChange);
+        window.addEventListener('resize', handleOrientationChange);
+    }
+
+    // 添加响应式调整函数
+    function adjustLayoutForLandscape() {
+        if (window.innerHeight > window.innerWidth) return; // 竖屏不处理
+
+        const boardElement = document.querySelector('.game-board');
+        const boardContainer = document.querySelector('.game-board-container');
+
+        if (boardElement && boardContainer) {
+            // 根据可用高度调整棋盘大小
+            const availableHeight = window.innerHeight * 0.7;
+            const boardHeight = Math.min(availableHeight, 560);
+            const boardWidth = boardHeight / 2;
+
+            boardElement.style.width = boardWidth + 'px';
+            boardElement.style.height = boardHeight + 'px';
+
+            // 调整道具栏高度
+            const itemsPanel = document.querySelector('.items-panel');
+            if (itemsPanel) {
+                itemsPanel.style.maxHeight = (boardHeight - 200) + 'px';
+            }
+        }
+    }
+
+
+    // 初始化剧情系统
+    // 初始化游戏
+    function init() {
+        // 先检查方向
+        if (!checkOrientation()) {
+            // 如果当前是竖屏，等待方向改变
+            const orientationCheck = setInterval(() => {
+                if (!(window.innerHeight > window.innerWidth && window.innerWidth < 768)) {
+                    clearInterval(orientationCheck);
+                    setupGame();
+                }
+            }, 500);
+        } else {
+            setupGame();
+        }
+
+        // 监听窗口大小变化
+        window.addEventListener('resize', function () {
+            checkOrientation();
+            if (!(window.innerHeight > window.innerWidth && window.innerWidth < 768)) {
+                adjustLayoutForLandscape();
+            }
+        });
+
+        // 监听方向变化
+        window.addEventListener('orientationchange', checkOrientation);
+    }
+
+    function setupGame() {
+        createBoard();
+        resetGame();
+
+        // 添加事件监听器
+        document.addEventListener('keydown', handleKeyDown);
+        startRestartButton.addEventListener('click', startOrRestartGame);
+        pauseResumeButton.addEventListener('click', togglePauseResume);
+
+        // 设置触摸控制
+        setupTouchControls();
+
+        // 初始绘制
+        drawBoard();
+        drawNextPiece();
+
+        // 调整布局
+        setTimeout(() => {
+            adjustLayoutForLandscape();
+        }, 100);
     }
 
     // 获取下一个随机剧情（保证不重复）
@@ -2696,6 +3040,10 @@
             const inputContainer = document.createElement('div');
             inputContainer.className = 'input-container';
 
+            const inputText = document.createElement('div');
+            inputText.className = 'input-text';
+            inputText.textContent = '卑微的_____ ';
+
             const textInput = document.createElement('input');
             textInput.type = 'text';
             textInput.className = 'text-input';
@@ -3154,7 +3502,6 @@
     }
 
     // 开始游戏
-    // 开始游戏
     function startGame() {
         gameStarted = true;
         gameOver = false;
@@ -3225,6 +3572,15 @@
 
         drawBoard();
 
+        // 确保游戏容器显示
+        document.querySelector('.game-container').style.display = 'flex';
+        document.querySelector('.header').style.display = 'block';
+
+        // 调整布局
+        setTimeout(() => {
+            adjustLayoutForLandscape();
+        }, 100);
+
         console.log("游戏开始完成");
     }
 
@@ -3262,7 +3618,6 @@
         updateMusicForPause();
     }
 
-    // 重置游戏状态
     // 重置游戏状态
     function resetGame() {
         // 清除定时器
@@ -3326,6 +3681,9 @@
         nextPiece = getRandomPiece();
         drawNextPiece();
         drawBoard();
+
+        // 检查方向
+        checkOrientation();
     }
 
     // 键盘控制
