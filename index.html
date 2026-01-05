@@ -855,7 +855,7 @@
             }
         };
 
-        // 剧情定义
+        // 剧情定义（黄铜箱子只出现一次）
         const STORIES = {
             SHIJUNZHILU: {
                 name: "食君之禄",
@@ -905,6 +905,7 @@
                 effectFunc: activateOpera,
                 canAppear: true
             },
+            // 新增剧情
             SNOOPY: {
                 name: "史努比",
                 type: "剧情",
@@ -920,8 +921,8 @@
                 effect: "分数直接变成9999",
                 effectFunc: activateBrassBox,
                 canAppear: true,
-                appearsOnlyOnce: true,
-                hasAppeared: false
+                appearsOnlyOnce: true,  // 只出现一次
+                hasAppeared: false      // 是否已经出现过
             },
             TICKET: {
                 name: "机票",
@@ -968,10 +969,10 @@
         let originalDropSpeed = 1000;
 
         // 剧情管理系统变量
-        let availableStories = [];
-        let usedStories = [];
-        let storyRound = 1;
-        let storyCount = 0;
+        let availableStories = []; // 当前可用的剧情列表
+        let usedStories = [];      // 本轮已使用的剧情
+        let storyRound = 1;        // 当前是第几轮
+        let storyCount = 0;        // 已触发的剧情数量（用于控制黄铜箱子在第3个以后出现）
 
         // 上一个方块状态（用于史努比撤回）
         let previousBoard = null;
@@ -979,10 +980,10 @@
 
         // 道具和状态变量
         let items = {
-            mojing: 0,
-            haitang: 0,
-            qingjunce: 0,
-            sodawater: 0
+            mojing: 0,      // 墨镜
+            haitang: 0,     // 海棠
+            qingjunce: 0,   // 清君侧
+            sodawater: 0    // 苏打水
         };
 
         // 道具恢复计时器
@@ -1001,18 +1002,18 @@
             sodawater: 0
         };
 
-        // 状态效果
+        // 状态效果（会被新剧情覆盖）
         let activeEffects = {
-            nightFall: false,
-            immortal: false,
-            bloodyWeather: false,
-            bloodyWeatherCount: 0,
-            friedLiver: false,
-            friedLiverTimer: null,
-            yuanGhost: false
+            nightFall: false,           // 夜幕降临
+            immortal: false,            // 长生者
+            bloodyWeather: false,       // 流血的天气
+            bloodyWeatherCount: 0,      // 流血天气剩余方块数
+            friedLiver: false,          // 炒肝（冻结操作）
+            friedLiverTimer: null,      // 炒肝计时器
+            yuanGhost: false            // 冤魂效果（黑色方块）
         };
 
-        // 效果计时器
+        // 效果计时器（用于清除效果）
         let effectTimers = {
             nightFall: null,
             immortal: null,
@@ -1025,11 +1026,10 @@
         const nextPieceBoardElement = document.getElementById('next-piece-board');
         const scoreElement = document.getElementById('score');
         const gameStatusElement = document.getElementById('game-status');
-        const startPauseButton = document.getElementById('start-pause-button');
-        const restartButton = document.getElementById('restart-button');
-        const gameContainer = document.getElementById('game-container');
+        const startRestartButton = document.getElementById('start-restart-button');
+        const pauseResumeButton = document.getElementById('pause-resume-button');
 
-        // 道具元素
+        // 道具数量显示元素和道具项
         const mojingCountElement = document.getElementById('mojing-count');
         const haitangCountElement = document.getElementById('haitang-count');
         const qingjunceCountElement = document.getElementById('qingjunce-count');
@@ -1054,40 +1054,53 @@
         const eventEffectDescElement = document.getElementById('event-effect-desc');
         const eventActionsElement = document.getElementById('event-actions');
 
-        // 控制按钮
+        // 道具选择弹窗元素
+        const itemSelectModal = document.getElementById('item-select-modal');
+        const itemOptionsElement = document.getElementById('item-options');
+        const cancelItemButton = document.getElementById('cancel-item-button');
+
+        // 触摸控制按钮
         const rotateBtn = document.getElementById('rotate-btn');
         const leftBtn = document.getElementById('left-btn');
         const rightBtn = document.getElementById('right-btn');
         const downBtn = document.getElementById('down-btn');
+        const dropBtn = document.getElementById('drop-btn');
 
         // 初始化剧情系统
         function initStorySystem() {
+            // 重置剧情系统
             availableStories = [];
             usedStories = [];
             storyRound = 1;
             storyCount = 0;
 
+            // 重置所有剧情的出现状态（除了黄铜箱子）
             for (const key in STORIES) {
                 if (key !== 'BRASS_BOX') {
                     STORIES[key].canAppear = true;
                 } else {
-                    STORIES[key].canAppear = false;
+                    STORIES[key].canAppear = false; // 初始不可出现
                     STORIES[key].hasAppeared = false;
                 }
             }
+
+            console.log(`剧情系统初始化，第${storyRound}轮`);
         }
 
-        // 获取下一个随机剧情
+        // 获取下一个随机剧情（保证不重复）
         function getNextRandomStory() {
             storyCount++;
 
+            // 如果黄铜箱子还没出现过，并且已经触发了3个以上的剧情，可以出现黄铜箱子
             if (storyCount > 3 && !STORIES.BRASS_BOX.hasAppeared) {
                 STORIES.BRASS_BOX.canAppear = true;
             }
 
+            // 构建可用剧情列表
             availableStories = [];
             for (const key in STORIES) {
                 if (STORIES[key].canAppear && !usedStories.includes(key)) {
+                    // 检查只出现一次的剧情是否已经出现过
                     if (STORIES[key].appearsOnlyOnce && STORIES[key].hasAppeared) {
                         continue;
                     }
@@ -1095,12 +1108,16 @@
                 }
             }
 
+            // 如果可用剧情列表为空，重置并进入下一轮
             if (availableStories.length === 0) {
+                // 重置已使用列表
                 usedStories = [];
                 storyRound++;
 
+                // 重建可用列表（排除已经永久出现过的）
                 for (const key in STORIES) {
                     if (STORIES[key].canAppear) {
+                        // 检查只出现一次的剧情是否已经出现过
                         if (STORIES[key].appearsOnlyOnce && STORIES[key].hasAppeared) {
                             continue;
                         }
@@ -1108,19 +1125,27 @@
                     }
                 }
 
+                // 打乱顺序（确保每轮顺序不同）
                 shuffleArray(availableStories);
+
+                console.log(`进入第${storyRound}轮剧情，打乱顺序`);
             }
 
+            // 从可用剧情中随机选择一个
             const randomIndex = Math.floor(Math.random() * availableStories.length);
             const storyKey = availableStories[randomIndex];
 
+            // 从可用列表中移除，添加到已使用列表
             availableStories.splice(randomIndex, 1);
             usedStories.push(storyKey);
 
+            // 标记只出现一次的剧情为已出现
             if (STORIES[storyKey].appearsOnlyOnce) {
                 STORIES[storyKey].hasAppeared = true;
                 STORIES[storyKey].canAppear = false;
             }
+
+            console.log(`选择剧情: ${STORIES[storyKey].name}，剩余可用: ${availableStories.length}，总触发: ${storyCount}`);
 
             return STORIES[storyKey];
         }
@@ -1134,8 +1159,11 @@
             return array;
         }
 
-        // 清除所有现有效果
+        // 清除所有现有效果（被新剧情覆盖）
         function clearAllEffects() {
+            console.log("清除所有现有效果");
+
+            // 清除夜幕降临效果
             if (activeEffects.nightFall) {
                 gameBoardElement.classList.remove('night-fall');
                 activeEffects.nightFall = false;
@@ -1143,12 +1171,14 @@
                     clearTimeout(effectTimers.nightFall);
                     effectTimers.nightFall = null;
                 }
+                // 移除提示文字
                 const warning = document.querySelector('.night-warning');
                 if (warning && warning.parentNode) {
                     warning.remove();
                 }
             }
 
+            // 清除长生者效果
             if (activeEffects.immortal) {
                 activeEffects.immortal = false;
                 dropSpeed = originalDropSpeed;
@@ -1159,23 +1189,27 @@
                 }
             }
 
+            // 清除炒肝效果
             if (activeEffects.friedLiver) {
                 activeEffects.friedLiver = false;
                 if (effectTimers.friedLiver) {
                     clearTimeout(effectTimers.friedLiver);
                     effectTimers.friedLiver = null;
                 }
+                // 移除冻结覆盖层
                 const freezeOverlay = document.querySelector('.freeze-overlay');
                 if (freezeOverlay && freezeOverlay.parentNode) {
                     freezeOverlay.remove();
                 }
             }
 
+            // 清除流血天气效果
             if (activeEffects.bloodyWeather) {
                 activeEffects.bloodyWeather = false;
                 activeEffects.bloodyWeatherCount = 0;
             }
 
+            // 清除冤魂效果
             if (activeEffects.yuanGhost) {
                 activeEffects.yuanGhost = false;
                 if (effectTimers.yuanGhost) {
@@ -1184,6 +1218,7 @@
                 }
             }
 
+            // 重新绘制游戏板
             drawBoard();
         }
 
@@ -1231,9 +1266,11 @@
             };
         }
 
-        // 保存当前方块状态
+        // 保存当前方块状态（用于史努比撤回）
         function saveCurrentState() {
+            // 深拷贝当前游戏板
             previousBoard = JSON.parse(JSON.stringify(board));
+            // 保存当前方块
             previousPiece = currentPiece ? JSON.parse(JSON.stringify(currentPiece)) : null;
         }
 
@@ -1248,17 +1285,21 @@
                 cell.style.borderColor = '';
             });
 
+            // 应用流血天气效果
             if (activeEffects.bloodyWeather) {
                 gameBoardElement.classList.add('blood-weather');
             } else {
                 gameBoardElement.classList.remove('blood-weather');
             }
 
+            // 应用冤魂效果（黑色方块）
             if (activeEffects.yuanGhost) {
                 gameBoardElement.classList.add('yuan-ghost');
             } else {
                 gameBoardElement.classList.remove('yuan-ghost');
             }
+
+            // 如果冤魂和流血天气同时存在，优先显示冤魂（通过CSS处理）
 
             for (let row = 0; row < BOARD_HEIGHT; row++) {
                 for (let col = 0; col < BOARD_WIDTH; col++) {
@@ -1266,10 +1307,13 @@
                         const cellIndex = row * BOARD_WIDTH + col;
                         cells[cellIndex].classList.add('filled', board[row][col]);
 
+                        // 如果处于冤魂状态，所有方块显示为黑色（优先于流血天气）
                         if (activeEffects.yuanGhost) {
                             cells[cellIndex].style.backgroundColor = '#000000';
                             cells[cellIndex].style.borderColor = '#444444';
-                        } else if (activeEffects.bloodyWeather) {
+                        }
+                        // 如果处于流血天气状态，所有方块显示为红色
+                        else if (activeEffects.bloodyWeather) {
                             cells[cellIndex].style.backgroundColor = '#ff2a2a';
                             cells[cellIndex].style.borderColor = '#ff7a7a';
                         }
@@ -1288,11 +1332,14 @@
                                 boardCol >= 0 && boardCol < BOARD_WIDTH) {
                                 const cellIndex = boardRow * BOARD_WIDTH + boardCol;
 
+                                // 如果处于冤魂状态，当前方块也显示为黑色（优先于流血天气）
                                 if (activeEffects.yuanGhost) {
                                     cells[cellIndex].classList.add('filled');
                                     cells[cellIndex].style.backgroundColor = '#000000';
                                     cells[cellIndex].style.borderColor = '#444444';
-                                } else if (activeEffects.bloodyWeather) {
+                                }
+                                // 如果处于流血天气状态，当前方块也显示为红色
+                                else if (activeEffects.bloodyWeather) {
                                     cells[cellIndex].classList.add('filled');
                                     cells[cellIndex].style.backgroundColor = '#ff2a2a';
                                     cells[cellIndex].style.borderColor = '#ff7a7a';
@@ -1329,6 +1376,7 @@
                             const cellIndex = previewRow * 4 + previewCol;
 
                             if (cellIndex >= 0 && cellIndex < cells.length) {
+                                // 如果处于流血天气状态，预览方块也显示为红色
                                 if (activeEffects.bloodyWeather && activeEffects.bloodyWeatherCount > 0) {
                                     cells[cellIndex].classList.add('filled');
                                     cells[cellIndex].style.backgroundColor = '#ff2a2a';
@@ -1350,7 +1398,10 @@
             qingjunceCountElement.textContent = items.qingjunce;
             sodawaterCountElement.textContent = items.sodawater;
 
+            // 更新恢复进度条
             updateRecoveryBars();
+
+            // 更新道具项状态（是否可用）
             updateItemStates();
         }
 
@@ -1362,26 +1413,30 @@
             sodawaterRecoveryElement.style.width = `${itemRecoveryProgress.sodawater}%`;
         }
 
-        // 更新道具项状态
+        // 更新道具项状态（是否可用）
         function updateItemStates() {
+            // 清君侧
             if (items.qingjunce > 0) {
                 qingjunceItemElement.classList.remove('disabled');
             } else {
                 qingjunceItemElement.classList.add('disabled');
             }
 
+            // 苏打水
             if (items.sodawater > 0) {
                 sodawaterItemElement.classList.remove('disabled');
             } else {
                 sodawaterItemElement.classList.add('disabled');
             }
 
+            // 海棠
             if (items.haitang > 0) {
                 haitangItemElement.classList.remove('disabled');
             } else {
                 haitangItemElement.classList.add('disabled');
             }
 
+            // 墨镜
             if (items.mojing > 0) {
                 mojingItemElement.classList.remove('disabled');
             } else {
@@ -1391,22 +1446,28 @@
 
         // 开始道具恢复计时器
         function startItemRecovery(itemType) {
+            // 如果已经有计时器在运行，先清除
             if (itemRecoveryTimers[itemType]) {
                 clearInterval(itemRecoveryTimers[itemType]);
             }
 
+            // 重置恢复进度
             itemRecoveryProgress[itemType] = 0;
 
+            // 计算恢复间隔（每100毫秒更新一次）
             const recoveryTime = ITEM_RECOVERY_TIMES[itemType];
             const interval = 100;
             const steps = recoveryTime / interval;
             const increment = 100 / steps;
 
+            // 开始恢复计时器
             itemRecoveryTimers[itemType] = setInterval(() => {
                 itemRecoveryProgress[itemType] += increment;
 
+                // 更新进度条
                 updateRecoveryBars();
 
+                // 恢复完成
                 if (itemRecoveryProgress[itemType] >= 100) {
                     clearInterval(itemRecoveryTimers[itemType]);
                     itemRecoveryTimers[itemType] = null;
@@ -1414,6 +1475,7 @@
                     items[itemType]++;
                     updateItemDisplays();
 
+                    // 显示获得提示
                     let itemName = '';
                     if (itemType === 'mojing') itemName = '墨镜';
                     else if (itemType === 'haitang') itemName = '海棠';
@@ -1425,9 +1487,10 @@
             }, interval);
         }
 
-        // 使用道具
+        // 使用道具（会触发恢复计时器）
         function useItem(itemType) {
             if (items[itemType] <= 0) {
+                // 道具不可用，给用户反馈
                 const itemElement = document.getElementById(`${itemType}-item`);
                 itemElement.style.animation = 'none';
                 setTimeout(() => {
@@ -1439,6 +1502,7 @@
             items[itemType]--;
             updateItemDisplays();
 
+            // 开始恢复计时器
             startItemRecovery(itemType);
 
             return true;
@@ -1449,21 +1513,9 @@
             const message = document.createElement('div');
             message.className = 'item-added';
             message.textContent = `获得道具：${itemName}`;
-            message.style.cssText = `
-                    position: fixed;
-                    top: 20px;
-                    right: 20px;
-                    background: linear-gradient(to right, #ff4d9e, #ff2a8f);
-                    color: white;
-                    padding: 10px 20px;
-                    border-radius: 10px;
-                    font-weight: bold;
-                    z-index: 999;
-                    animation: slideIn 0.5s, fadeOut 0.5s 2s forwards;
-                    box-shadow: 0 5px 15px rgba(255, 77, 158, 0.4);
-                `;
             document.body.appendChild(message);
 
+            // 3秒后移除提示
             setTimeout(() => {
                 if (message.parentNode) {
                     message.remove();
@@ -1493,10 +1545,11 @@
             return false;
         }
 
-        // 移动方块
+        // 移动方块（考虑炒肝冻结效果）
         function movePiece(rowOffset, colOffset) {
             if (!currentPiece || gameOver || isPaused || !gameStarted) return false;
 
+            // 炒肝效果：玩家不能操作，但游戏正常进行
             if (activeEffects.friedLiver) return false;
 
             if (!checkCollision(currentPiece, rowOffset, colOffset)) {
@@ -1514,10 +1567,11 @@
             return false;
         }
 
-        // 旋转方块
+        // 旋转方块（考虑炒肝冻结效果）
         function rotatePiece() {
             if (!currentPiece || gameOver || isPaused || !gameStarted) return;
 
+            // 炒肝效果：玩家不能操作，但游戏正常进行
             if (activeEffects.friedLiver) return;
 
             const originalShape = currentPiece.shape;
@@ -1567,10 +1621,11 @@
             drawBoard();
         }
 
-        // 直接落下方块
+        // 直接落下方块（考虑炒肝冻结效果）
         function dropPiece() {
             if (!currentPiece || gameOver || isPaused || !gameStarted) return;
 
+            // 炒肝效果：玩家不能操作，但游戏正常进行
             if (activeEffects.friedLiver) return;
 
             while (movePiece(1, 0)) {
@@ -1582,6 +1637,7 @@
         function lockPiece() {
             if (!currentPiece) return;
 
+            // 在固定方块前保存状态（用于史努比撤回）
             saveCurrentState();
 
             for (let row = 0; row < currentPiece.shape.length; row++) {
@@ -1591,8 +1647,9 @@
                         const boardCol = currentPiece.col + col;
 
                         if (boardRow >= 0) {
+                            // 如果处于流血天气状态，固定为红色方块
                             if (activeEffects.bloodyWeather && activeEffects.bloodyWeatherCount > 0) {
-                                board[boardRow][boardCol] = 'z';
+                                board[boardRow][boardCol] = 'z'; // 使用z类作为红色方块标识
                             } else {
                                 board[boardRow][boardCol] = currentPiece.className;
                             }
@@ -1601,6 +1658,7 @@
                 }
             }
 
+            // 减少流血天气计数器
             if (activeEffects.bloodyWeather && activeEffects.bloodyWeatherCount > 0) {
                 activeEffects.bloodyWeatherCount--;
                 if (activeEffects.bloodyWeatherCount <= 0) {
@@ -1616,13 +1674,15 @@
 
             clearLines();
 
+            // 获取下一个方块
             currentPiece = nextPiece;
 
+            // 如果处于流血天气状态，生成红色方块
             if (activeEffects.bloodyWeather && activeEffects.bloodyWeatherCount > 0) {
                 nextPiece = {
                     name: 'Z',
                     shape: TETROMINOES.Z.shape,
-                    className: 'z',
+                    className: 'z', // 红色方块
                     row: 0,
                     col: Math.floor(BOARD_WIDTH / 2) - Math.floor(TETROMINOES.Z.shape[0].length / 2)
                 };
@@ -1632,14 +1692,14 @@
 
             drawNextPiece();
 
+            // 检查游戏是否结束
             if (checkCollision(currentPiece)) {
                 gameOver = true;
                 gameStatusElement.textContent = "游戏结束!";
                 clearInterval(dropInterval);
                 dropInterval = null;
-                startPauseButton.textContent = "开始游戏";
-                gameContainer.classList.remove('game-started');
-                restartButton.disabled = false;
+                pauseResumeButton.disabled = true;
+                pauseResumeButton.textContent = "暂停";
             }
 
             drawBoard();
@@ -1659,11 +1719,13 @@
             }
 
             if (linesCleared > 0) {
+                // 更新分数
                 score += linesCleared * 100;
                 scoreElement.textContent = score;
 
                 gameStatusElement.textContent = `消除了 ${linesCleared} 行!`;
 
+                // 每次消除都会触发随机剧情
                 setTimeout(() => {
                     triggerRandomStory();
                 }, 500);
@@ -1678,10 +1740,14 @@
         function triggerRandomStory() {
             if (gameOver || isPaused) return;
 
+            // 暂停游戏
             clearInterval(dropInterval);
             isPaused = true;
 
+            // 获取下一个随机剧情（保证不重复）
             const story = getNextRandomStory();
+
+            // 显示剧情弹窗
             showStoryModal(story);
         }
 
@@ -1692,14 +1758,18 @@
             eventDescriptionElement.textContent = story.description;
             eventEffectDescElement.textContent = story.effect;
 
+            // 如果是黄铜箱子，添加特殊样式
             if (story.name === "黄铜箱子") {
                 const eventContent = eventModal.querySelector('.event-content');
                 eventContent.classList.add('brass-box-special');
             }
 
+            // 清空之前的动作按钮
             eventActionsElement.innerHTML = '';
 
+            // 根据剧情类型添加不同的动作按钮
             if (story.name === "食君之禄") {
+                // 食君之禄：需要消耗海棠
                 const consumeButton = document.createElement('button');
                 consumeButton.className = 'event-button consume';
                 consumeButton.textContent = `消耗1个海棠继续游戏 (当前:${items.haitang})`;
@@ -1707,10 +1777,13 @@
                     if (items.haitang > 0) {
                         items.haitang--;
                         updateItemDisplays();
+                        // 开始海棠恢复计时器
                         startItemRecovery('haitang');
+                        // 清除所有现有效果
                         clearAllEffects();
                         resumeGame();
                     } else {
+                        // 没有海棠，触发冤魂效果
                         handleYuanGhost();
                     }
                 };
@@ -1719,6 +1792,7 @@
                 cancelButton.className = 'event-button cancel';
                 cancelButton.textContent = '拒绝消耗海棠';
                 cancelButton.onclick = () => {
+                    // 拒绝消耗海棠，触发冤魂效果
                     handleYuanGhost();
                 };
 
@@ -1726,6 +1800,7 @@
                 eventActionsElement.appendChild(cancelButton);
 
             } else if (story.name === "夜幕降临") {
+                // 夜幕降临：需要消耗墨镜
                 const consumeButton = document.createElement('button');
                 consumeButton.className = 'event-button consume';
                 consumeButton.textContent = `消耗1个墨镜继续游戏 (当前:${items.mojing})`;
@@ -1733,10 +1808,13 @@
                     if (items.mojing > 0) {
                         items.mojing--;
                         updateItemDisplays();
+                        // 开始墨镜恢复计时器
                         startItemRecovery('mojing');
+                        // 清除所有现有效果
                         clearAllEffects();
                         resumeGame();
                     } else {
+                        // 没有墨镜，触发黑夜效果
                         handleNightFallWithoutMojing();
                     }
                 };
@@ -1745,6 +1823,7 @@
                 cancelButton.className = 'event-button cancel';
                 cancelButton.textContent = '拒绝消耗墨镜';
                 cancelButton.onclick = () => {
+                    // 拒绝消耗墨镜，触发黑夜效果
                     handleNightFallWithoutMojing();
                 };
 
@@ -1752,28 +1831,28 @@
                 eventActionsElement.appendChild(cancelButton);
 
             } else if (story.name === "机票") {
+                // 机票：需要输入正确文本
                 const inputContainer = document.createElement('div');
                 inputContainer.className = 'input-container';
-                inputContainer.style.cssText = 'margin: 20px 0;';
 
                 const inputText = document.createElement('div');
                 inputText.className = 'input-text';
                 inputText.textContent = "卑微的——";
-                inputText.style.cssText = 'font-size: 1.1rem; margin-bottom: 10px; color: #ff9ec9;';
 
                 const textInput = document.createElement('input');
                 textInput.type = 'text';
                 textInput.className = 'text-input';
                 textInput.placeholder = '请输入...';
-                textInput.style.cssText = 'width: 100%; padding: 10px; font-size: 1rem; border: 2px solid #ff2a8f; border-radius: 8px; background-color: rgba(255, 255, 255, 0.1); color: white; text-align: center; margin-bottom: 15px;';
 
                 const confirmButton = document.createElement('button');
                 confirmButton.className = 'event-button';
                 confirmButton.textContent = '确认';
                 confirmButton.onclick = () => {
                     if (textInput.value === '爱情') {
+                        // 清除所有现有效果
                         clearAllEffects();
                         resumeGame();
+                        // 触发剧情效果
                         story.effectFunc();
                     } else {
                         alert('输入错误，请重新输入！');
@@ -1787,17 +1866,21 @@
                 eventActionsElement.appendChild(inputContainer);
                 eventActionsElement.appendChild(confirmButton);
 
+                // 自动聚焦到输入框
                 setTimeout(() => {
                     textInput.focus();
                 }, 100);
 
             } else {
+                // 其他剧情：直接确认继续
                 const confirmButton = document.createElement('button');
                 confirmButton.className = 'event-button';
                 confirmButton.textContent = '确认继续';
                 confirmButton.onclick = () => {
+                    // 清除所有现有效果
                     clearAllEffects();
                     resumeGame();
+                    // 触发剧情效果
                     story.effectFunc();
                 };
 
@@ -1810,6 +1893,7 @@
         // 恢复游戏
         function resumeGame() {
             eventModal.classList.remove('active');
+            // 移除黄铜箱子的特殊样式
             const eventContent = eventModal.querySelector('.event-content');
             eventContent.classList.remove('brass-box-special');
 
@@ -1824,31 +1908,38 @@
 
         // 处理食君之禄剧情
         function handleShijunzhilu() {
+            // 这个函数不会被直接调用，因为食君之禄有特殊的弹窗处理
             console.log("食君之禄剧情处理");
         }
 
-        // 处理冤魂效果
+        // 处理冤魂效果（没有海棠的情况）
         function handleYuanGhost() {
+            // 清除所有现有效果
             clearAllEffects();
 
+            // 触发冤魂效果
             activeEffects.yuanGhost = true;
 
+            // 显示冤字弹窗
             eventModal.classList.remove('active');
 
+            // 创建冤字弹窗
             const yuanModal = document.createElement('div');
             yuanModal.className = 'event-modal active';
             yuanModal.innerHTML = `
-                    <div class="event-content">
-                        <div class="yuan-character" style="font-size: 6rem; color: #000000; text-shadow: 0 0 20px rgba(0,0,0,0.7); font-family: 'SimHei', 'Microsoft YaHei', sans-serif; margin: 20px 0; animation: pulse 1s infinite;">冤</div>
-                        <div class="event-description">没有海棠供奉，冤魂缠绕！所有方块变为黑色...</div>
-                        <button class="event-button" id="confirm-yuan-button">确认</button>
-                    </div>
-                `;
+                        <div class="event-content">
+                            <div class="yuan-character">冤</div>
+                            <div class="event-description">没有海棠供奉，冤魂缠绕！所有方块变为黑色...</div>
+                            <button class="confirm-button" id="confirm-yuan-button">确认</button>
+                        </div>
+                    `;
 
             document.body.appendChild(yuanModal);
 
+            // 更新游戏板显示（黑色方块优先）
             drawBoard();
 
+            // 设置定时器，20秒后自动清除效果
             effectTimers.yuanGhost = setTimeout(() => {
                 activeEffects.yuanGhost = false;
                 drawBoard();
@@ -1860,29 +1951,40 @@
                 }, 2000);
             }, 20000);
 
+            // 确认按钮事件
             document.getElementById('confirm-yuan-button').onclick = () => {
                 yuanModal.remove();
                 resumeGame();
             };
         }
 
+        // 处理夜幕降临剧情（有墨镜消耗）
+        function handleNightFall() {
+            // 这个函数不会被直接调用，因为夜幕降临有特殊的弹窗处理
+            console.log("夜幕降临剧情处理");
+        }
+
         // 处理夜幕降临（没有墨镜的情况）
         function handleNightFallWithoutMojing() {
+            // 清除所有现有效果
             clearAllEffects();
 
             eventModal.classList.remove('active');
 
+            // 触发夜幕降临效果
             activeEffects.nightFall = true;
             gameBoardElement.classList.add('night-fall');
 
+            // 添加提示文字
             const warning = document.createElement('div');
             warning.className = 'night-warning';
             warning.textContent = "夜幕降临，5秒后恢复...";
-            warning.style.cssText = 'position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 1.5rem; font-weight: bold; color: white; text-shadow: 0 0 10px rgba(255,255,255,0.7); z-index: 101; text-align: center; width: 100%;';
             gameBoardElement.appendChild(warning);
 
+            // 游戏正常进行，只是玩家看不到
             resumeGame();
 
+            // 5秒后恢复
             effectTimers.nightFall = setTimeout(() => {
                 activeEffects.nightFall = false;
                 gameBoardElement.classList.remove('night-fall');
@@ -1902,10 +2004,11 @@
         function activateImmortal() {
             activeEffects.immortal = true;
             originalDropSpeed = dropSpeed;
-            dropSpeed *= 2;
+            dropSpeed *= 2; // 速度减半
             updateDropSpeed();
             gameStatusElement.textContent = "长生者出现！方块下落速度变慢";
 
+            // 长生者效果持续20秒
             effectTimers.immortal = setTimeout(() => {
                 if (activeEffects.immortal) {
                     activeEffects.immortal = false;
@@ -1921,26 +2024,25 @@
             }, 20000);
         }
 
-        // 炒肝效果
+        // 炒肝效果 - 玩家不能操作，但游戏正常进行
         function activateFriedLiver() {
+            // 炒肝效果在确认后触发
             setTimeout(() => {
                 if (activeEffects.friedLiver) return;
 
                 activeEffects.friedLiver = true;
                 gameStatusElement.textContent = "炒肝生效！操作被冻结3秒";
 
+                // 创建冻结效果覆盖层
                 const freezeOverlay = document.createElement('div');
                 freezeOverlay.className = 'freeze-overlay';
-                freezeOverlay.style.cssText = 'position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(139, 69, 19, 0.3); display: flex; justify-content: center; align-items: center; z-index: 100; border-radius: 4px; pointer-events: none;';
-
                 const freezeText = document.createElement('div');
                 freezeText.className = 'freeze-text';
                 freezeText.textContent = "吃炒肝中，勿扰";
-                freezeText.style.cssText = 'font-size: 1.5rem; font-weight: bold; color: white; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); animation: pulse 1s infinite; background-color: rgba(139, 69, 19, 0.7); padding: 10px 20px; border-radius: 10px;';
-
                 freezeOverlay.appendChild(freezeText);
                 gameBoardElement.appendChild(freezeOverlay);
 
+                // 3秒后解除冻结
                 effectTimers.friedLiver = setTimeout(() => {
                     activeEffects.friedLiver = false;
                     if (freezeOverlay.parentNode) {
@@ -1953,11 +2055,12 @@
                         }
                     }, 2000);
                 }, 3000);
-            }, 100);
+            }, 100); // 延迟一点，确保游戏已经恢复
         }
 
         // 流血天气效果
         function activateBloodyWeather() {
+            // 如果已经有冤魂效果（黑色方块），优先显示黑色
             if (activeEffects.yuanGhost) {
                 gameStatusElement.textContent = "流血天气被冤魂效果覆盖";
                 setTimeout(() => {
@@ -1969,7 +2072,7 @@
             }
 
             activeEffects.bloodyWeather = true;
-            activeEffects.bloodyWeatherCount = 5;
+            activeEffects.bloodyWeatherCount = 5; // 接下来的5个方块
             gameStatusElement.textContent = "流血的天气！接下来5个方块变为红色";
             drawBoard();
             drawNextPiece();
@@ -1985,9 +2088,10 @@
             }, 3000);
         }
 
-        // 史努比效果
+        // 史努比效果 - 撤回这一步方块
         function activateSnoopy() {
             if (previousBoard && previousPiece) {
+                // 恢复之前的游戏板状态
                 board = JSON.parse(JSON.stringify(previousBoard));
                 currentPiece = JSON.parse(JSON.stringify(previousPiece));
 
@@ -2008,7 +2112,7 @@
             }
         }
 
-        // 黄铜箱子效果
+        // 黄铜箱子效果 - 分数变成9999
         function activateBrassBox() {
             score = 9999;
             scoreElement.textContent = score;
@@ -2020,13 +2124,15 @@
             }, 2000);
         }
 
-        // 机票效果
+        // 机票效果 - 需要输入正确文本（已在showStoryModal中处理）
         function activateTicket() {
+            // 效果在showStoryModal中处理，这里只需记录
             console.log("机票剧情激活");
         }
 
-        // 易拉罐风车效果
+        // 易拉罐风车效果 - 随机消除3块已经存在的方块
         function activateCanWindmill() {
+            // 收集所有已填充的方块位置
             const filledCells = [];
             for (let row = 0; row < BOARD_HEIGHT; row++) {
                 for (let col = 0; col < BOARD_WIDTH; col++) {
@@ -2046,6 +2152,7 @@
                 return;
             }
 
+            // 随机选择3个方块（如果总数不足3个，则选择所有）
             const cellsToRemove = Math.min(3, filledCells.length);
             const removedPositions = [];
 
@@ -2055,10 +2162,13 @@
                 removedPositions.push({ ...cell });
                 filledCells.splice(randomIndex, 1);
 
+                // 标记为需要移除
                 board[cell.row][cell.col] = EMPTY_CELL;
             }
 
+            // 处理方块下落
             for (const pos of removedPositions) {
+                // 从被移除的位置开始，上方的方块下落
                 for (let row = pos.row - 1; row >= 0; row--) {
                     if (board[row][pos.col] !== EMPTY_CELL) {
                         board[row + 1][pos.col] = board[row][pos.col];
@@ -2078,6 +2188,7 @@
 
         // 道具效果函数
         function clearAllBlocks() {
+            // 清除所有方块
             for (let row = 0; row < BOARD_HEIGHT; row++) {
                 for (let col = 0; col < BOARD_WIDTH; col++) {
                     board[row][col] = EMPTY_CELL;
@@ -2093,6 +2204,7 @@
         }
 
         function randomizeNextPiece() {
+            // 随机改变下一个方块的形状
             nextPiece = getRandomPiece();
             drawNextPiece();
             gameStatusElement.textContent = "苏打水生效！下一个方块已改变";
@@ -2113,22 +2225,30 @@
             }
         }
 
+        // 开始/重新开始游戏
+        function startOrRestartGame() {
+            if (gameStarted && !gameOver) {
+                resetGame();
+                startGame();
+            } else {
+                resetGame();
+                startGame();
+            }
+        }
+
         // 开始游戏
         function startGame() {
             gameStarted = true;
             gameOver = false;
             isPaused = false;
             gameStatusElement.textContent = "游戏中";
-            startPauseButton.textContent = "暂停";
-            restartButton.disabled = false;
-
-            // 切换右侧面板显示
-            gameContainer.classList.add('game-started');
+            startRestartButton.textContent = "重新开始";
+            pauseResumeButton.disabled = false;
 
             // 初始化剧情系统
             initStorySystem();
 
-            // 初始化道具
+            // 初始化道具（初始值为0，会自动恢复）
             items = {
                 mojing: 0,
                 haitang: 0,
@@ -2155,6 +2275,8 @@
 
             // 清除所有效果
             clearAllEffects();
+
+            gameBoardElement.classList.remove('night-fall', 'blood-weather', 'yuan-ghost');
 
             // 确保有当前方块和下一个方块
             if (!currentPiece) {
@@ -2192,10 +2314,10 @@
             if (isPaused) {
                 clearInterval(dropInterval);
                 gameStatusElement.textContent = "已暂停";
-                startPauseButton.textContent = "继续";
+                pauseResumeButton.textContent = "继续";
             } else {
                 gameStatusElement.textContent = "游戏中";
-                startPauseButton.textContent = "暂停";
+                pauseResumeButton.textContent = "暂停";
 
                 dropInterval = setInterval(() => {
                     movePiece(1, 0);
@@ -2203,29 +2325,15 @@
             }
         }
 
-        // 开始/暂停按钮点击
-        function handleStartPause() {
-            if (!gameStarted || gameOver) {
-                resetGame();
-                startGame();
-            } else {
-                togglePauseResume();
-            }
-        }
-
-        // 重新开始游戏
-        function handleRestart() {
-            resetGame();
-            startGame();
-        }
-
         // 重置游戏状态
         function resetGame() {
+            // 清除定时器
             if (dropInterval) {
                 clearInterval(dropInterval);
                 dropInterval = null;
             }
 
+            // 清除道具恢复计时器
             for (const itemType in itemRecoveryTimers) {
                 if (itemRecoveryTimers[itemType]) {
                     clearInterval(itemRecoveryTimers[itemType]);
@@ -2234,6 +2342,7 @@
                 itemRecoveryProgress[itemType] = 0;
             }
 
+            // 清除效果计时器
             for (const timer in effectTimers) {
                 if (effectTimers[timer]) {
                     clearTimeout(effectTimers[timer]);
@@ -2241,25 +2350,28 @@
                 }
             }
 
+            // 重置游戏变量
             score = 0;
             gameOver = false;
             isPaused = false;
             gameStarted = false;
             dropSpeed = 1000;
 
+            // 清除所有效果
             clearAllEffects();
 
+            // 重置剧情状态
             previousBoard = null;
             previousPiece = null;
 
+            // 更新UI
             scoreElement.textContent = score;
             gameStatusElement.textContent = "准备开始";
-            startPauseButton.textContent = "开始游戏";
-            restartButton.disabled = true;
+            startRestartButton.textContent = "开始游戏";
+            pauseResumeButton.textContent = "暂停";
+            pauseResumeButton.disabled = true;
 
-            // 切换回默认面板
-            gameContainer.classList.remove('game-started');
-
+            // 重置游戏板
             createBoard();
             currentPiece = getRandomPiece();
             nextPiece = getRandomPiece();
@@ -2300,11 +2412,12 @@
                 case 'r':
                 case 'R':
                     event.preventDefault();
-                    handleRestart();
+                    resetGame();
+                    startGame();
                     break;
                 case 'Enter':
                     event.preventDefault();
-                    handleStartPause();
+                    startOrRestartGame();
                     break;
             }
         }
@@ -2353,6 +2466,16 @@
                 movePiece(1, 0);
             });
 
+            dropBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                dropPiece();
+            });
+
+            dropBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                dropPiece();
+            });
+
             // 道具点击事件
             qingjunceItemElement.addEventListener('click', () => {
                 if (useItem('qingjunce')) {
@@ -2366,37 +2489,21 @@
                 }
             });
 
-            mojingItemElement.addEventListener('click', () => {
-                if (useItem('mojing')) {
-                    // 墨镜可以直接使用，但没有特殊效果
-                    gameStatusElement.textContent = "墨镜已使用！";
-                    setTimeout(() => {
-                        if (!gameOver && !isPaused && gameStarted) {
-                            gameStatusElement.textContent = "游戏中";
-                        }
-                    }, 2000);
-                }
+            // 取消道具选择按钮
+            cancelItemButton.addEventListener('click', () => {
+                itemSelectModal.classList.remove('active');
             });
-
-            haitangItemElement.addEventListener('click', () => {
-                if (useItem('haitang')) {
-                    // 海棠可以直接使用，但没有特殊效果
-                    gameStatusElement.textContent = "海棠已使用！";
-                    setTimeout(() => {
-                        if (!gameOver && !isPaused && gameStarted) {
-                            gameStatusElement.textContent = "游戏中";
-                        }
-                    }, 2000);
-                }
-            });
-
-            // 开始/暂停按钮
-            startPauseButton.addEventListener('click', handleStartPause);
-            restartButton.addEventListener('click', handleRestart);
 
             // 防止触摸滚动
-            document.querySelectorAll('.control-btn, .item').forEach(btn => {
+            document.querySelectorAll('.touch-btn').forEach(btn => {
                 btn.addEventListener('touchmove', (e) => {
+                    e.preventDefault();
+                });
+            });
+
+            // 道具项也防止触摸滚动
+            document.querySelectorAll('.item').forEach(item => {
+                item.addEventListener('touchmove', (e) => {
                     e.preventDefault();
                 });
             });
@@ -2409,6 +2516,8 @@
 
             // 添加事件监听器
             document.addEventListener('keydown', handleKeyDown);
+            startRestartButton.addEventListener('click', startOrRestartGame);
+            pauseResumeButton.addEventListener('click', togglePauseResume);
 
             // 设置触摸控制
             setupTouchControls();
@@ -2416,55 +2525,6 @@
             // 初始绘制
             drawBoard();
             drawNextPiece();
-
-            // 添加CSS动画关键帧
-            const style = document.createElement('style');
-            style.textContent = `
-                    @keyframes slideIn {
-                        from {
-                            transform: translateX(100%);
-                            opacity: 0;
-                        }
-                        to {
-                            transform: translateX(0);
-                            opacity: 1;
-                        }
-                    }
-                    @keyframes fadeOut {
-                        to {
-                            opacity: 0;
-                        }
-                    }
-                    @keyframes pulse {
-                        0% {
-                            transform: scale(1);
-                            opacity: 0.8;
-                        }
-                        50% {
-                            transform: scale(1.1);
-                            opacity: 1;
-                        }
-                        100% {
-                            transform: scale(1);
-                            opacity: 0.8;
-                        }
-                    }
-                    .brass-box-special {
-                        position: relative;
-                        border: 2px solid #ffd700 !important;
-                        background: linear-gradient(145deg, rgba(50, 35, 10, 0.9), rgba(70, 50, 20, 0.9)) !important;
-                        animation: glow 1.5s infinite alternate;
-                    }
-                    @keyframes glow {
-                        from {
-                            box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
-                        }
-                        to {
-                            box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
-                        }
-                    }
-                `;
-            document.head.appendChild(style);
         }
 
         // 页面加载完成后初始化游戏
