@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>俄罗斯方块 - 黑粉色系</title>
+    <title>黑黑花花的俄罗斯方块</title>
     <style>
         * {
             margin: 0;
@@ -114,16 +114,21 @@
             border-color: #ff7a7a !important;
         }
 
-        /* 当冤魂和流血天气同时存在时，优先显示冤魂（黑色） */
-        .yuan-ghost.blood-weather .cell.filled.i,
-        .yuan-ghost.blood-weather .cell.filled.j,
-        .yuan-ghost.blood-weather .cell.filled.l,
-        .yuan-ghost.blood-weather .cell.filled.o,
-        .yuan-ghost.blood-weather .cell.filled.s,
-        .yuan-ghost.blood-weather .cell.filled.t,
-        .yuan-ghost.blood-weather .cell.filled.z {
-            background-color: #000000 !important;
-            border-color: #444444 !important;
+        /* 道具颜色调整 */
+        .item.mojing {
+            border-left-color: #ffffff; /* 墨镜 - 黑色 */
+        }
+
+        .item.haitang {
+            border-left-color: #ff4081; /* 海棠 - 粉色 */
+        }
+
+        .item.sodawater {
+            border-left-color: #2196f3; /* 苏打水 - 蓝色 */
+        }
+
+        .item.qingjunce {
+            border-left-color: #ffc107; /* 清君侧 - 黄色 */
         }
 
         .game-info {
@@ -185,18 +190,14 @@
         }
 
         .item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px 15px;
-            background: linear-gradient(145deg, rgba(30, 15, 40, 0.9), rgba(20, 10, 30, 0.9));
-            border-radius: 10px;
-            border-left: 4px solid;
             position: relative;
             overflow: hidden;
+            border-radius: 10px;
+            border-left: 4px solid;
             cursor: pointer;
             transition: all 0.3s ease;
             box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(145deg, rgba(30, 15, 40, 0.9), rgba(20, 10, 30, 0.9));
         }
 
             .item:hover {
@@ -215,12 +216,33 @@
                 pointer-events: none;
             }
 
+            /* 道具恢复完成的状态 */
+            .item.recovered {
+                border-left-width: 6px;
+                box-shadow: 0 5px 15px rgba(255, 255, 255, 0.2);
+            }
+
+                .item.recovered .item-name {
+                    color: #ffffff;
+                    text-shadow: 0 0 10px currentColor;
+                    font-weight: bold;
+                }
+
+                .item.recovered .item-count {
+                    color: #ffffff;
+                    text-shadow: 0 0 10px #ffffff;
+                    font-weight: bold;
+                    animation: count-glow 1.5s infinite alternate;
+                }
+
         .item-content {
+            position: relative;
+            z-index: 2;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            width: 100%;
-            z-index: 2;
+            padding: 12px 15px;
+            height: 100%;
         }
 
         .item-name {
@@ -228,6 +250,7 @@
             font-size: 1.1rem;
             color: #fff;
             text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
         }
 
         .item-count {
@@ -237,50 +260,46 @@
             text-align: center;
             color: #ff7eb3;
             text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
         }
 
-        ..item-recovery {
+        @keyframes count-glow {
+            from {
+                transform: scale(1);
+                text-shadow: 0 0 5px #ffffff;
+            }
+
+            to {
+                transform: scale(1.1);
+                text-shadow: 0 0 15px #ffffff;
+            }
+        }
+
+        .item-recovery {
             position: absolute;
-            bottom: 0;
+            top: 0;
             left: 0;
             height: 100%;
+            width: 0%;
             z-index: 1;
-            transition: width 0.1s linear;
-            border-radius: 6px;
+            transition: width 0.3s ease;
+            opacity: 0.5;
         }
 
-        /* 道具恢复进度条颜色 */
         .item.mojing .item-recovery {
-            background: linear-gradient(90deg, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.5));
+            background: linear-gradient(90deg, #000000 0%, #333333 100%);
         }
 
         .item.haitang .item-recovery {
-            background: linear-gradient(90deg, rgba(255, 64, 129, 0.3), rgba(255, 64, 129, 0.5));
+            background: linear-gradient(90deg, #ff2a8f 0%, #ff7eb3 100%);
         }
 
         .item.sodawater .item-recovery {
-            background: linear-gradient(90deg, rgba(33, 150, 243, 0.3), rgba(33, 150, 243, 0.5));
+            background: linear-gradient(90deg, #2196f3 0%, #64b5f6 100%);
         }
 
         .item.qingjunce .item-recovery {
-            background: linear-gradient(90deg, rgba(255, 193, 7, 0.3), rgba(255, 193, 7, 0.5));
-        }
-
-        /* 道具颜色调整 */
-        .item.mojing {
-            border-left-color: #000000; /* 墨镜 - 黑色 */
-        }
-
-        .item.haitang {
-            border-left-color: #ff4081; /* 海棠 - 粉色 */
-        }
-
-        .item.sodawater {
-            border-left-color: #2196f3; /* 苏打水 - 蓝色 */
-        }
-
-        .item.qingjunce {
-            border-left-color: #ffc107; /* 清君侧 - 黄色 */
+            background: linear-gradient(90deg, #ffc107 0%, #ffd54f 100%);
         }
 
         .controls-container {
@@ -453,7 +472,6 @@
         }
         /* Z型 - 红色 */
 
-
         .game-status {
             text-align: center;
             margin-top: 15px;
@@ -586,6 +604,10 @@
                 background: linear-gradient(to bottom, #666666, #444444);
             }
 
+        .event-type {
+            display: none !important;
+        }
+
         .yuan-character {
             font-size: 8rem;
             color: #000000;
@@ -704,6 +726,254 @@
         .key {
             font-weight: bold;
             color: #ff9ec9;
+        }
+
+        /* 规则弹窗样式 */
+        .rules-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(15, 8, 25, 0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+
+            .rules-modal.active {
+                opacity: 1;
+                visibility: visible;
+            }
+
+        .rules-content {
+            background: linear-gradient(145deg, rgba(25, 12, 35, 0.95), rgba(35, 17, 45, 0.95));
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(255, 42, 143, 0.2);
+            border: 2px solid rgba(255, 122, 179, 0.3);
+            transform: translateY(-20px);
+            transition: transform 0.3s;
+        }
+
+        .rules-modal.active .rules-content {
+            transform: translateY(0);
+        }
+
+        .rules-title {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: #ff7eb3;
+            text-shadow: 0 2px 10px rgba(255, 126, 179, 0.5);
+        }
+
+        .rules-text {
+            text-align: left;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: #ff9ec9;
+            margin-bottom: 25px;
+        }
+
+            .rules-text p {
+                margin-bottom: 15px;
+            }
+
+        .rule-item {
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 4px solid;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+            .rule-item:hover {
+                transform: translateX(5px);
+            }
+
+            /* 墨镜 - 黑色主题 */
+            .rule-item.mojing-rule {
+                background: linear-gradient(145deg, rgba(0, 0, 0, 0.15), rgba(50, 50, 50, 0.1));
+                border-left-color: #ffffff;
+                color: #ffffff;
+            }
+
+                .rule-item.mojing-rule strong {
+                    color: #ffffff;
+                    text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+                }
+
+            /* 海棠 - 粉色主题 */
+            .rule-item.haitang-rule {
+                background: linear-gradient(145deg, rgba(255, 42, 143, 0.15), rgba(255, 126, 179, 0.1));
+                border-left-color: #ff2a8f;
+                color: #ff9ec9;
+            }
+
+                .rule-item.haitang-rule strong {
+                    color: #ff7eb3;
+                    text-shadow: 0 0 5px rgba(255, 126, 179, 0.5);
+                }
+
+            /* 苏打水 - 蓝色主题 */
+            .rule-item.sodawater-rule {
+                background: linear-gradient(145deg, rgba(33, 150, 243, 0.15), rgba(100, 181, 246, 0.1));
+                border-left-color: #2196f3;
+                color: #90caf9;
+            }
+
+                .rule-item.sodawater-rule strong {
+                    color: #64b5f6;
+                    text-shadow: 0 0 5px rgba(100, 181, 246, 0.5);
+                }
+
+            /* 清君侧 - 黄色主题 */
+            .rule-item.qingjunce-rule {
+                background: linear-gradient(145deg, rgba(255, 193, 7, 0.15), rgba(255, 213, 79, 0.1));
+                border-left-color: #ffc107;
+                color: #ffd54f;
+            }
+
+                .rule-item.qingjunce-rule strong {
+                    color: #ffd54f;
+                    text-shadow: 0 0 5px rgba(255, 213, 79, 0.5);
+                }
+
+            /* 添加装饰效果 */
+            .rule-item::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+                transform: translateX(-100%);
+                transition: transform 0.5s;
+            }
+
+            .rule-item:hover::before {
+                transform: translateX(100%);
+            }
+
+            /* 添加项目符号 */
+            .rule-item strong::before {
+                content: '✦ ';
+                margin-right: 5px;
+            }
+
+            /* 墨镜添加特殊效果 */
+            .rule-item.mojing-rule strong::before {
+                content: '🕶️ ';
+            }
+
+            /* 海棠添加特殊效果 */
+            .rule-item.haitang-rule strong::before {
+                content: '🌸 ';
+            }
+
+            /* 苏打水添加特殊效果 */
+            .rule-item.sodawater-rule strong::before {
+                content: '🥤 ';
+            }
+
+            /* 清君侧添加特殊效果 */
+            .rule-item.qingjunce-rule strong::before {
+                content: '⚔️ ';
+            }
+
+            .rule-item strong {
+                color: #ffffff;
+                font-size: 1.2rem;
+                display: block;
+                margin-bottom: 8px;
+                text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+            }
+
+        .rule-tip {
+            background: rgba(255, 122, 179, 0.05);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            border: 1px dashed rgba(255, 122, 179, 0.3);
+            font-size: 0.95rem;
+            color: #ffb3d1;
+        }
+
+        .rules-confirm-button {
+            background: linear-gradient(to bottom, #ff2a8f, #ff4d9e);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 14px 40px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(255, 42, 143, 0.3);
+            margin-top: 10px;
+            min-width: 200px;
+        }
+
+            .rules-confirm-button:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 8px 20px rgba(255, 42, 143, 0.4);
+            }
+
+            .rules-confirm-button:active {
+                transform: translateY(1px);
+            }
+
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .rules-content {
+                padding: 20px;
+                max-width: 95%;
+            }
+
+            .rules-title {
+                font-size: 1.7rem;
+            }
+
+            .rules-text {
+                font-size: 1rem;
+            }
+
+            .rules-confirm-button {
+                padding: 12px 30px;
+                font-size: 1.1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .rules-title {
+                font-size: 1.5rem;
+            }
+
+            .rules-text {
+                font-size: 0.95rem;
+            }
+
+            .rule-item {
+                padding: 12px;
+            }
+
+            .rules-confirm-button {
+                padding: 10px 25px;
+                font-size: 1rem;
+                min-width: 180px;
+            }
         }
 
         /* 响应式设计 - 手机适配 */
@@ -1050,14 +1320,49 @@
                 max-width: none;
             }
         }
-
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>俄罗斯方块 - 黑粉色系</h1>
-        <div class="subtitle">点击道具直接使用 | 黑粉配色 | 手机优化</div>
+        <h1>黑黑花花的俄罗斯方块</h1>
+        <div class="subtitle">🕶️ 黑眼镜 · 🎮  · 解雨臣 🌸</div>
     </div>
+
+    <!-- 游戏规则弹窗 -->
+    <div class="rules-modal" id="rules-modal">
+        <div class="rules-content">
+            <h2 class="rules-title">游戏规则</h2>
+            <div class="rules-text">
+                <p style="text-align: center; font-weight: bold; margin: 20px 0;">🎉 欢迎来到黑黑花花的俄罗斯方块！🎉</p>
+                <p>本游戏在传统的俄罗斯方块上增加了4种【道具】和10种【剧情】</p>
+                <p>在消除一行方块后会触发随机【剧情】，需完成相应要求后才能继续游戏</p>
+                <p>在游戏过程中可使用右侧【道具】，介绍如下：</p>
+
+                <div class="rule-item mojing-rule">
+                    <strong>【墨镜】</strong>
+                    <p>用于适应剧情【夜幕降临】</p>
+                </div>
+
+                <div class="rule-item haitang-rule">
+                    <strong>【海棠】</strong>
+                    <p>用于支付剧情【食君之禄】</p>
+                </div>
+
+                <div class="rule-item sodawater-rule">
+                    <strong>【苏打水】</strong>
+                    <p>随机改变下一方块的形状。</p>
+                </div>
+
+                <div class="rule-item qingjunce-rule">
+                    <strong>【清君侧】</strong>
+                    <p>清除现有全部方块。</p>
+                </div>
+
+            </div>
+            <button class="rules-confirm-button" id="rules-confirm-button">开始游戏</button>
+        </div>
+    </div>
+
 
     <div class="game-container">
 
@@ -1090,7 +1395,7 @@
                     <div class="item mojing" id="mojing-item">
                         <div class="item-recovery" id="mojing-recovery"></div>
                         <div class="item-content">
-                            <span class="item-name">墨镜</span>
+                            <span class="item-name">🕶️ 墨镜</span>
                             <span class="item-count" id="mojing-count">0</span>
                         </div>
                     </div>
@@ -1098,7 +1403,7 @@
                     <div class="item haitang" id="haitang-item">
                         <div class="item-recovery" id="haitang-recovery"></div>
                         <div class="item-content">
-                            <span class="item-name">海棠</span>
+                            <span class="item-name">🌸 海棠</span>
                             <span class="item-count" id="haitang-count">0</span>
                         </div>
                     </div>
@@ -1106,7 +1411,7 @@
                     <div class="item sodawater" id="sodawater-item">
                         <div class="item-recovery" id="sodawater-recovery"></div>
                         <div class="item-content">
-                            <span class="item-name">苏打水</span>
+                            <span class="item-name">🥤 苏打水</span>
                             <span class="item-count" id="sodawater-count">0</span>
                         </div>
                     </div>
@@ -1114,7 +1419,7 @@
                     <div class="item qingjunce" id="qingjunce-item">
                         <div class="item-recovery" id="qingjunce-recovery"></div>
                         <div class="item-content">
-                            <span class="item-name">清君侧</span>
+                            <span class="item-name">⚔️ 清君侧</span>
                             <span class="item-count" id="qingjunce-count">0</span>
                         </div>
                     </div>
@@ -1141,6 +1446,30 @@
 
     </div>
 
+    <!-- 音频元素 -->
+    <audio id="background-music" loop preload="auto">
+        <source src="backgroundmusic.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="opera-music" preload="auto">
+        <source src="xiqu.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- 事件弹窗 -->
+    <div class="event-modal" id="event-modal">
+        <div class="event-content">
+            <h2 class="event-title" id="event-title">事件标题</h2>
+            <div class="event-type" id="event-type"></div>
+            <div class="event-description" id="event-description"></div>
+            <div class="event-effect">
+                <div class="event-effect-title"></div>
+                <div id="event-effect-desc"></div>
+            </div>
+            <div class="event-actions" id="event-actions">
+                <!-- 按钮会动态添加 -->
+            </div>
+        </div>
+    </div>
+
 </body>
 
 
@@ -1152,9 +1481,9 @@
 
     // 道具恢复时间（毫秒）
     const ITEM_RECOVERY_TIMES = {
-        mojing: 5000,      // 墨镜：5秒
-        haitang: 5000,     // 海棠：5秒
-        sodawater: 10000,  // 苏打水：10秒
+        mojing: 6000,      // 墨镜：6秒
+        haitang: 8000,     // 海棠：8秒
+        sodawater: 12000,  // 苏打水：12秒
         qingjunce: 20000   // 清君侧：20秒
     };
 
@@ -1221,85 +1550,84 @@
     // 剧情定义（黄铜箱子只出现一次）
     const STORIES = {
         SHIJUNZHILU: {
-            name: "食君之禄",
-            type: "剧情",
-            description: "享受朝廷的俸禄，便要承担相应的责任",
-            effect: "需要消耗1个【海棠】才能继续游戏，否则所有方块变黑并显示'冤'字",
+            name: "🍚 食君之禄",
+            type:"剧情",
+            description: "食君之禄，为君分忧。",
+            effect: "👻 需消耗【海棠】🌸x1支付报酬，否则将出现黑色怨气。",
             effectFunc: handleShijunzhilu,
             canAppear: true
         },
         NIGHTFALL: {
-            name: "夜幕降临",
+            name: "🌙 夜幕降临",
             type: "剧情",
-            description: "黑暗笼罩大地，视线变得模糊...",
-            effect: "需要消耗1个【墨镜】才能继续游戏，否则屏幕变黑5秒（游戏正常进行）",
+            description: "太阳没有出来之前，我是无敌的。",
+            effect: "👀 需消耗【墨镜】🕶️x1适应黑暗，否则将被剥夺视线5秒。",
             effectFunc: handleNightFall,
             canAppear: true
         },
         IMMORTAL: {
-            name: "长生者",
+            name: "🧬 长生者",
             type: "剧情",
-            description: "传说中的长生者出现，时间仿佛变慢了",
-            effect: "方块下落速度变为原来的一半，持续20秒",
+            description: "这个人汉姓姓齐，家族显赫，他没有受过什么正规的教育，在德国有一个音乐和解剖学的学位。",
+            effect: "⏳ 方块下落时间放缓为0.5倍，持续10秒。",
             effectFunc: activateImmortal,
             canAppear: true
         },
         FRIED_LIVER: {
-            name: "炒肝",
+            name: "🍲 炒肝",
             type: "剧情",
-            description: "闻到一股奇特的炒肝香味，动作变得迟缓",
-            effect: "游戏继续后玩家不能操作3秒（游戏正常进行）",
+            description: "-今天晚上我想吃炒肝。 -我们能天亮之后去吃吗？天亮之后如果你能到这来，我就带你去吃炒肝。",
+            effect: "⏸️ 小小花开始吃炒肝，停止操作3秒。",
             effectFunc: activateFriedLiver,
             canAppear: true
         },
         BLOODY_WEATHER: {
-            name: "流血的天气",
+            name: "🌧️ 流血的天气",
             type: "剧情",
-            description: "天空下起了红色的雨，一切都染上了血色",
-            effect: "接下来的5个方块全部变为红色",
+            description: "今晚要下雨，流血的天气。",
+            effect: "🔴 现有及接下来的5个方块全部变为红色",
             effectFunc: activateBloodyWeather,
             canAppear: true
         },
         OPERA: {
-            name: "戏曲",
+            name: "🎭 戏曲",
             type: "剧情",
-            description: "远处传来悠扬的戏曲声，氛围变得不一样了",
-            effect: "游戏继续，心情变得愉悦",
+            description: "如果我声带坏了，我就不能唱戏了，很多女孩子会伤心的。",
+            effect: "🎵 解语花路过，更换了BGM。",
             effectFunc: activateOpera,
             canAppear: true
         },
-        // 新增剧情
         SNOOPY: {
-            name: "史努比",
+            name: "🐶 史努比",
             type: "剧情",
-            description: "可爱的史努比出现，帮你撤回了一步",
-            effect: "撤回这一步方块（不消除）",
+            description: "九点五十分，上床看了会儿史努比的漫画。",
+            effect: "↩️ 解雨臣打开漫画，撤回这一步方块。",
             effectFunc: activateSnoopy,
             canAppear: true
         },
         BRASS_BOX: {
-            name: "黄铜箱子",
+            name: "📦 黄铜箱子",
             type: "剧情",
-            description: "发现了一个古老的黄铜箱子，里面装满了财宝",
-            effect: "分数直接变成9999",
+            description: "-很久以前的那个黄铜箱子。 -你也有那么想找回来的东西？",
+            effect: "💞 找到宿命结局，分数直接变为9999。",
             effectFunc: activateBrassBox,
             canAppear: true,
             appearsOnlyOnce: true,  // 只出现一次
             hasAppeared: false      // 是否已经出现过
         },
         TICKET: {
-            name: "机票",
+            name: "✈️ 机票",
             type: "剧情",
-            description: "一张神秘的机票出现在你面前",
-            effect: "输入正确密码才能继续游戏",
+            description: "类似于回去的机票都买不起的那种卑微。",
+            effect: "💓 卑微的_____",
             effectFunc: activateTicket,
             canAppear: true
         },
         CAN_WINDMILL: {
-            name: "易拉罐风车",
+            name: "🎡 易拉罐风车",
             type: "剧情",
-            description: "一阵风吹过，易拉罐风车开始转动",
-            effect: "随机消除3块已经存在的方块（有下落的下落）",
+            description: "苏打水易拉罐diy风车手作。",
+            effect: "💨 黑眼镜示范玩法，随机吹走了现有的9格方块。",
             effectFunc: activateCanWindmill,
             canAppear: true
         }
@@ -1365,7 +1693,7 @@
         sodawater: 0
     };
 
-    // 状态效果（会被新剧情覆盖）
+    // 状态效果（后一个剧情覆盖前一个）
     let activeEffects = {
         nightFall: false,           // 夜幕降临
         immortal: false,            // 长生者
@@ -1384,7 +1712,15 @@
         yuanGhost: null
     };
 
+    // 音乐变量
+    let backgroundMusic = document.getElementById('background-music');
+    let operaMusic = document.getElementById('opera-music');
+    let isOperaPlaying = false;
+    let operaTimeout = null;
+
     // DOM元素
+    const rulesModal = document.getElementById('rules-modal');
+    const rulesConfirmButton = document.getElementById('rules-confirm-button');
     const gameBoardElement = document.getElementById('game-board');
     const nextPieceBoardElement = document.getElementById('next-piece-board');
     const scoreElement = document.getElementById('score');
@@ -1428,6 +1764,85 @@
     const rightBtn = document.getElementById('right-btn');
     const downBtn = document.getElementById('down-btn');
     const dropBtn = document.getElementById('drop-btn');
+
+    // 音乐控制函数
+    function playBackgroundMusic() {
+        if (backgroundMusic) {
+            backgroundMusic.currentTime = 0;
+            backgroundMusic.play().catch(e => console.log("背景音乐播放失败:", e));
+        }
+    }
+
+    function pauseBackgroundMusic() {
+        if (backgroundMusic && !backgroundMusic.paused) {
+            backgroundMusic.pause();
+        }
+    }
+
+    function stopOperaMusic() {
+        if (operaMusic && !operaMusic.paused) {
+            operaMusic.pause();
+            operaMusic.currentTime = 0;
+            isOperaPlaying = false;
+            if (operaTimeout) {
+                clearTimeout(operaTimeout);
+                operaTimeout = null;
+            }
+        }
+    }
+
+    function playOperaMusic() {
+        if (isOperaPlaying) return;
+
+        isOperaPlaying = true;
+        if (backgroundMusic && !backgroundMusic.paused) {
+            backgroundMusic.pause();
+        }
+
+        if (operaMusic) {
+            operaMusic.currentTime = 0;
+            operaMusic.play().catch(e => console.log("戏曲音乐播放失败:", e));
+
+            // 监听戏曲音乐结束事件
+            operaMusic.onended = function () {
+                isOperaPlaying = false;
+                if (gameStarted && !isPaused && !gameOver) {
+                    playBackgroundMusic();
+                }
+            };
+
+            // 安全起见，设置一个超时恢复背景音乐
+            if (operaTimeout) clearTimeout(operaTimeout);
+            operaTimeout = setTimeout(() => {
+                if (isOperaPlaying) {
+                    stopOperaMusic();
+                    if (gameStarted && !isPaused && !gameOver) {
+                        playBackgroundMusic();
+                    }
+                }
+            }, 30000); // 30秒后自动恢复
+        }
+    }
+
+    // 游戏暂停/恢复时控制音乐
+    function updateMusicForPause() {
+        if (isPaused) {
+            if (backgroundMusic && !backgroundMusic.paused) {
+                backgroundMusic.pause();
+            }
+            if (operaMusic && !operaMusic.paused) {
+                operaMusic.pause();
+            }
+        } else {
+            if (gameStarted && !gameOver) {
+                if (isOperaPlaying) {
+                    if (operaMusic) operaMusic.play().catch(e => console.log(e));
+                } else {
+                    if (backgroundMusic) backgroundMusic.play().catch(e => console.log(e));
+                }
+            }
+        }
+    }
 
     // 初始化剧情系统
     function initStorySystem() {
@@ -1570,6 +1985,7 @@
         if (activeEffects.bloodyWeather) {
             activeEffects.bloodyWeather = false;
             activeEffects.bloodyWeatherCount = 0;
+            gameBoardElement.classList.remove('blood-weather');
         }
 
         // 清除冤魂效果
@@ -1662,15 +2078,13 @@
             gameBoardElement.classList.remove('yuan-ghost');
         }
 
-        // 如果冤魂和流血天气同时存在，优先显示冤魂（通过CSS处理）
-
         for (let row = 0; row < BOARD_HEIGHT; row++) {
             for (let col = 0; col < BOARD_WIDTH; col++) {
                 if (board[row][col] !== EMPTY_CELL) {
                     const cellIndex = row * BOARD_WIDTH + col;
                     cells[cellIndex].classList.add('filled', board[row][col]);
 
-                    // 如果处于冤魂状态，所有方块显示为黑色（优先于流血天气）
+                    // 如果处于冤魂状态，所有方块显示为黑色
                     if (activeEffects.yuanGhost) {
                         cells[cellIndex].style.backgroundColor = '#000000';
                         cells[cellIndex].style.borderColor = '#444444';
@@ -1695,7 +2109,7 @@
                             boardCol >= 0 && boardCol < BOARD_WIDTH) {
                             const cellIndex = boardRow * BOARD_WIDTH + boardCol;
 
-                            // 如果处于冤魂状态，当前方块也显示为黑色（优先于流血天气）
+                            // 如果处于冤魂状态，当前方块也显示为黑色
                             if (activeEffects.yuanGhost) {
                                 cells[cellIndex].classList.add('filled');
                                 cells[cellIndex].style.backgroundColor = '#000000';
@@ -1781,41 +2195,61 @@
         // 清君侧
         if (items.qingjunce > 0) {
             qingjunceItemElement.classList.remove('disabled');
+            qingjunceItemElement.classList.add('recovered');
         } else {
             qingjunceItemElement.classList.add('disabled');
+            qingjunceItemElement.classList.remove('recovered');
         }
 
         // 苏打水
         if (items.sodawater > 0) {
             sodawaterItemElement.classList.remove('disabled');
+            sodawaterItemElement.classList.add('recovered');
         } else {
             sodawaterItemElement.classList.add('disabled');
+            sodawaterItemElement.classList.remove('recovered');
         }
 
         // 海棠
         if (items.haitang > 0) {
             haitangItemElement.classList.remove('disabled');
+            haitangItemElement.classList.add('recovered');
         } else {
             haitangItemElement.classList.add('disabled');
+            haitangItemElement.classList.remove('recovered');
         }
 
         // 墨镜
         if (items.mojing > 0) {
             mojingItemElement.classList.remove('disabled');
+            mojingItemElement.classList.add('recovered');
         } else {
             mojingItemElement.classList.add('disabled');
+            mojingItemElement.classList.remove('recovered');
         }
     }
 
-    // 开始道具恢复计时器
+    // 开始道具恢复计时器（暂停时会自动暂停）
     function startItemRecovery(itemType) {
         // 如果已经有计时器在运行，先清除
         if (itemRecoveryTimers[itemType]) {
             clearInterval(itemRecoveryTimers[itemType]);
         }
 
-        // 重置恢复进度
-        itemRecoveryProgress[itemType] = 0;
+        // 重置恢复进度（如果已经有道具，则从100%开始）
+        if (items[itemType] > 0) {
+            itemRecoveryProgress[itemType] = 100;
+        } else {
+            itemRecoveryProgress[itemType] = 0;
+        }
+
+        // 立即更新一次进度条
+        updateRecoveryBars();
+
+        // 如果道具数已经大于0（表示已经有可用道具），不启动恢复计时器
+        if (items[itemType] > 0) {
+            return;
+        }
 
         // 计算恢复间隔（每100毫秒更新一次）
         const recoveryTime = ITEM_RECOVERY_TIMES[itemType];
@@ -1823,18 +2257,37 @@
         const steps = recoveryTime / interval;
         const increment = 100 / steps;
 
+        let accumulatedProgress = itemRecoveryProgress[itemType];
+        let lastUpdateTime = Date.now();
+
         // 开始恢复计时器
         itemRecoveryTimers[itemType] = setInterval(() => {
-            itemRecoveryProgress[itemType] += increment;
+            if (isPaused || !gameStarted) return;
+
+            const currentTime = Date.now();
+            const elapsed = currentTime - lastUpdateTime;
+            lastUpdateTime = currentTime;
+
+            // 根据实际经过的时间计算进度
+            const progressIncrement = (elapsed / recoveryTime) * 100;
+            accumulatedProgress += progressIncrement;
+
+            // 确保不超过100%
+            if (accumulatedProgress > 100) {
+                accumulatedProgress = 100;
+            }
+
+            itemRecoveryProgress[itemType] = accumulatedProgress;
 
             // 更新进度条
             updateRecoveryBars();
 
             // 恢复完成
-            if (itemRecoveryProgress[itemType] >= 100) {
+            if (accumulatedProgress >= 100) {
                 clearInterval(itemRecoveryTimers[itemType]);
                 itemRecoveryTimers[itemType] = null;
-                itemRecoveryProgress[itemType] = 0;
+                // 保持100%
+                itemRecoveryProgress[itemType] = 100;
                 items[itemType]++;
                 updateItemDisplays();
 
@@ -1850,22 +2303,46 @@
         }, interval);
     }
 
+    // 暂停所有道具恢复计时器
+    function pauseAllItemRecovery() {
+        for (const itemType in itemRecoveryTimers) {
+            if (itemRecoveryTimers[itemType]) {
+                // 不清除计时器，但在恢复函数中检查暂停状态
+                console.log(`暂停 ${itemType} 恢复`);
+            }
+        }
+    }
+
+    // 恢复所有道具恢复计时器
+    function resumeAllItemRecovery() {
+        for (const itemType in itemRecoveryTimers) {
+            if (itemRecoveryTimers[itemType]) {
+                // 恢复函数已经在检查暂停状态
+                console.log(`恢复 ${itemType} 恢复`);
+            }
+        }
+    }
+
     // 使用道具（会触发恢复计时器）
     function useItem(itemType) {
         if (items[itemType] <= 0) {
             // 道具不可用，给用户反馈
             const itemElement = document.getElementById(`${itemType}-item`);
-            itemElement.style.animation = 'none';
+            itemElement.style.transform = 'scale(0.95)';
             setTimeout(() => {
-                itemElement.style.animation = '';
-            }, 10);
+                itemElement.style.transform = '';
+            }, 300);
             return false;
         }
 
         items[itemType]--;
         updateItemDisplays();
 
-        // 开始恢复计时器
+        // 道具使用后，立即将恢复进度重置为0
+        itemRecoveryProgress[itemType] = 0;
+        updateRecoveryBars();
+
+        // 开始恢复计时器（从0开始恢复）
         startItemRecovery(itemType);
 
         return true;
@@ -2063,6 +2540,8 @@
             dropInterval = null;
             pauseResumeButton.disabled = true;
             pauseResumeButton.textContent = "暂停";
+            pauseBackgroundMusic();
+            stopOperaMusic();
         }
 
         drawBoard();
@@ -2100,8 +2579,11 @@
     }
 
     // 触发随机剧情
+    // 触发随机剧情
     function triggerRandomStory() {
         if (gameOver || isPaused) return;
+
+        console.log("触发随机剧情...");
 
         // 暂停游戏
         clearInterval(dropInterval);
@@ -2110,19 +2592,26 @@
         // 获取下一个随机剧情（保证不重复）
         const story = getNextRandomStory();
 
+        console.log("获取到剧情:", story.name);
+
         // 显示剧情弹窗
         showStoryModal(story);
     }
 
     // 显示剧情弹窗
     function showStoryModal(story) {
+        console.log("显示剧情弹窗，剧情名称:", story.name);
+
         eventTitleElement.textContent = story.name;
-        eventTypeElement.textContent = story.type;
-        eventDescriptionElement.textContent = story.description;
-        eventEffectDescElement.textContent = story.effect;
+        // 隐藏类型标签
+        if (eventTypeElement) {
+            eventTypeElement.style.display = 'none';
+        }
+        eventDescriptionElement.textContent = story.effect;
+        eventEffectDescElement.textContent = story.description;
 
         // 如果是黄铜箱子，添加特殊样式
-        if (story.name === "黄铜箱子") {
+        if (story.name.includes("黄铜箱子")) {
             const eventContent = eventModal.querySelector('.event-content');
             eventContent.classList.add('brass-box-special');
         }
@@ -2131,12 +2620,14 @@
         eventActionsElement.innerHTML = '';
 
         // 根据剧情类型添加不同的动作按钮
-        if (story.name === "食君之禄") {
+        if (story.name.includes("食君之禄")) {
+            console.log("创建食君之禄按钮");
             // 食君之禄：需要消耗海棠
             const consumeButton = document.createElement('button');
             consumeButton.className = 'event-button consume';
-            consumeButton.textContent = `消耗1个海棠继续游戏 (当前:${items.haitang})`;
+            consumeButton.textContent = `支付1朵【海棠】🌸`;
             consumeButton.onclick = () => {
+                console.log("点击支付海棠按钮");
                 if (items.haitang > 0) {
                     items.haitang--;
                     updateItemDisplays();
@@ -2147,14 +2638,16 @@
                     resumeGame();
                 } else {
                     // 没有海棠，触发冤魂效果
+                    console.log("没有海棠，触发怨气效果");
                     handleYuanGhost();
                 }
             };
 
             const cancelButton = document.createElement('button');
             cancelButton.className = 'event-button cancel';
-            cancelButton.textContent = '拒绝消耗海棠';
+            cancelButton.textContent = '拒绝支付';
             cancelButton.onclick = () => {
+                console.log("点击拒绝支付按钮");
                 // 拒绝消耗海棠，触发冤魂效果
                 handleYuanGhost();
             };
@@ -2162,12 +2655,14 @@
             eventActionsElement.appendChild(consumeButton);
             eventActionsElement.appendChild(cancelButton);
 
-        } else if (story.name === "夜幕降临") {
+        } else if (story.name.includes("夜幕降临")) {
+            console.log("创建夜幕降临按钮");
             // 夜幕降临：需要消耗墨镜
             const consumeButton = document.createElement('button');
             consumeButton.className = 'event-button consume';
-            consumeButton.textContent = `消耗1个墨镜继续游戏 (当前:${items.mojing})`;
+            consumeButton.textContent = `使用1副【墨镜】🕶️`;
             consumeButton.onclick = () => {
+                console.log("点击使用墨镜按钮");
                 if (items.mojing > 0) {
                     items.mojing--;
                     updateItemDisplays();
@@ -2178,14 +2673,16 @@
                     resumeGame();
                 } else {
                     // 没有墨镜，触发黑夜效果
+                    console.log("没有墨镜，触发黑夜效果");
                     handleNightFallWithoutMojing();
                 }
             };
 
             const cancelButton = document.createElement('button');
             cancelButton.className = 'event-button cancel';
-            cancelButton.textContent = '拒绝消耗墨镜';
+            cancelButton.textContent = '拒绝使用';
             cancelButton.onclick = () => {
+                console.log("点击拒绝使用按钮");
                 // 拒绝消耗墨镜，触发黑夜效果
                 handleNightFallWithoutMojing();
             };
@@ -2193,34 +2690,37 @@
             eventActionsElement.appendChild(consumeButton);
             eventActionsElement.appendChild(cancelButton);
 
-        } else if (story.name === "机票") {
+        } else if (story.name.includes("机票")) {
+            console.log("创建机票输入框");
             // 机票：需要输入正确文本
             const inputContainer = document.createElement('div');
             inputContainer.className = 'input-container';
 
-            const inputText = document.createElement('div');
-            inputText.className = 'input-text';
-            inputText.textContent = "卑微的——";
-
             const textInput = document.createElement('input');
             textInput.type = 'text';
             textInput.className = 'text-input';
-            textInput.placeholder = '请输入...';
+            textInput.placeholder = '请输入答案';
 
             const confirmButton = document.createElement('button');
             confirmButton.className = 'event-button';
             confirmButton.textContent = '确认';
+
             confirmButton.onclick = () => {
-                if (textInput.value === '爱情') {
-                    // 清除所有现有效果
+                console.log("点击确认按钮，输入值:", textInput.value);
+                if (textInput.value.trim() === '爱情') {
+                    console.log("输入正确");
+                    // 输入正确，清除所有现有效果
                     clearAllEffects();
                     resumeGame();
                     // 触发剧情效果
                     story.effectFunc();
                 } else {
-                    alert('输入错误，请重新输入！');
+                    console.log("输入错误");
+                    // 输入错误，保持弹窗显示，给出提示
+                    alert('❌ 输入错误！提示：友情/爱情/亲情');
                     textInput.value = '';
                     textInput.focus();
+                    // 不关闭弹窗，让用户继续尝试
                 }
             };
 
@@ -2229,17 +2729,26 @@
             eventActionsElement.appendChild(inputContainer);
             eventActionsElement.appendChild(confirmButton);
 
+            // 添加回车键支持
+            textInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    confirmButton.click();
+                }
+            });
+
             // 自动聚焦到输入框
             setTimeout(() => {
                 textInput.focus();
             }, 100);
 
         } else {
+            console.log("创建默认确认按钮");
             // 其他剧情：直接确认继续
             const confirmButton = document.createElement('button');
             confirmButton.className = 'event-button';
             confirmButton.textContent = '确认继续';
             confirmButton.onclick = () => {
+                console.log("点击确认继续按钮");
                 // 清除所有现有效果
                 clearAllEffects();
                 resumeGame();
@@ -2250,6 +2759,7 @@
             eventActionsElement.appendChild(confirmButton);
         }
 
+        console.log("显示弹窗");
         eventModal.classList.add('active');
     }
 
@@ -2266,6 +2776,7 @@
                 movePiece(1, 0);
             }, dropSpeed);
             gameStatusElement.textContent = "游戏中";
+            updateMusicForPause();
         }
     }
 
@@ -2275,6 +2786,7 @@
         console.log("食君之禄剧情处理");
     }
 
+    // 处理冤魂效果（没有海棠的情况）
     // 处理冤魂效果（没有海棠的情况）
     function handleYuanGhost() {
         // 清除所有现有效果
@@ -2290,16 +2802,16 @@
         const yuanModal = document.createElement('div');
         yuanModal.className = 'event-modal active';
         yuanModal.innerHTML = `
-                        <div class="event-content">
-                            <div class="yuan-character">冤</div>
-                            <div class="event-description">没有海棠供奉，冤魂缠绕！所有方块变为黑色...</div>
-                            <button class="confirm-button" id="confirm-yuan-button">确认</button>
-                        </div>
-                    `;
+        <div class="event-content">
+            <div class="yuan-character" style="color: white !important; text-shadow: 0 0 20px rgba(255, 255, 255, 0.7) !important;">冤</div>
+            <div class="event-description" style="color: #ff9ec9;">黑眼镜把发票贴成一个冤字</div>
+            <button class="confirm-button" id="confirm-yuan-button">确认</button>
+        </div>
+    `;
 
         document.body.appendChild(yuanModal);
 
-        // 更新游戏板显示（黑色方块优先）
+        // 更新游戏板显示（黑色方块）
         drawBoard();
 
         // 设置定时器，20秒后自动清除效果
@@ -2334,14 +2846,14 @@
 
         eventModal.classList.remove('active');
 
-        // 触发夜幕降临效果
+        // 触发夜幕降临效果（覆盖之前的效果）
         activeEffects.nightFall = true;
         gameBoardElement.classList.add('night-fall');
 
         // 添加提示文字
         const warning = document.createElement('div');
         warning.className = 'night-warning';
-        warning.textContent = "夜幕降临，5秒后恢复...";
+        warning.textContent = "夜幕降临，5秒后恢复";
         gameBoardElement.appendChild(warning);
 
         // 游戏正常进行，只是玩家看不到
@@ -2365,11 +2877,14 @@
 
     // 长生者效果
     function activateImmortal() {
+        // 清除之前的效果
+        clearAllEffects();
+
         activeEffects.immortal = true;
         originalDropSpeed = dropSpeed;
         dropSpeed *= 2; // 速度减半
         updateDropSpeed();
-        gameStatusElement.textContent = "长生者出现！方块下落速度变慢";
+        gameStatusElement.textContent = "方块下落速度变慢";
 
         // 长生者效果持续20秒
         effectTimers.immortal = setTimeout(() => {
@@ -2377,31 +2892,39 @@
                 activeEffects.immortal = false;
                 dropSpeed = originalDropSpeed;
                 updateDropSpeed();
-                gameStatusElement.textContent = "长生者效果结束";
+                gameStatusElement.textContent = "变慢效果结束";
                 setTimeout(() => {
                     if (!gameOver && !isPaused && gameStarted) {
                         gameStatusElement.textContent = "游戏中";
                     }
-                }, 2000);
+                }, 1000);
             }
-        }, 20000);
+        }, 10000);
     }
 
     // 炒肝效果 - 玩家不能操作，但游戏正常进行
+    // 炒肝效果 - 玩家不能操作，但游戏正常进行
     function activateFriedLiver() {
+        // 清除之前的效果
+        clearAllEffects();
+
         // 炒肝效果在确认后触发
         setTimeout(() => {
             if (activeEffects.friedLiver) return;
 
             activeEffects.friedLiver = true;
-            gameStatusElement.textContent = "炒肝生效！操作被冻结3秒";
+            gameStatusElement.textContent = "操作被冻结3秒";
 
             // 创建冻结效果覆盖层
             const freezeOverlay = document.createElement('div');
             freezeOverlay.className = 'freeze-overlay';
             const freezeText = document.createElement('div');
             freezeText.className = 'freeze-text';
-            freezeText.textContent = "吃炒肝中，勿扰";
+            freezeText.textContent = "🌸 吃炒肝中";  // 修改这里的文字
+            freezeText.style.animation = 'none';  // 移除动画效果
+            freezeText.style.fontSize = '2.5rem';  // 调整字体大小
+            freezeText.style.color = '#ff9ec9';    // 粉色文字
+            freezeText.style.textShadow = '0 2px 4px rgba(0, 0, 0, 0.5)';
             freezeOverlay.appendChild(freezeText);
             gameBoardElement.appendChild(freezeOverlay);
 
@@ -2411,39 +2934,32 @@
                 if (freezeOverlay.parentNode) {
                     freezeOverlay.remove();
                 }
-                gameStatusElement.textContent = "炒肝效果结束";
+                gameStatusElement.textContent = "炒肝吃完啦";
                 setTimeout(() => {
                     if (!gameOver && !isPaused && gameStarted) {
                         gameStatusElement.textContent = "游戏中";
                     }
                 }, 2000);
             }, 3000);
-        }, 100); // 延迟一点，确保游戏已经恢复
+        }, 100);
     }
 
     // 流血天气效果
     function activateBloodyWeather() {
-        // 如果已经有冤魂效果（黑色方块），优先显示黑色
-        if (activeEffects.yuanGhost) {
-            gameStatusElement.textContent = "流血天气被冤魂效果覆盖";
-            setTimeout(() => {
-                if (!gameOver && !isPaused && gameStarted) {
-                    gameStatusElement.textContent = "游戏中";
-                }
-            }, 2000);
-            return;
-        }
+        // 清除之前的效果
+        clearAllEffects();
 
         activeEffects.bloodyWeather = true;
         activeEffects.bloodyWeatherCount = 5; // 接下来的5个方块
-        gameStatusElement.textContent = "流血的天气！接下来5个方块变为红色";
+        gameStatusElement.textContent = "接下来5个方块变为红色";
         drawBoard();
         drawNextPiece();
     }
 
     // 戏曲效果
     function activateOpera() {
-        gameStatusElement.textContent = "戏曲响起！游戏氛围变化";
+        gameStatusElement.textContent = "播放BGM《霸王别姬》";
+        playOperaMusic();
         setTimeout(() => {
             if (!gameOver && !isPaused && gameStarted) {
                 gameStatusElement.textContent = "游戏中";
@@ -2454,12 +2970,15 @@
     // 史努比效果 - 撤回这一步方块
     function activateSnoopy() {
         if (previousBoard && previousPiece) {
+            // 清除之前的效果
+            clearAllEffects();
+
             // 恢复之前的游戏板状态
             board = JSON.parse(JSON.stringify(previousBoard));
             currentPiece = JSON.parse(JSON.stringify(previousPiece));
 
             drawBoard();
-            gameStatusElement.textContent = "史努比帮你撤回了这一步！";
+            gameStatusElement.textContent = "撤回了一步";
             setTimeout(() => {
                 if (!gameOver && !isPaused && gameStarted) {
                     gameStatusElement.textContent = "游戏中";
@@ -2477,9 +2996,12 @@
 
     // 黄铜箱子效果 - 分数变成9999
     function activateBrassBox() {
+        // 清除之前的效果
+        clearAllEffects();
+
         score = 9999;
         scoreElement.textContent = score;
-        gameStatusElement.textContent = "黄铜箱子！分数变为9999";
+        gameStatusElement.textContent = "分数变为9999";
         setTimeout(() => {
             if (!gameOver && !isPaused && gameStarted) {
                 gameStatusElement.textContent = "游戏中";
@@ -2495,6 +3017,9 @@
 
     // 易拉罐风车效果 - 随机消除3块已经存在的方块
     function activateCanWindmill() {
+        // 清除之前的效果
+        clearAllEffects();
+
         // 收集所有已填充的方块位置
         const filledCells = [];
         for (let row = 0; row < BOARD_HEIGHT; row++) {
@@ -2515,8 +3040,8 @@
             return;
         }
 
-        // 随机选择3个方块（如果总数不足3个，则选择所有）
-        const cellsToRemove = Math.min(3, filledCells.length);
+        // 随机选择3个方块（如果总数不足9个，则选择所有）
+        const cellsToRemove = Math.min(9, filledCells.length);
         const removedPositions = [];
 
         for (let i = 0; i < cellsToRemove; i++) {
@@ -2541,7 +3066,7 @@
         }
 
         drawBoard();
-        gameStatusElement.textContent = `易拉罐风车消除了${cellsToRemove}个方块！`;
+        gameStatusElement.textContent = `消除了${cellsToRemove}个方块`;
         setTimeout(() => {
             if (!gameOver && !isPaused && gameStarted) {
                 gameStatusElement.textContent = "游戏中";
@@ -2558,7 +3083,7 @@
             }
         }
         drawBoard();
-        gameStatusElement.textContent = "清君侧！所有方块已清除";
+        gameStatusElement.textContent = "所有方块已清除";
         setTimeout(() => {
             if (!gameOver && !isPaused && gameStarted) {
                 gameStatusElement.textContent = "游戏中";
@@ -2570,7 +3095,7 @@
         // 随机改变下一个方块的形状
         nextPiece = getRandomPiece();
         drawNextPiece();
-        gameStatusElement.textContent = "苏打水生效！下一个方块已改变";
+        gameStatusElement.textContent = "下一个方块已改变";
         setTimeout(() => {
             if (!gameOver && !isPaused && gameStarted) {
                 gameStatusElement.textContent = "游戏中";
@@ -2589,16 +3114,46 @@
     }
 
     // 开始/重新开始游戏
+    // 开始/重新开始游戏
     function startOrRestartGame() {
+        console.log("点击开始/重新开始按钮，当前状态 - gameStarted:", gameStarted, "gameOver:", gameOver);
+
         if (gameStarted && !gameOver) {
+            // 重新开始游戏：直接开始，不显示规则
+            console.log("重新开始游戏");
             resetGame();
             startGame();
         } else {
+            // 第一次开始游戏：先显示规则
+            console.log("第一次开始游戏，显示规则");
             resetGame();
-            startGame();
+            showRulesModal();
         }
     }
 
+    // 显示规则弹窗
+    function showRulesModal() {
+        console.log("显示游戏规则弹窗");
+        rulesModal.classList.add('active');
+
+        // 禁用其他按钮
+        startRestartButton.disabled = true;
+        pauseResumeButton.disabled = true;
+    }
+
+    // 隐藏规则弹窗并开始游戏
+    function hideRulesModalAndStartGame() {
+        console.log("关闭规则弹窗，开始游戏");
+        rulesModal.classList.remove('active');
+
+        // 启用其他按钮
+        startRestartButton.disabled = false;
+
+        // 开始游戏
+        startGame();
+    }
+
+    // 开始游戏
     // 开始游戏
     function startGame() {
         gameStarted = true;
@@ -2665,8 +3220,23 @@
             movePiece(1, 0);
         }, dropSpeed);
 
+        // 开始播放背景音乐（从规则弹窗确认后播放）
+        playBackgroundMusic();
+
         drawBoard();
+
+        console.log("游戏开始完成");
     }
+
+    // 规则弹窗确认按钮事件
+    rulesConfirmButton.addEventListener('click', hideRulesModalAndStartGame);
+
+    // 也可以在规则弹窗区域点击其他地方关闭（可选）
+    rulesModal.addEventListener('click', function (e) {
+        if (e.target === rulesModal) {
+            hideRulesModalAndStartGame();
+        }
+    });
 
     // 暂停/继续游戏
     function togglePauseResume() {
@@ -2678,6 +3248,7 @@
             clearInterval(dropInterval);
             gameStatusElement.textContent = "已暂停";
             pauseResumeButton.textContent = "继续";
+            pauseAllItemRecovery();
         } else {
             gameStatusElement.textContent = "游戏中";
             pauseResumeButton.textContent = "暂停";
@@ -2685,9 +3256,13 @@
             dropInterval = setInterval(() => {
                 movePiece(1, 0);
             }, dropSpeed);
+            resumeAllItemRecovery();
         }
+
+        updateMusicForPause();
     }
 
+    // 重置游戏状态
     // 重置游戏状态
     function resetGame() {
         // 清除定时器
@@ -2726,6 +3301,17 @@
         // 重置剧情状态
         previousBoard = null;
         previousPiece = null;
+
+        // 隐藏规则弹窗（如果显示的话）
+        rulesModal.classList.remove('active');
+
+        // 确保开始按钮可用
+        startRestartButton.disabled = false;
+
+        // 停止音乐
+        pauseBackgroundMusic();
+        stopOperaMusic();
+        isOperaPlaying = false;
 
         // 更新UI
         scoreElement.textContent = score;
@@ -2788,56 +3374,71 @@
     // 设置触摸控制和道具点击
     function setupTouchControls() {
         // 旋转按钮
-        rotateBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            rotatePiece();
-        });
+        const rotateBtn = document.querySelector('.touch-btn.rotate');
+        if (rotateBtn) {
+            rotateBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                rotatePiece();
+            });
 
-        rotateBtn.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            rotatePiece();
-        });
+            rotateBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                rotatePiece();
+            });
+        }
 
         // 移动按钮
-        leftBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            movePiece(0, -1);
-        });
+        const leftBtn = document.querySelector('.touch-btn.left');
+        if (leftBtn) {
+            leftBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                movePiece(0, -1);
+            });
 
-        leftBtn.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            movePiece(0, -1);
-        });
+            leftBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                movePiece(0, -1);
+            });
+        }
 
-        rightBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            movePiece(0, 1);
-        });
+        const rightBtn = document.querySelector('.touch-btn.right');
+        if (rightBtn) {
+            rightBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                movePiece(0, 1);
+            });
 
-        rightBtn.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            movePiece(0, 1);
-        });
+            rightBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                movePiece(0, 1);
+            });
+        }
 
-        downBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            movePiece(1, 0);
-        });
+        const downBtn = document.querySelector('.touch-btn.down');
+        if (downBtn) {
+            downBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                movePiece(1, 0);
+            });
 
-        downBtn.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            movePiece(1, 0);
-        });
+            downBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                movePiece(1, 0);
+            });
+        }
 
-        dropBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            dropPiece();
-        });
+        const dropBtn = document.querySelector('.touch-btn.drop');
+        if (dropBtn) {
+            dropBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                dropPiece();
+            });
 
-        dropBtn.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            dropPiece();
-        });
+            dropBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                dropPiece();
+            });
+        }
 
         // 道具点击事件
         qingjunceItemElement.addEventListener('click', () => {
@@ -2850,11 +3451,6 @@
             if (useItem('sodawater')) {
                 ITEMS.SODAWATER.effectFunc();
             }
-        });
-
-        // 取消道具选择按钮
-        cancelItemButton.addEventListener('click', () => {
-            itemSelectModal.classList.remove('active');
         });
 
         // 防止触摸滚动
@@ -2895,5 +3491,3 @@
 </script>
 
 </html>
-
-
