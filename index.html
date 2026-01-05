@@ -20,19 +20,19 @@
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
-            padding: 10px;
+            padding: 5px;
             overflow-x: hidden;
         }
 
         .header {
             text-align: center;
-            margin: 10px 0 15px;
+            margin: 5px 0 8px;
             width: 100%;
         }
 
         h1 {
-            font-size: 2.2rem;
-            margin-bottom: 5px;
+            font-size: 1.5rem;
+            margin-bottom: 3px;
             background: linear-gradient(to right, #ff2a8f, #ff7eb3);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -41,7 +41,7 @@
 
         .subtitle {
             color: #ff9ec9;
-            font-size: 0.9rem;
+            font-size: 0.75rem;
             opacity: 0.9;
         }
 
@@ -50,35 +50,38 @@
             flex-direction: column;
             align-items: center;
             width: 100%;
-            max-width: 900px;
+            max-width: 100%;
         }
 
         .main-game {
             display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 15px;
+            flex-direction: column;
+            align-items: center;
             width: 100%;
+            gap: 10px;
         }
 
         .game-board-container {
             position: relative;
             background: linear-gradient(145deg, rgba(20, 10, 30, 0.9), rgba(30, 15, 40, 0.9));
-            border-radius: 12px;
-            padding: 12px;
-            box-shadow: 0 8px 20px rgba(255, 42, 143, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 8px;
+            box-shadow: 0 4px 10px rgba(255, 42, 143, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 122, 179, 0.2);
+            width: 100%;
+            max-width: 300px;
         }
 
         .game-board {
             display: grid;
             grid-template-columns: repeat(10, 1fr);
             grid-template-rows: repeat(20, 1fr);
-            width: 280px;
-            height: 560px;
+            width: 100%;
+            height: 50vh;
+            max-height: 400px;
             background-color: rgba(10, 5, 20, 0.9);
             border: 2px solid rgba(255, 122, 179, 0.3);
-            border-radius: 6px;
+            border-radius: 4px;
             overflow: hidden;
             transition: background-color 0.5s, filter 0.5s;
             box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
@@ -126,25 +129,41 @@
             border-color: #444444 !important;
         }
 
-        .game-info {
+        .info-container {
             display: flex;
             flex-direction: column;
-            gap: 15px;
-            min-width: 200px;
+            gap: 10px;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .top-info {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .score-panel {
+            background: linear-gradient(145deg, rgba(20, 10, 30, 0.9), rgba(30, 15, 40, 0.9));
+            border-radius: 8px;
+            padding: 12px;
+            box-shadow: 0 4px 15px rgba(255, 42, 143, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 122, 179, 0.2);
             flex: 1;
         }
 
-        .info-panel {
+        .next-piece-panel {
             background: linear-gradient(145deg, rgba(20, 10, 30, 0.9), rgba(30, 15, 40, 0.9));
-            border-radius: 12px;
-            padding: 15px;
+            border-radius: 8px;
+            padding: 12px;
             box-shadow: 0 4px 15px rgba(255, 42, 143, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 122, 179, 0.2);
+            width: 120px;
         }
 
         .info-title {
-            font-size: 1.2rem;
-            margin-bottom: 10px;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
             color: #ff7eb3;
             text-align: center;
             font-weight: 600;
@@ -152,7 +171,7 @@
         }
 
         .score-display {
-            font-size: 2.5rem;
+            font-size: 1.8rem;
             text-align: center;
             font-weight: bold;
             color: #ff4d9e;
@@ -170,33 +189,45 @@
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             grid-template-rows: repeat(4, 1fr);
-            width: 120px;
-            height: 120px;
+            width: 80px;
+            height: 80px;
             background-color: rgba(10, 5, 20, 0.9);
-            border-radius: 6px;
+            border-radius: 4px;
             margin-top: 5px;
             border: 1px solid rgba(255, 122, 179, 0.3);
         }
 
         .items-panel {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
+            background: linear-gradient(145deg, rgba(20, 10, 30, 0.9), rgba(30, 15, 40, 0.9));
+            border-radius: 8px;
+            padding: 12px;
+            box-shadow: 0 4px 15px rgba(255, 42, 143, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 122, 179, 0.2);
+            width: 100%;
+        }
+
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin-top: 8px;
         }
 
         .item {
             display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: space-between;
-            padding: 12px 15px;
+            padding: 8px;
             background: linear-gradient(145deg, rgba(30, 15, 40, 0.9), rgba(20, 10, 30, 0.9));
-            border-radius: 10px;
-            border-left: 4px solid;
+            border-radius: 8px;
             position: relative;
             overflow: hidden;
             cursor: pointer;
             transition: all 0.3s ease;
             box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+            height: 100%;
+            justify-content: space-between;
+            border: 2px solid;
         }
 
             .item:hover {
@@ -215,38 +246,56 @@
                 pointer-events: none;
             }
 
-        .item-content {
+        .item-header {
             display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: space-between;
             width: 100%;
             z-index: 2;
         }
 
         .item-name {
             font-weight: bold;
-            font-size: 1.1rem;
+            font-size: 0.9rem;
             color: #fff;
             text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+            margin-bottom: 5px;
         }
 
         .item-count {
             font-size: 1.4rem;
             font-weight: bold;
-            min-width: 35px;
             text-align: center;
             color: #ff7eb3;
             text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
         }
 
-        ..item-recovery {
+        .item-recovery {
             position: absolute;
             bottom: 0;
             left: 0;
-            height: 100%;
+            height: 4px;
+            width: 100%;
             z-index: 1;
             transition: width 0.1s linear;
-            border-radius: 6px;
+            border-radius: 0 0 4px 4px;
+        }
+
+        /* 道具颜色调整 - 按照新顺序 */
+        .item.mojing {
+            border-color: #000000;
+        }
+
+        .item.haitang {
+            border-color: #ff4081;
+        }
+
+        .item.sodawater {
+            border-color: #2196f3;
+        }
+
+        .item.qingjunce {
+            border-color: #ffc107;
         }
 
         /* 道具恢复进度条颜色 */
@@ -266,55 +315,38 @@
             background: linear-gradient(90deg, rgba(255, 193, 7, 0.3), rgba(255, 193, 7, 0.5));
         }
 
-        /* 道具颜色调整 */
-        .item.mojing {
-            border-left-color: #000000; /* 墨镜 - 黑色 */
-        }
-
-        .item.haitang {
-            border-left-color: #ff4081; /* 海棠 - 粉色 */
-        }
-
-        .item.sodawater {
-            border-left-color: #2196f3; /* 苏打水 - 蓝色 */
-        }
-
-        .item.qingjunce {
-            border-left-color: #ffc107; /* 清君侧 - 黄色 */
-        }
-
         .controls-container {
-            margin-top: 20px;
+            margin-top: 15px;
             width: 100%;
-            max-width: 500px;
+            max-width: 300px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 15px;
+            gap: 12px;
         }
 
         .buttons-row {
             display: flex;
             justify-content: center;
-            gap: 20px;
+            gap: 15px;
             width: 100%;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
         }
 
         .game-button {
             background: linear-gradient(to bottom, #ff2a8f, #ff4d9e);
             color: white;
             border: none;
-            border-radius: 50px;
-            padding: 16px 28px;
-            font-size: 1.2rem;
+            border-radius: 25px;
+            padding: 12px 20px;
+            font-size: 1rem;
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(255, 42, 143, 0.3);
+            box-shadow: 0 4px 12px rgba(255, 42, 143, 0.3);
             flex: 1;
-            max-width: 200px;
-            min-width: 150px;
+            max-width: 140px;
+            min-width: 120px;
             position: relative;
             overflow: hidden;
         }
@@ -335,8 +367,8 @@
             }
 
             .game-button:hover, .game-button:active {
-                transform: translateY(-3px);
-                box-shadow: 0 8px 20px rgba(255, 42, 143, 0.4);
+                transform: translateY(-2px);
+                box-shadow: 0 6px 15px rgba(255, 42, 143, 0.4);
             }
 
             .game-button:active {
@@ -351,11 +383,11 @@
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             grid-template-rows: repeat(3, 1fr);
-            gap: 12px;
-            margin-top: 20px;
-            height: 180px;
+            gap: 10px;
+            margin-top: 15px;
+            height: 150px;
             width: 100%;
-            max-width: 300px;
+            max-width: 280px;
             margin-left: auto;
             margin-right: auto;
         }
@@ -363,16 +395,16 @@
         .touch-btn {
             background: linear-gradient(145deg, rgba(40, 20, 50, 0.9), rgba(30, 15, 40, 0.9));
             border: 2px solid rgba(255, 122, 179, 0.4);
-            border-radius: 12px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2rem;
+            font-size: 1.6rem;
             color: #ff7eb3;
             cursor: pointer;
             transition: all 0.2s ease;
             user-select: none;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
         }
 
             .touch-btn:active {
@@ -413,17 +445,13 @@
             transition: background-color 0.3s, transform 0.2s;
         }
 
-            .cell:hover {
-                transform: scale(1.05);
-            }
-
         .filled {
             border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 3px;
+            border-radius: 2px;
             box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.3);
         }
 
-        /* 方块颜色 - 经典俄罗斯方块颜色 */
+        /* 方块颜色 - 经典俄罗斯方块颜色（保持原样） */
         .i {
             background-color: #00bcd4;
         }
@@ -452,14 +480,13 @@
             background-color: #f44336;
         }
         /* Z型 - 红色 */
-            
 
         .game-status {
             text-align: center;
-            margin-top: 15px;
-            font-size: 1.3rem;
+            margin-top: 8px;
+            font-size: 1rem;
             font-weight: bold;
-            height: 30px;
+            height: 24px;
             color: #ff7eb3;
             text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
         }
@@ -488,12 +515,12 @@
 
         .event-content {
             background: linear-gradient(145deg, rgba(25, 12, 35, 0.95), rgba(35, 17, 45, 0.95));
-            border-radius: 16px;
-            padding: 30px;
-            max-width: 500px;
+            border-radius: 12px;
+            padding: 20px;
+            max-width: 90%;
             width: 90%;
             text-align: center;
-            box-shadow: 0 15px 35px rgba(255, 42, 143, 0.2);
+            box-shadow: 0 10px 25px rgba(255, 42, 143, 0.2);
             border: 2px solid rgba(255, 122, 179, 0.3);
             transform: translateY(-20px);
             transition: transform 0.3s;
@@ -504,78 +531,79 @@
         }
 
         .event-title {
-            font-size: 2rem;
-            margin-bottom: 15px;
+            font-size: 1.5rem;
+            margin-bottom: 10px;
             color: #ff7eb3;
             text-shadow: 0 2px 10px rgba(255, 126, 179, 0.5);
         }
 
         .event-type {
             display: inline-block;
-            padding: 6px 18px;
+            padding: 4px 12px;
             border-radius: 20px;
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             font-weight: bold;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
             .event-type.item {
                 background: linear-gradient(to right, #ff4d9e, #ff2a8f);
                 color: white;
-                box-shadow: 0 3px 8px rgba(255, 77, 158, 0.3);
+                box-shadow: 0 2px 6px rgba(255, 77, 158, 0.3);
             }
 
             .event-type.story {
                 background: linear-gradient(to right, #ff7eb3, #ff4d9e);
                 color: white;
-                box-shadow: 0 3px 8px rgba(255, 126, 179, 0.3);
+                box-shadow: 0 2px 6px rgba(255, 126, 179, 0.3);
             }
 
         .event-description {
-            font-size: 1.1rem;
-            line-height: 1.6;
-            margin-bottom: 25px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            margin-bottom: 15px;
             color: #ff9ec9;
         }
 
         .event-effect {
             background: rgba(255, 122, 179, 0.1);
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 25px;
-            border-left: 4px solid #ff7eb3;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 3px solid #ff7eb3;
         }
 
         .event-effect-title {
             font-weight: bold;
             color: #ff7eb3;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
+            font-size: 0.9rem;
         }
 
         .event-actions {
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 10px;
             justify-content: center;
-            margin-top: 20px;
+            margin-top: 15px;
         }
 
         .event-button {
             background: linear-gradient(to bottom, #ff2a8f, #ff4d9e);
             color: white;
             border: none;
-            border-radius: 50px;
-            padding: 12px 24px;
-            font-size: 1rem;
+            border-radius: 25px;
+            padding: 10px 20px;
+            font-size: 0.9rem;
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(255, 42, 143, 0.3);
+            box-shadow: 0 3px 10px rgba(255, 42, 143, 0.3);
         }
 
             .event-button:hover {
                 transform: translateY(-2px);
-                box-shadow: 0 6px 16px rgba(255, 42, 143, 0.4);
+                box-shadow: 0 5px 12px rgba(255, 42, 143, 0.4);
             }
 
             .event-button.consume {
@@ -587,11 +615,11 @@
             }
 
         .yuan-character {
-            font-size: 8rem;
+            font-size: 5rem;
             color: #000000;
-            text-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+            text-shadow: 0 0 15px rgba(0, 0, 0, 0.7);
             font-family: 'SimHei', 'Microsoft YaHei', sans-serif;
-            margin: 20px 0;
+            margin: 15px 0;
             animation: pulse 1s infinite;
         }
 
@@ -616,284 +644,96 @@
             background: linear-gradient(to bottom, #ff2a8f, #ff4d9e);
             color: white;
             border: none;
-            border-radius: 50px;
-            padding: 12px 30px;
-            font-size: 1.2rem;
+            border-radius: 25px;
+            padding: 10px 25px;
+            font-size: 1rem;
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(255, 42, 143, 0.3);
+            box-shadow: 0 4px 12px rgba(255, 42, 143, 0.3);
         }
 
             .confirm-button:hover {
                 transform: translateY(-2px);
-                box-shadow: 0 8px 20px rgba(255, 42, 143, 0.4);
+                box-shadow: 0 6px 15px rgba(255, 42, 143, 0.4);
             }
 
         .input-container {
-            margin: 20px 0;
+            margin: 15px 0;
         }
 
         .input-text {
-            font-size: 1.2rem;
-            margin-bottom: 10px;
+            font-size: 1rem;
+            margin-bottom: 8px;
             color: #ff9ec9;
         }
 
         .text-input {
             width: 100%;
-            padding: 12px;
-            font-size: 1.1rem;
+            padding: 10px;
+            font-size: 1rem;
             border: 2px solid #ff2a8f;
-            border-radius: 8px;
+            border-radius: 6px;
             background-color: rgba(255, 255, 255, 0.1);
             color: white;
             text-align: center;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             transition: all 0.3s ease;
         }
 
             .text-input:focus {
                 outline: none;
                 border-color: #ff7eb3;
-                box-shadow: 0 0 15px rgba(255, 126, 179, 0.5);
+                box-shadow: 0 0 12px rgba(255, 126, 179, 0.5);
                 background-color: rgba(255, 255, 255, 0.15);
             }
 
         .instructions {
-            margin-top: 25px;
-            max-width: 600px;
+            margin-top: 15px;
+            max-width: 100%;
             text-align: center;
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             color: #ff9ec9;
-            line-height: 1.5;
-            padding: 0 15px;
+            line-height: 1.4;
+            padding: 0 10px;
         }
 
         .control-instructions {
             display: flex;
             justify-content: center;
             flex-wrap: wrap;
-            gap: 15px;
-            margin-top: 15px;
+            gap: 10px;
+            margin-top: 10px;
             background: rgba(255, 122, 179, 0.1);
-            padding: 15px;
-            border-radius: 10px;
-            max-width: 500px;
+            padding: 10px;
+            border-radius: 8px;
+            max-width: 100%;
             border: 1px solid rgba(255, 122, 179, 0.2);
         }
 
         .control-item {
             display: flex;
             align-items: center;
-            gap: 8px;
-            font-size: 0.85rem;
+            gap: 6px;
+            font-size: 0.75rem;
             color: #ff9ec9;
         }
 
         .control-icon {
             background: rgba(255, 122, 179, 0.2);
-            padding: 5px 10px;
-            border-radius: 5px;
+            padding: 4px 8px;
+            border-radius: 4px;
             font-weight: bold;
-            min-width: 40px;
+            min-width: 35px;
             text-align: center;
             color: #ff7eb3;
         }
 
-        .key {
-            font-weight: bold;
-            color: #ff9ec9;
-        }
-
-        /* 响应式设计 - 手机适配 */
-        @media (max-width: 768px) {
-            .main-game {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .game-board {
-                width: 250px;
-                height: 500px;
-            }
-
-            .game-info {
-                width: 100%;
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .info-panel {
-                width: 100%;
-                max-width: 350px;
-            }
-
-            .score-display {
-                font-size: 2.2rem;
-            }
-
-            .next-piece-board {
-                width: 110px;
-                height: 110px;
-            }
-
-            .game-button {
-                padding: 14px 20px;
-                font-size: 1.1rem;
-                min-width: 140px;
-            }
-
-            .item {
-                padding: 10px 12px;
-            }
-
-            .item-name {
-                font-size: 1rem;
-            }
-
-            .item-count {
-                font-size: 1.3rem;
-            }
-
-            .event-content {
-                padding: 20px;
-                width: 95%;
-                margin: 10px;
-            }
-
-            .event-title {
-                font-size: 1.7rem;
-            }
-
-            .yuan-character {
-                font-size: 6rem;
-            }
-
-            .touch-controls {
-                height: 160px;
-                max-width: 280px;
-                gap: 10px;
-            }
-
-            .touch-btn {
-                font-size: 1.8rem;
-            }
-        }
-
-        @media (max-width: 480px) {
-            h1 {
-                font-size: 1.8rem;
-            }
-
-            .game-board {
-                width: 220px;
-                height: 440px;
-            }
-
-            .buttons-row {
-                flex-direction: column;
-                align-items: center;
-                gap: 12px;
-            }
-
-            .game-button {
-                width: 90%;
-                max-width: 280px;
-                padding: 12px 18px;
-                font-size: 1rem;
-            }
-
-            .touch-controls {
-                height: 150px;
-                max-width: 250px;
-            }
-
-            .info-panel {
-                padding: 12px;
-            }
-
-            .event-actions {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .event-button {
-                width: 100%;
-                max-width: none;
-            }
-
-            .item-content {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 5px;
-            }
-
-            .item-count {
-                align-self: flex-end;
-                position: absolute;
-                right: 12px;
-                top: 50%;
-                transform: translateY(-50%);
-            }
-        }
-
-        @media (max-width: 360px) {
-            .game-board {
-                width: 200px;
-                height: 400px;
-            }
-
-            .game-button {
-                padding: 10px 15px;
-                font-size: 0.95rem;
-            }
-
-            .touch-controls {
-                height: 140px;
-                max-width: 230px;
-            }
-
-            .score-display {
-                font-size: 2rem;
-            }
-
-            .item {
-                padding: 8px 10px;
-            }
-        }
-
-        /* 横向手机适配 */
-        @media (max-height: 600px) and (orientation: landscape) {
-            .main-game {
-                flex-direction: row;
-                justify-content: space-around;
-            }
-
-            .game-board {
-                width: 200px;
-                height: 400px;
-            }
-
-            .game-info {
-                width: auto;
-                min-width: 180px;
-            }
-
-            .info-panel {
-                padding: 10px;
-            }
-
-            .score-display {
-                font-size: 1.8rem;
-            }
-        }
-
         .footer {
-            margin-top: 25px;
-            margin-bottom: 15px;
+            margin-top: 15px;
+            margin-bottom: 10px;
             color: #ff9ec9;
-            font-size: 0.8rem;
+            font-size: 0.7rem;
             text-align: center;
             opacity: 0.7;
         }
@@ -914,14 +754,14 @@
         }
 
         .freeze-text {
-            font-size: 2rem;
+            font-size: 1.5rem;
             font-weight: bold;
             color: white;
             text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
             animation: pulse 1s infinite;
             background-color: rgba(139, 69, 19, 0.7);
-            padding: 10px 20px;
-            border-radius: 10px;
+            padding: 8px 15px;
+            border-radius: 8px;
         }
 
         .night-warning {
@@ -929,7 +769,7 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 2rem;
+            font-size: 1.5rem;
             font-weight: bold;
             color: white;
             text-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
@@ -940,16 +780,17 @@
 
         .item-added {
             position: fixed;
-            top: 20px;
-            right: 20px;
+            top: 10px;
+            right: 10px;
             background: linear-gradient(to right, #ff4d9e, #ff2a8f);
             color: white;
-            padding: 12px 24px;
-            border-radius: 10px;
+            padding: 8px 16px;
+            border-radius: 8px;
             font-weight: bold;
             z-index: 999;
             animation: slideIn 0.5s, fadeOut 0.5s 2s forwards;
-            box-shadow: 0 5px 15px rgba(255, 77, 158, 0.4);
+            box-shadow: 0 4px 12px rgba(255, 77, 158, 0.4);
+            font-size: 0.9rem;
         }
 
         @keyframes slideIn {
@@ -979,11 +820,121 @@
 
         @keyframes glow {
             from {
-                box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+                box-shadow: 0 0 8px rgba(255, 215, 0, 0.5);
             }
 
             to {
-                box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+                box-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
+            }
+        }
+
+        /* 横向手机适配 */
+        @media (max-height: 600px) and (orientation: landscape) {
+            .main-game {
+                flex-direction: row;
+                justify-content: space-around;
+                align-items: flex-start;
+            }
+
+            .game-board-container {
+                max-width: 200px;
+                height: 70vh;
+            }
+
+            .game-board {
+                height: 60vh;
+            }
+
+            .info-container {
+                max-width: 200px;
+                height: 70vh;
+                overflow-y: auto;
+            }
+
+            .items-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* 超小屏幕适配 */
+        @media (max-width: 320px) {
+            .game-board-container {
+                padding: 6px;
+            }
+
+            .game-board {
+                height: 45vh;
+            }
+
+            .score-display {
+                font-size: 1.6rem;
+            }
+
+            .next-piece-board {
+                width: 70px;
+                height: 70px;
+            }
+
+            .game-button {
+                padding: 10px 16px;
+                font-size: 0.9rem;
+                max-width: 130px;
+                min-width: 110px;
+            }
+
+            .touch-controls {
+                height: 130px;
+                max-width: 250px;
+            }
+
+            .touch-btn {
+                font-size: 1.4rem;
+            }
+
+            .item {
+                padding: 6px;
+            }
+
+            .item-name {
+                font-size: 0.8rem;
+            }
+
+            .item-count {
+                font-size: 1.2rem;
+            }
+        }
+
+        /* 中等屏幕适配 */
+        @media (min-width: 768px) {
+            .game-board-container {
+                max-width: 350px;
+            }
+
+            .game-board {
+                height: 500px;
+            }
+
+            .info-container {
+                max-width: 350px;
+            }
+
+            .next-piece-board {
+                width: 100px;
+                height: 100px;
+            }
+
+            .game-button {
+                max-width: 160px;
+                min-width: 140px;
+            }
+
+            .touch-controls {
+                height: 180px;
+                max-width: 320px;
+            }
+
+            .touch-btn {
+                font-size: 2rem;
             }
         }
     </style>
@@ -1001,51 +952,55 @@
                 <div class="game-status" id="game-status">准备开始</div>
             </div>
 
-            <div class="game-info">
-                <div class="info-panel">
-                    <div class="info-title">分数</div>
-                    <div class="score-display" id="score">0</div>
-                </div>
+            <div class="info-container">
+                <div class="top-info">
+                    <div class="score-panel">
+                        <div class="info-title">分数</div>
+                        <div class="score-display" id="score">0</div>
+                    </div>
 
-                <div class="info-panel">
-                    <div class="info-title">下一个方块</div>
-                    <div class="next-piece-container">
-                        <div class="next-piece-board" id="next-piece-board"></div>
+                    <div class="next-piece-panel">
+                        <div class="info-title">下一个</div>
+                        <div class="next-piece-container">
+                            <div class="next-piece-board" id="next-piece-board"></div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="info-panel items-panel">
+                <div class="items-panel">
                     <div class="info-title">道具栏 (点击使用)</div>
-                    <!-- 新顺序：墨镜 → 海棠 → 苏打水 → 清君侧 -->
-                    <div class="item mojing" id="mojing-item">
-                        <div class="item-recovery" id="mojing-recovery"></div>
-                        <div class="item-content">
-                            <span class="item-name">墨镜</span>
-                            <span class="item-count" id="mojing-count">0</span>
+                    <div class="items-grid">
+                        <!-- 新顺序：墨镜 → 海棠 → 苏打水 → 清君侧 -->
+                        <div class="item mojing" id="mojing-item">
+                            <div class="item-header">
+                                <span class="item-name">墨镜</span>
+                                <span class="item-count" id="mojing-count">0</span>
+                            </div>
+                            <div class="item-recovery" id="mojing-recovery"></div>
                         </div>
-                    </div>
 
-                    <div class="item haitang" id="haitang-item">
-                        <div class="item-recovery" id="haitang-recovery"></div>
-                        <div class="item-content">
-                            <span class="item-name">海棠</span>
-                            <span class="item-count" id="haitang-count">0</span>
+                        <div class="item haitang" id="haitang-item">
+                            <div class="item-header">
+                                <span class="item-name">海棠</span>
+                                <span class="item-count" id="haitang-count">0</span>
+                            </div>
+                            <div class="item-recovery" id="haitang-recovery"></div>
                         </div>
-                    </div>
 
-                    <div class="item sodawater" id="sodawater-item">
-                        <div class="item-recovery" id="sodawater-recovery"></div>
-                        <div class="item-content">
-                            <span class="item-name">苏打水</span>
-                            <span class="item-count" id="sodawater-count">0</span>
+                        <div class="item sodawater" id="sodawater-item">
+                            <div class="item-header">
+                                <span class="item-name">苏打水</span>
+                                <span class="item-count" id="sodawater-count">0</span>
+                            </div>
+                            <div class="item-recovery" id="sodawater-recovery"></div>
                         </div>
-                    </div>
 
-                    <div class="item qingjunce" id="qingjunce-item">
-                        <div class="item-recovery" id="qingjunce-recovery"></div>
-                        <div class="item-content">
-                            <span class="item-name">清君侧</span>
-                            <span class="item-count" id="qingjunce-count">0</span>
+                        <div class="item qingjunce" id="qingjunce-item">
+                            <div class="item-header">
+                                <span class="item-name">清君侧</span>
+                                <span class="item-count" id="qingjunce-count">0</span>
+                            </div>
+                            <div class="item-recovery" id="qingjunce-recovery"></div>
                         </div>
                     </div>
                 </div>
@@ -1069,11 +1024,11 @@
             <div class="control-instructions">
                 <div class="control-item">
                     <span class="control-icon">✨</span>
-                    <span>点击道具文字直接使用！进度条满即可用</span>
+                    <span>点击道具直接使用！进度条满即可用</span>
                 </div>
                 <div class="control-item">
                     <span class="control-icon">📱</span>
-                    <span>专为手机屏幕优化设计</span>
+                    <span>专为手机屏幕优化</span>
                 </div>
             </div>
         </div>
@@ -1110,7 +1065,7 @@
             <div class="event-description">
                 请选择要使用的道具：
             </div>
-            <div id="item-options" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
+            <div id="item-options" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 15px;">
                 <!-- 道具选项将动态生成 -->
             </div>
             <button class="confirm-button" id="cancel-item-button">取消</button>
@@ -2823,6 +2778,14 @@
                 if (useItem('sodawater')) {
                     ITEMS.SODAWATER.effectFunc();
                 }
+            });
+
+            mojingItemElement.addEventListener('click', () => {
+                // 墨镜没有直接效果，只是用于抵消夜幕降临
+            });
+
+            haitangItemElement.addEventListener('click', () => {
+                // 海棠没有直接效果，只是用于抵消食君之禄
             });
 
             // 取消道具选择按钮
