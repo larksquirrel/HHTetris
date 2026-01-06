@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>黑黑花花的俄罗斯方块</title>
+
     <style>
         * {
             margin: 0;
@@ -20,19 +21,19 @@
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
-            padding: 5px;
+            padding: 10px;
             overflow-x: hidden;
         }
 
         .header {
             text-align: center;
-            margin: 5px 0 8px;
+            margin: 10px 0 15px;
             width: 100%;
         }
 
         h1 {
-            font-size: 1.8rem;
-            margin-bottom: 3px;
+            font-size: 2.2rem;
+            margin-bottom: 5px;
             background: linear-gradient(to right, #ff2a8f, #ff7eb3);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -41,75 +42,244 @@
 
         .subtitle {
             color: #ff9ec9;
-            font-size: 0.8rem;
+            font-size: 0.9rem;
             opacity: 0.9;
         }
 
+        /* 修改游戏主容器 */
         .game-container {
             display: flex;
             flex-direction: column;
+            align-items: flex-start; /* 改为左对齐 */
             width: 100%;
-            height: calc(100vh - 120px);
-            max-width: 900px;
+            max-width: 1200px; /* 增加最大宽度 */
+            margin: 0 auto;
+            padding-left: 5%; /* 左边固定距离 */
         }
 
+        /* 修改主游戏区域 */
         .main-game {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            flex: 1;
+            display: flex;
+            flex-wrap: nowrap; /* 改为不换行 */
+            justify-content: space-between; /* 左右分散对齐 */
+            align-items: flex-start;
             width: 100%;
+            gap: 20px;
         }
 
-        /* 游戏棋盘区域 */
+        /* 修改棋盘容器 - 关键修改 */
         .game-board-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            position: relative;
             background: linear-gradient(145deg, rgba(20, 10, 30, 0.9), rgba(30, 15, 40, 0.9));
-            border-radius: 10px;
-            padding: 8px;
+            border-radius: 12px;
+            padding: 15px;
             box-shadow: 0 8px 20px rgba(255, 42, 143, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 122, 179, 0.2);
+            flex-shrink: 0; /* 防止缩小 */
+            /* 宽度占屏幕的70% */
+            width: 70vw;
+            max-width: 700px; /* 最大宽度限制 */
+            min-width: 300px; /* 最小宽度限制 */
+            /* 高度自适应 */
+            height: auto;
+            aspect-ratio: 1/2; /* 保持经典的2:1高度比 */
         }
 
+        /* 修改游戏棋盘 */
         .game-board {
             display: grid;
             grid-template-columns: repeat(10, 1fr);
             grid-template-rows: repeat(20, 1fr);
-            width: 100%;
-            height: 100%;
-            max-width: 300px;
-            max-height: 600px;
+            width: 100% !important; /* 重要：占满父容器 */
+            height: 100% !important; /* 重要：占满父容器 */
             background-color: rgba(10, 5, 20, 0.9);
             border: 2px solid rgba(255, 122, 179, 0.3);
             border-radius: 6px;
             overflow: hidden;
             transition: background-color 0.5s, filter 0.5s;
             box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
-            aspect-ratio: 1/2;
         }
 
-        /* 游戏信息区域 */
+        /* 修改游戏信息区域 - 右侧20%宽度 */
         .game-info {
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            overflow-y: auto;
+            gap: 20px;
+            width: 20vw; /* 宽度占屏幕20% */
+            min-width: 200px; /* 最小宽度 */
+            max-width: 280px; /* 最大宽度 */
+            flex-shrink: 0; /* 防止缩小 */
+            margin-left: auto; /* 推到最右边 */
+            margin-right: 5%; /* 右边固定距离 */
         }
 
+        /* 修改底部控制区域 */
+        .controls-container {
+            margin-top: 30px;
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            margin-left: 0; /* 移除左边距，与棋盘对齐 */
+        }
+
+        /* 添加棋盘单元格自适应样式 */
+        .cell {
+            width: 100%;
+            height: 100%;
+            border: 1px solid rgba(255, 122, 179, 0.1);
+            transition: background-color 0.3s, transform 0.2s;
+        }
+
+        /* 响应式设计 - 平板 */
+        @media (max-width: 1024px) {
+            .game-container {
+                padding-left: 3%;
+            }
+
+            .game-board-container {
+                width: 65vw;
+                max-width: 600px;
+            }
+
+            .game-info {
+                width: 22vw; /* 稍微增加宽度 */
+                margin-right: 3%;
+            }
+
+            .main-game {
+                gap: 15px;
+            }
+        }
+
+        /* 响应式设计 - 手机横屏 */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .game-board-container {
+                width: 50vw;
+                max-width: 400px;
+            }
+
+            .game-info {
+                width: 25vw;
+                min-width: 180px;
+                max-width: 220px;
+                margin-right: 2%;
+            }
+        }
+
+        /* 响应式设计 - 手机竖屏 */
+        @media (max-width: 768px) and (orientation: portrait) {
+            .game-container {
+                padding-left: 10px;
+                align-items: center; /* 小屏幕居中 */
+            }
+
+            .main-game {
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+            }
+
+            .game-board-container {
+                width: 90vw; /* 手机竖屏占90%宽度 */
+                max-width: 400px;
+                margin: 0 auto;
+            }
+
+            .game-info {
+                width: 90vw; /* 手机竖屏占90%宽度 */
+                max-width: 400px;
+                margin: 15px auto 0 auto; /* 居中 */
+                flex-direction: row;
+                flex-wrap: wrap;
+                gap: 15px;
+            }
+
+            .info-panel, .items-panel {
+                flex: 1 1 calc(50% - 10px);
+                min-width: 180px;
+            }
+        }
+
+        /* 超小屏幕手机 */
+        @media (max-width: 480px) {
+            .game-board-container {
+                width: 95vw;
+                max-width: 350px;
+            }
+
+            .game-info {
+                width: 95vw;
+                max-width: 350px;
+            }
+
+            .info-panel, .items-panel {
+                flex: 1 1 100%;
+            }
+        }
+
+        /* 夜幕降临效果 - 全黑 */
+        .night-fall {
+            background-color: #000 !important;
+            filter: brightness(0.1);
+        }
+
+        /* 冤魂效果 - 黑色方块 */
+        .yuan-ghost .cell.filled.i,
+        .yuan-ghost .cell.filled.j,
+        .yuan-ghost .cell.filled.l,
+        .yuan-ghost .cell.filled.o,
+        .yuan-ghost .cell.filled.s,
+        .yuan-ghost .cell.filled.t,
+        .yuan-ghost .cell.filled.z {
+            background-color: #000000 !important;
+            border-color: #444444 !important;
+        }
+
+        /* 流血天气效果 - 红色方块 */
+        .blood-weather .cell.filled.i,
+        .blood-weather .cell.filled.j,
+        .blood-weather .cell.filled.l,
+        .blood-weather .cell.filled.o,
+        .blood-weather .cell.filled.s,
+        .blood-weather .cell.filled.t,
+        .blood-weather .cell.filled.z {
+            background-color: #ff2a2a !important;
+            border-color: #ff7a7a !important;
+        }
+
+        /* 道具颜色调整 */
+        .item.mojing {
+            border-left-color: #ffffff; /* 墨镜 - 黑色 */
+        }
+
+        .item.haitang {
+            border-left-color: #ff4081; /* 海棠 - 粉色 */
+        }
+
+        .item.sodawater {
+            border-left-color: #2196f3; /* 苏打水 - 蓝色 */
+        }
+
+        .item.qingjunce {
+            border-left-color: #ffc107; /* 清君侧 - 黄色 */
+        }
+
+        /* 信息面板样式 */
         .info-panel {
             background: linear-gradient(145deg, rgba(20, 10, 30, 0.9), rgba(30, 15, 40, 0.9));
-            border-radius: 10px;
-            padding: 12px;
+            border-radius: 12px;
+            padding: 15px;
             box-shadow: 0 4px 15px rgba(255, 42, 143, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 122, 179, 0.2);
+            width: 100%; /* 占满父容器 */
         }
 
         .info-title {
-            font-size: 1.1rem;
-            margin-bottom: 8px;
+            font-size: 1.2rem;
+            margin-bottom: 10px;
             color: #ff7eb3;
             text-align: center;
             font-weight: 600;
@@ -117,51 +287,76 @@
         }
 
         .score-display {
-            font-size: 2.2rem;
+            font-size: 2.2rem; /* 稍微减小分数字体 */
             text-align: center;
             font-weight: bold;
             color: #ff4d9e;
             margin: 5px 0;
             text-shadow: 0 2px 8px rgba(255, 77, 158, 0.5);
+            line-height: 1.2;
         }
 
         .next-piece-container {
             display: flex;
             flex-direction: column;
             align-items: center;
+            gap: 10px; /* 增加间距 */
         }
 
         .next-piece-board {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             grid-template-rows: repeat(4, 1fr);
-            width: 90px;
-            height: 90px;
+            width: 100px; /* 固定宽度 */
+            height: 100px; /* 固定高度，保持正方形 */
             background-color: rgba(10, 5, 20, 0.9);
-            border-radius: 6px;
-            margin-top: 5px;
-            border: 1px solid rgba(255, 122, 179, 0.3);
+            border-radius: 8px;
+            border: 2px solid rgba(255, 122, 179, 0.3);
+            padding: 8px; /* 增加内边距，让方块和框框有距离 */
+            margin: 10px auto; /* 居中并添加间距 */
         }
 
+            /* 调整下一个方块的单元格 */
+            .next-piece-board .cell {
+                border: 1px solid rgba(255, 122, 179, 0.15);
+                border-radius: 4px;
+            }
+
+                .next-piece-board .cell.filled {
+                    border: 1px solid rgba(255, 255, 255, 0.2);
+                    border-radius: 3px;
+                }
+
         .items-panel {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: linear-gradient(145deg, rgba(20, 10, 30, 0.9), rgba(30, 15, 40, 0.9));
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 4px 15px rgba(255, 42, 143, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 122, 179, 0.2);
         }
 
         .item {
             position: relative;
             overflow: hidden;
-            border-radius: 8px;
+            border-radius: 10px;
             border-left: 4px solid;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
             box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
             background: linear-gradient(145deg, rgba(30, 15, 40, 0.9), rgba(20, 10, 30, 0.9));
+            padding: 12px 15px; /* 调整内边距 */
         }
 
+            .item:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+            }
+
             .item:active {
-                transform: scale(0.95);
+                transform: translateY(0);
             }
 
             .item.disabled {
@@ -171,37 +366,63 @@
                 pointer-events: none;
             }
 
+            /* 道具恢复完成的状态 */
             .item.recovered {
                 border-left-width: 6px;
                 box-shadow: 0 5px 15px rgba(255, 255, 255, 0.2);
             }
 
+                .item.recovered .item-name {
+                    color: #ffffff;
+                    text-shadow: 0 0 10px currentColor;
+                    font-weight: bold;
+                }
+
+                .item.recovered .item-count {
+                    color: #ffffff;
+                    text-shadow: 0 0 10px #ffffff;
+                    font-weight: bold;
+                    animation: count-glow 1.5s infinite alternate;
+                }
+
         .item-content {
             position: relative;
             z-index: 2;
             display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            padding: 10px;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 15px;
             height: 100%;
         }
 
         .item-name {
             font-weight: bold;
-            font-size: 0.9rem;
+            font-size: 1rem; /* 调整字体大小 */
             color: #fff;
             text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-            margin-bottom: 5px;
+            transition: all 0.3s ease;
         }
 
         .item-count {
-            font-size: 1.2rem;
+            font-size: 1.2rem; /* 调整字体大小 */
             font-weight: bold;
+            min-width: 30px;
             text-align: center;
             color: #ff7eb3;
             text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
-            align-self: flex-end;
-            margin-top: auto;
+            transition: all 0.3s ease;
+        }
+
+        @keyframes count-glow {
+            from {
+                transform: scale(1);
+                text-shadow: 0 0 5px #ffffff;
+            }
+
+            to {
+                transform: scale(1.1);
+                text-shadow: 0 0 15px #ffffff;
+            }
         }
 
         .item-recovery {
@@ -213,23 +434,6 @@
             z-index: 1;
             transition: width 0.3s ease;
             opacity: 0.5;
-        }
-
-        /* 道具颜色 */
-        .item.mojing {
-            border-left-color: #ffffff;
-        }
-
-        .item.haitang {
-            border-left-color: #ff4081;
-        }
-
-        .item.sodawater {
-            border-left-color: #2196f3;
-        }
-
-        .item.qingjunce {
-            border-left-color: #ffc107;
         }
 
         .item.mojing .item-recovery {
@@ -248,14 +452,22 @@
             background: linear-gradient(90deg, #ffc107 0%, #ffd54f 100%);
         }
 
-        /* 控制按钮区域 */
         .controls-container {
+            margin-top: 20px;
+            width: 100%;
+            max-width: 500px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .buttons-row {
             display: flex;
             justify-content: center;
-            gap: 15px;
-            margin-top: 10px;
-            padding: 10px 0;
+            gap: 20px;
             width: 100%;
+            margin-bottom: 10px;
         }
 
         .game-button {
@@ -263,47 +475,116 @@
             color: white;
             border: none;
             border-radius: 50px;
-            padding: 12px 24px;
-            font-size: 1.1rem;
+            padding: 16px 28px;
+            font-size: 1.2rem;
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s ease;
             box-shadow: 0 5px 15px rgba(255, 42, 143, 0.3);
             flex: 1;
-            max-width: 180px;
-            min-width: 120px;
+            max-width: 200px;
+            min-width: 150px;
+            position: relative;
+            overflow: hidden;
         }
 
+            .game-button::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+                transition: left 0.5s;
+            }
+
+            .game-button:hover::after {
+                left: 100%;
+            }
+
+            .game-button:hover, .game-button:active {
+                transform: translateY(-3px);
+                box-shadow: 0 8px 20px rgba(255, 42, 143, 0.4);
+            }
+
             .game-button:active {
-                transform: scale(0.95);
+                transform: translateY(1px);
             }
 
             .game-button.pause {
                 background: linear-gradient(to bottom, #ff7eb3, #ff9ec9);
             }
 
-            .game-button:disabled {
-                opacity: 0.5;
-                cursor: not-allowed;
-            }
-
-        /* 游戏状态 */
-        .game-status {
-            text-align: center;
-            margin-top: 8px;
-            font-size: 1rem;
-            font-weight: bold;
-            height: 24px;
-            color: #ff7eb3;
-            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+        .touch-controls {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 20px;
+            height: 180px;
+            width: 100%;
+            max-width: 300px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
-        /* 格子样式 */
+        .touch-btn {
+            background: linear-gradient(145deg, rgba(40, 20, 50, 0.9), rgba(30, 15, 40, 0.9));
+            border: 2px solid rgba(255, 122, 179, 0.4);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: #ff7eb3;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+            .touch-btn:active {
+                background: linear-gradient(145deg, rgba(50, 25, 60, 0.9), rgba(40, 20, 50, 0.9));
+                transform: scale(0.95);
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            }
+
+            .touch-btn.rotate {
+                grid-column: 2;
+                grid-row: 1;
+            }
+
+            .touch-btn.left {
+                grid-column: 1;
+                grid-row: 2;
+            }
+
+            .touch-btn.down {
+                grid-column: 2;
+                grid-row: 2;
+            }
+
+            .touch-btn.right {
+                grid-column: 3;
+                grid-row: 2;
+            }
+
+            .touch-btn.drop {
+                grid-column: 2;
+                grid-row: 3;
+            }
+
         .cell {
             width: 100%;
             height: 100%;
             border: 1px solid rgba(255, 122, 179, 0.1);
+            transition: background-color 0.3s, transform 0.2s;
         }
+
+            .cell:hover {
+                transform: scale(1.05);
+            }
 
         .filled {
             border: 2px solid rgba(255, 255, 255, 0.3);
@@ -311,63 +592,44 @@
             box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.3);
         }
 
-        /* 方块颜色 */
+        /* 方块颜色 - 经典俄罗斯方块颜色 */
         .i {
             background-color: #00bcd4;
         }
-
+        /* I型 - 青色 */
         .j {
             background-color: #2196f3;
         }
-
+        /* J型 - 蓝色 */
         .l {
             background-color: #ff9800;
         }
-
+        /* L型 - 橙色 */
         .o {
             background-color: #ffeb3b;
         }
-
+        /* O型 - 黄色 */
         .s {
             background-color: #4caf50;
         }
-
+        /* S型 - 绿色 */
         .t {
             background-color: #9c27b0;
         }
-
+        /* T型 - 紫色 */
         .z {
             background-color: #f44336;
         }
+        /* Z型 - 红色 */
 
-        /* 夜幕降临效果 */
-        .night-fall {
-            background-color: #000 !important;
-            filter: brightness(0.1);
-        }
-
-        /* 冤魂效果 */
-        .yuan-ghost .cell.filled.i,
-        .yuan-ghost .cell.filled.j,
-        .yuan-ghost .cell.filled.l,
-        .yuan-ghost .cell.filled.o,
-        .yuan-ghost .cell.filled.s,
-        .yuan-ghost .cell.filled.t,
-        .yuan-ghost .cell.filled.z {
-            background-color: #000000 !important;
-            border-color: #444444 !important;
-        }
-
-        /* 流血天气效果 */
-        .blood-weather .cell.filled.i,
-        .blood-weather .cell.filled.j,
-        .blood-weather .cell.filled.l,
-        .blood-weather .cell.filled.o,
-        .blood-weather .cell.filled.s,
-        .blood-weather .cell.filled.t,
-        .blood-weather .cell.filled.z {
-            background-color: #ff2a2a !important;
-            border-color: #ff7a7a !important;
+        .game-status {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            height: 30px;
+            color: #ff7eb3;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
         }
 
         /* 事件弹窗样式 */
@@ -395,32 +657,74 @@
         .event-content {
             background: linear-gradient(145deg, rgba(25, 12, 35, 0.95), rgba(35, 17, 45, 0.95));
             border-radius: 16px;
-            padding: 20px;
+            padding: 30px;
             max-width: 500px;
             width: 90%;
             text-align: center;
             box-shadow: 0 15px 35px rgba(255, 42, 143, 0.2);
             border: 2px solid rgba(255, 122, 179, 0.3);
+            transform: translateY(-20px);
+            transition: transform 0.3s;
+        }
+
+        .event-modal.active .event-content {
+            transform: translateY(0);
         }
 
         .event-title {
-            font-size: 1.8rem;
+            font-size: 2rem;
             margin-bottom: 15px;
             color: #ff7eb3;
             text-shadow: 0 2px 10px rgba(255, 126, 179, 0.5);
         }
 
-        .event-description {
-            font-size: 1rem;
-            line-height: 1.5;
+        .event-type {
+            display: inline-block;
+            padding: 6px 18px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
             margin-bottom: 20px;
+        }
+
+            .event-type.item {
+                background: linear-gradient(to right, #ff4d9e, #ff2a8f);
+                color: white;
+                box-shadow: 0 3px 8px rgba(255, 77, 158, 0.3);
+            }
+
+            .event-type.story {
+                background: linear-gradient(to right, #ff7eb3, #ff4d9e);
+                color: white;
+                box-shadow: 0 3px 8px rgba(255, 126, 179, 0.3);
+            }
+
+        .event-description {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 25px;
             color: #ff9ec9;
+        }
+
+        .event-effect {
+            background: rgba(255, 122, 179, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            border-left: 4px solid #ff7eb3;
+        }
+
+        .event-effect-title {
+            font-weight: bold;
+            color: #ff7eb3;
+            margin-bottom: 8px;
         }
 
         .event-actions {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 15px;
+            justify-content: center;
             margin-top: 20px;
         }
 
@@ -437,8 +741,9 @@
             box-shadow: 0 4px 12px rgba(255, 42, 143, 0.3);
         }
 
-            .event-button:active {
-                transform: scale(0.95);
+            .event-button:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 16px rgba(255, 42, 143, 0.4);
             }
 
             .event-button.consume {
@@ -448,6 +753,130 @@
             .event-button.cancel {
                 background: linear-gradient(to bottom, #666666, #444444);
             }
+
+        .event-type {
+            display: none !important;
+        }
+
+        .yuan-character {
+            font-size: 8rem;
+            color: #000000;
+            text-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+            font-family: 'SimHei', 'Microsoft YaHei', sans-serif;
+            margin: 20px 0;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
+
+            50% {
+                transform: scale(1.1);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
+        }
+
+        .confirm-button {
+            background: linear-gradient(to bottom, #ff2a8f, #ff4d9e);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 12px 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(255, 42, 143, 0.3);
+        }
+
+            .confirm-button:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 20px rgba(255, 42, 143, 0.4);
+            }
+
+        .input-container {
+            margin: 20px 0;
+        }
+
+        .input-text {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: #ff9ec9;
+        }
+
+        .text-input {
+            width: 100%;
+            padding: 12px;
+            font-size: 1.1rem;
+            border: 2px solid #ff2a8f;
+            border-radius: 8px;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            text-align: center;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+            .text-input:focus {
+                outline: none;
+                border-color: #ff7eb3;
+                box-shadow: 0 0 15px rgba(255, 126, 179, 0.5);
+                background-color: rgba(255, 255, 255, 0.15);
+            }
+
+        .instructions {
+            margin-top: 25px;
+            max-width: 600px;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #ff9ec9;
+            line-height: 1.5;
+            padding: 0 15px;
+        }
+
+        .control-instructions {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 15px;
+            background: rgba(255, 122, 179, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            max-width: 500px;
+            border: 1px solid rgba(255, 122, 179, 0.2);
+        }
+
+        .control-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            color: #ff9ec9;
+        }
+
+        .control-icon {
+            background: rgba(255, 122, 179, 0.2);
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            min-width: 40px;
+            text-align: center;
+            color: #ff7eb3;
+        }
+
+        .key {
+            font-weight: bold;
+            color: #ff9ec9;
+        }
 
         /* 规则弹窗样式 */
         .rules-modal {
@@ -474,7 +903,7 @@
         .rules-content {
             background: linear-gradient(145deg, rgba(25, 12, 35, 0.95), rgba(35, 17, 45, 0.95));
             border-radius: 16px;
-            padding: 20px;
+            padding: 30px;
             max-width: 600px;
             width: 90%;
             max-height: 80vh;
@@ -482,178 +911,562 @@
             text-align: center;
             box-shadow: 0 15px 35px rgba(255, 42, 143, 0.2);
             border: 2px solid rgba(255, 122, 179, 0.3);
+            transform: translateY(-20px);
+            transition: transform 0.3s;
+        }
+
+        .rules-modal.active .rules-content {
+            transform: translateY(0);
         }
 
         .rules-title {
-            font-size: 1.8rem;
-            margin-bottom: 15px;
+            font-size: 2rem;
+            margin-bottom: 20px;
             color: #ff7eb3;
             text-shadow: 0 2px 10px rgba(255, 126, 179, 0.5);
         }
 
         .rules-text {
             text-align: left;
-            font-size: 1rem;
-            line-height: 1.5;
+            font-size: 1.1rem;
+            line-height: 1.6;
             color: #ff9ec9;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
+
+            .rules-text p {
+                margin-bottom: 15px;
+            }
 
         .rule-item {
-            padding: 10px;
-            border-radius: 8px;
-            margin: 10px 0;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
             border-left: 4px solid;
-            background: rgba(255, 122, 179, 0.1);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
         }
 
+            .rule-item:hover {
+                transform: translateX(5px);
+            }
+
+            /* 墨镜 - 黑色主题 */
             .rule-item.mojing-rule {
+                background: linear-gradient(145deg, rgba(0, 0, 0, 0.15), rgba(50, 50, 50, 0.1));
                 border-left-color: #ffffff;
+                color: #ffffff;
             }
 
+                .rule-item.mojing-rule strong {
+                    color: #ffffff;
+                    text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+                }
+
+            /* 海棠 - 粉色主题 */
             .rule-item.haitang-rule {
+                background: linear-gradient(145deg, rgba(255, 42, 143, 0.15), rgba(255, 126, 179, 0.1));
                 border-left-color: #ff2a8f;
+                color: #ff9ec9;
             }
 
+                .rule-item.haitang-rule strong {
+                    color: #ff7eb3;
+                    text-shadow: 0 0 5px rgba(255, 126, 179, 0.5);
+                }
+
+            /* 苏打水 - 蓝色主题 */
             .rule-item.sodawater-rule {
+                background: linear-gradient(145deg, rgba(33, 150, 243, 0.15), rgba(100, 181, 246, 0.1));
                 border-left-color: #2196f3;
+                color: #90caf9;
             }
 
+                .rule-item.sodawater-rule strong {
+                    color: #64b5f6;
+                    text-shadow: 0 0 5px rgba(100, 181, 246, 0.5);
+                }
+
+            /* 清君侧 - 黄色主题 */
             .rule-item.qingjunce-rule {
+                background: linear-gradient(145deg, rgba(255, 193, 7, 0.15), rgba(255, 213, 79, 0.1));
                 border-left-color: #ffc107;
+                color: #ffd54f;
+            }
+
+                .rule-item.qingjunce-rule strong {
+                    color: #ffd54f;
+                    text-shadow: 0 0 5px rgba(255, 213, 79, 0.5);
+                }
+
+            /* 添加装饰效果 */
+            .rule-item::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+                transform: translateX(-100%);
+                transition: transform 0.5s;
+            }
+
+            .rule-item:hover::before {
+                transform: translateX(100%);
+            }
+
+            /* 添加项目符号 */
+            .rule-item strong::before {
+                content: '✦ ';
+                margin-right: 5px;
+            }
+
+            /* 墨镜添加特殊效果 */
+            .rule-item.mojing-rule strong::before {
+                content: '🕶️ ';
+            }
+
+            /* 海棠添加特殊效果 */
+            .rule-item.haitang-rule strong::before {
+                content: '🌸 ';
+            }
+
+            /* 苏打水添加特殊效果 */
+            .rule-item.sodawater-rule strong::before {
+                content: '🥤 ';
+            }
+
+            /* 清君侧添加特殊效果 */
+            .rule-item.qingjunce-rule strong::before {
+                content: '⚔️ ';
             }
 
             .rule-item strong {
                 color: #ffffff;
-                font-size: 1rem;
+                font-size: 1.2rem;
                 display: block;
-                margin-bottom: 5px;
+                margin-bottom: 8px;
+                text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
             }
+
+        .rule-tip {
+            background: rgba(255, 122, 179, 0.05);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            border: 1px dashed rgba(255, 122, 179, 0.3);
+            font-size: 0.95rem;
+            color: #ffb3d1;
+        }
 
         .rules-confirm-button {
             background: linear-gradient(to bottom, #ff2a8f, #ff4d9e);
             color: white;
             border: none;
             border-radius: 50px;
-            padding: 12px 30px;
-            font-size: 1.1rem;
+            padding: 14px 40px;
+            font-size: 1.2rem;
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s ease;
             box-shadow: 0 5px 15px rgba(255, 42, 143, 0.3);
             margin-top: 10px;
+            min-width: 200px;
         }
+
+            .rules-confirm-button:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 8px 20px rgba(255, 42, 143, 0.4);
+            }
 
             .rules-confirm-button:active {
-                transform: scale(0.95);
+                transform: translateY(1px);
             }
 
-        /* 竖屏手机优化 */
-        @media screen and (orientation: portrait) and (max-width: 768px) {
-            .game-container {
-                height: calc(100vh - 80px);
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            .rules-content {
+                padding: 20px;
+                max-width: 95%;
             }
 
-            .main-game {
-                grid-template-columns: 1.2fr 0.8fr;
-                gap: 8px;
+            .rules-title {
+                font-size: 1.7rem;
             }
 
-            .game-board {
-                max-width: 100%;
-                max-height: 100%;
-            }
-
-            .items-panel {
-                grid-template-columns: 1fr;
-                gap: 8px;
-            }
-
-            .item-content {
-                flex-direction: row;
-                justify-content: space-between;
-                align-items: center;
-                padding: 8px 10px;
-            }
-
-            .item-name {
-                margin-bottom: 0;
-                font-size: 0.85rem;
-            }
-
-            .item-count {
-                margin-top: 0;
-                font-size: 1.1rem;
-            }
-
-            .controls-container {
-                gap: 10px;
-            }
-
-            .game-button {
-                padding: 10px 20px;
+            .rules-text {
                 font-size: 1rem;
-                max-width: 150px;
-                min-width: 100px;
+            }
+
+            .rules-confirm-button {
+                padding: 12px 30px;
+                font-size: 1.1rem;
             }
         }
 
-        /* 超小屏幕优化 */
-        @media screen and (orientation: portrait) and (max-width: 480px) {
-            h1 {
+        @media (max-width: 480px) {
+            .rules-title {
                 font-size: 1.5rem;
             }
 
-            .subtitle {
-                font-size: 0.7rem;
+            .rules-text {
+                font-size: 0.95rem;
             }
 
+            .rule-item {
+                padding: 12px;
+            }
+
+            .rules-confirm-button {
+                padding: 10px 25px;
+                font-size: 1rem;
+                min-width: 180px;
+            }
+        }
+
+        /* 响应式设计 - 手机适配 */
+        @media (max-width: 768px) {
             .main-game {
-                grid-template-columns: 1.3fr 0.7fr;
-                gap: 6px;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .game-board {
+                width: 250px;
+                height: 500px;
+            }
+
+            .game-info {
+                width: 100%;
+                flex-direction: column;
+                align-items: center;
             }
 
             .info-panel {
-                padding: 8px;
+                width: 100%;
+                max-width: 350px;
             }
 
-            .info-title {
-                font-size: 0.9rem;
+            .score-display {
+                font-size: 2.2rem;
+            }
+
+            .next-piece-board {
+                width: 110px;
+                height: 110px;
+            }
+
+            .game-button {
+                padding: 14px 20px;
+                font-size: 1.1rem;
+                min-width: 140px;
+            }
+
+            .item {
+                padding: 10px 12px;
+            }
+
+            .item-name {
+                font-size: 1rem;
+            }
+
+            .item-count {
+                font-size: 1.3rem;
+            }
+
+            .event-content {
+                padding: 20px;
+                width: 95%;
+                margin: 10px;
+            }
+
+            .event-title {
+                font-size: 1.7rem;
+            }
+
+            .yuan-character {
+                font-size: 6rem;
+            }
+
+            .touch-controls {
+                height: 160px;
+                max-width: 280px;
+                gap: 10px;
+            }
+
+            .touch-btn {
+                font-size: 1.8rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .game-board {
+                width: 220px;
+                height: 440px;
+            }
+
+            .buttons-row {
+                flex-direction: column;
+                align-items: center;
+                gap: 12px;
+            }
+
+            .game-button {
+                width: 90%;
+                max-width: 280px;
+                padding: 12px 18px;
+                font-size: 1rem;
+            }
+
+            .touch-controls {
+                height: 150px;
+                max-width: 250px;
+            }
+
+            .info-panel {
+                padding: 12px;
+            }
+
+            .event-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .event-button {
+                width: 100%;
+                max-width: none;
+            }
+
+            .item-content {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+
+            .item-count {
+                align-self: flex-end;
+                position: absolute;
+                right: 12px;
+                top: 50%;
+                transform: translateY(-50%);
+            }
+        }
+
+        @media (max-width: 360px) {
+            .game-board {
+                width: 200px;
+                height: 400px;
+            }
+
+            .game-button {
+                padding: 10px 15px;
+                font-size: 0.95rem;
+            }
+
+            .touch-controls {
+                height: 140px;
+                max-width: 230px;
+            }
+
+            .score-display {
+                font-size: 2rem;
+            }
+
+            .item {
+                padding: 8px 10px;
+            }
+        }
+
+        /* 横向手机适配 */
+        @media (max-height: 600px) and (orientation: landscape) {
+            .main-game {
+                flex-direction: row;
+                justify-content: space-around;
+            }
+
+            .game-board {
+                width: 200px;
+                height: 400px;
+            }
+
+            .game-info {
+                width: auto;
+                min-width: 180px;
+            }
+
+            .info-panel {
+                padding: 10px;
             }
 
             .score-display {
                 font-size: 1.8rem;
             }
+        }
 
-            .next-piece-board {
-                width: 70px;
-                height: 70px;
+        .footer {
+            margin-top: 25px;
+            margin-bottom: 15px;
+            color: #ff9ec9;
+            font-size: 0.8rem;
+            text-align: center;
+            opacity: 0.7;
+        }
+
+        .freeze-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(139, 69, 19, 0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            border-radius: 4px;
+            pointer-events: none;
+        }
+
+        .freeze-text {
+            font-size: 2rem;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+            animation: pulse 1s infinite;
+            background-color: rgba(139, 69, 19, 0.7);
+            padding: 10px 20px;
+            border-radius: 10px;
+        }
+
+        .night-warning {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2rem;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
+            z-index: 101;
+            text-align: center;
+            width: 100%;
+        }
+
+        .item-added {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(to right, #ff4d9e, #ff2a8f);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: bold;
+            z-index: 999;
+            animation: slideIn 0.5s, fadeOut 0.5s 2s forwards;
+            box-shadow: 0 5px 15px rgba(255, 77, 158, 0.4);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
             }
 
-            .item-name {
-                font-size: 0.8rem;
-            }
-
-            .item-count {
-                font-size: 1rem;
-            }
-
-            .game-button {
-                padding: 8px 16px;
-                font-size: 0.9rem;
-                max-width: 130px;
-                min-width: 90px;
+            to {
+                transform: translateX(0);
+                opacity: 1;
             }
         }
 
-        /* 横屏布局 */
-        @media screen and (orientation: landscape) {
-            .main-game {
-                grid-template-columns: 1fr 1fr;
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+            }
+        }
+
+        .brass-box-special {
+            position: relative;
+            border: 2px solid #ffd700 !important;
+            background: linear-gradient(145deg, rgba(50, 35, 10, 0.9), rgba(70, 50, 20, 0.9)) !important;
+            animation: glow 1.5s infinite alternate;
+        }
+
+        @keyframes glow {
+            from {
+                box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
             }
 
-            .items-panel {
+            to {
+                box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+            }
+        }
+
+        /* 手机竖屏：整体重排 */
+        @media (max-width: 768px) {
+            .main-game {
+                display: grid;
                 grid-template-columns: 1fr 1fr;
+                grid-template-areas:
+                    "board info"
+                    "board info";
+                align-items: start;
+                gap: 12px;
+            }
+
+            .game-board-container {
+                grid-area: board;
+                justify-self: center;
+            }
+
+            .game-info {
+                grid-area: info;
+                width: 100%;
+                max-width: 180px;
+            }
+
+                .game-info .info-panel {
+                    margin-bottom: 10px;
+                }
+
+            /* 道具栏压缩高度，防止挤屏 */
+            .items-panel {
+                max-height: 260px;
+                overflow-y: auto;
+            }
+
+            /* 底部按钮固定在棋盘下方 */
+            .controls-container {
+                margin-top: 15px;
+            }
+
+            .buttons-row {
+                flex-direction: row;
+                gap: 10px;
+            }
+
+            .game-button {
+                min-width: 0;
+                flex: 1;
+            }
+        }
+
+        /* 超小屏进一步压缩 */
+        @media (max-width: 480px) {
+            .main-game {
+                grid-template-columns: 1fr;
+                grid-template-areas:
+                    "board"
+                    "info";
+            }
+
+            .game-info {
+                max-width: none;
             }
         }
     </style>
@@ -661,7 +1474,7 @@
 <body>
     <div class="header">
         <h1>黑黑花花的俄罗斯方块</h1>
-        <div class="subtitle">🕶️ 黑眼镜 · 🎮 · 解雨臣 🌸</div>
+        <div class="subtitle">🕶️ 黑眼镜 · 🎮  · 解雨臣 🌸</div>
     </div>
 
     <!-- 游戏规则弹窗 -->
@@ -669,7 +1482,7 @@
         <div class="rules-content">
             <h2 class="rules-title">游戏规则</h2>
             <div class="rules-text">
-                <p style="text-align: center; font-weight: bold; margin: 10px 0;">🎉 欢迎来到黑黑花花的俄罗斯方块！🎉</p>
+                <p style="text-align: center; font-weight: bold; margin: 20px 0;">🎉 欢迎来到黑黑花花的俄罗斯方块！🎉</p>
                 <p>本游戏在传统的俄罗斯方块上增加了4种【道具】和10种【剧情】</p>
                 <p>在消除一行方块后会触发随机【剧情】，需完成相应要求后才能继续游戏</p>
                 <p>在游戏过程中可使用右侧【道具】，介绍如下：</p>
@@ -693,13 +1506,17 @@
                     <strong>【清君侧】</strong>
                     <p>清除现有全部方块。</p>
                 </div>
+
             </div>
             <button class="rules-confirm-button" id="rules-confirm-button">开始游戏</button>
         </div>
     </div>
 
+
     <div class="game-container">
+
         <div class="main-game">
+
             <!-- 左：棋盘 -->
             <div class="game-board-container">
                 <div class="game-board" id="game-board"></div>
@@ -708,6 +1525,7 @@
 
             <!-- 右：信息区 -->
             <div class="game-info">
+
                 <div class="info-panel">
                     <div class="info-title">分数</div>
                     <div class="score-display" id="score">0</div>
@@ -754,15 +1572,27 @@
                             <span class="item-count" id="qingjunce-count">0</span>
                         </div>
                     </div>
+
                 </div>
             </div>
         </div>
 
-        <!-- 底部控制按钮 -->
+        <!-- 底部控制 -->
         <div class="controls-container">
-            <button class="game-button" id="start-restart-button">开始游戏</button>
-            <button class="game-button pause" id="pause-resume-button" disabled>暂停</button>
+            <div class="buttons-row">
+                <button class="game-button" id="start-restart-button">开始游戏</button>
+                <button class="game-button pause" id="pause-resume-button" disabled>暂停</button>
+            </div>
+
+            <div class="touch-controls">
+                <div class="touch-btn rotate">↻</div>
+                <div class="touch-btn left">←</div>
+                <div class="touch-btn down">↓</div>
+                <div class="touch-btn right">→</div>
+                <div class="touch-btn drop">↓</div>
+            </div>
         </div>
+
     </div>
 
     <!-- 音频元素 -->
@@ -777,826 +1607,444 @@
     <div class="event-modal" id="event-modal">
         <div class="event-content">
             <h2 class="event-title" id="event-title">事件标题</h2>
+            <div class="event-type" id="event-type"></div>
             <div class="event-description" id="event-description"></div>
+            <div class="event-effect">
+                <div class="event-effect-title"></div>
+                <div id="event-effect-desc"></div>
+            </div>
             <div class="event-actions" id="event-actions">
                 <!-- 按钮会动态添加 -->
             </div>
         </div>
     </div>
 
-    <script>
-        // 游戏常量
-        const BOARD_WIDTH = 10;
-        const BOARD_HEIGHT = 20;
-        const EMPTY_CELL = 'empty';
+</body>
 
-        // 道具恢复时间（毫秒）
-        const ITEM_RECOVERY_TIMES = {
-            mojing: 6000,      // 墨镜：6秒
-            haitang: 8000,     // 海棠：8秒
-            sodawater: 12000,  // 苏打水：12秒
-            qingjunce: 20000   // 清君侧：20秒
-        };
 
-        // 方块形状定义
-        const TETROMINOES = {
-            I: {
-                shape: [
-                    [0, 0, 0, 0],
-                    [1, 1, 1, 1],
-                    [0, 0, 0, 0],
-                    [0, 0, 0, 0]
-                ],
-                className: 'i'
-            },
-            J: {
-                shape: [
-                    [1, 0, 0],
-                    [1, 1, 1],
-                    [0, 0, 0]
-                ],
-                className: 'j'
-            },
-            L: {
-                shape: [
-                    [0, 0, 1],
-                    [1, 1, 1],
-                    [0, 0, 0]
-                ],
-                className: 'l'
-            },
-            O: {
-                shape: [
-                    [1, 1],
-                    [1, 1]
-                ],
-                className: 'o'
-            },
-            S: {
-                shape: [
-                    [0, 1, 1],
-                    [1, 1, 0],
-                    [0, 0, 0]
-                ],
-                className: 's'
-            },
-            T: {
-                shape: [
-                    [0, 1, 0],
-                    [1, 1, 1],
-                    [0, 0, 0]
-                ],
-                className: 't'
-            },
-            Z: {
-                shape: [
-                    [1, 1, 0],
-                    [0, 1, 1],
-                    [0, 0, 0]
-                ],
-                className: 'z'
-            }
-        };
+<script>
+    // 游戏常量
+    const BOARD_WIDTH = 10;
+    const BOARD_HEIGHT = 20;
+    const EMPTY_CELL = 'empty';
 
-        // 剧情定义
-        const STORIES = {
-            SHIJUNZHILU: {
-                name: "🍚 食君之禄",
-                description: "食君之禄，为君分忧。",
-                effect: "👻 需消耗【海棠】🌸x1支付报酬，否则将出现黑色怨气。",
-                effectFunc: handleShijunzhilu,
-                canAppear: true
-            },
-            NIGHTFALL: {
-                name: "🌙 夜幕降临",
-                description: "太阳没有出来之前，我是无敌的。",
-                effect: "👀 需消耗【墨镜】🕶️x1适应黑暗，否则将被剥夺视线5秒。",
-                effectFunc: handleNightFall,
-                canAppear: true
-            },
-            IMMORTAL: {
-                name: "🧬 长生者",
-                description: "这个人汉姓姓齐，家族显赫，他没有受过什么正规的教育，在德国有一个音乐和解剖学的学位。",
-                effect: "⏳ 方块下落时间放缓为0.5倍，持续10秒。",
-                effectFunc: activateImmortal,
-                canAppear: true
-            },
-            FRIED_LIVER: {
-                name: "🍲 炒肝",
-                description: "-今天晚上我想吃炒肝。 -我们能天亮之后去吃吗？天亮之后如果你能到这来，我就带你去吃炒肝。",
-                effect: "⏸️ 小小花开始吃炒肝，停止操作3秒。",
-                effectFunc: activateFriedLiver,
-                canAppear: true
-            },
-            BLOODY_WEATHER: {
-                name: "🌧️ 流血的天气",
-                description: "今晚要下雨，流血的天气。",
-                effect: "🔴 现有及接下来的5个方块全部变为红色",
-                effectFunc: activateBloodyWeather,
-                canAppear: true
-            },
-            OPERA: {
-                name: "🎭 戏曲",
-                description: "如果我声带坏了，我就不能唱戏了，很多女孩子会伤心的。",
-                effect: "🎵 解语花路过，更换了BGM。",
-                effectFunc: activateOpera,
-                canAppear: true
-            },
-            SNOOPY: {
-                name: "🐶 史努比",
-                description: "九点五十分，上床看了会儿史努比的漫画。",
-                effect: "↩️ 解雨臣打开漫画，撤回这一步方块。",
-                effectFunc: activateSnoopy,
-                canAppear: true
-            },
-            BRASS_BOX: {
-                name: "📦 黄铜箱子",
-                description: "-很久以前的那个黄铜箱子。 -你也有那么想找回来的东西？",
-                effect: "💞 找到宿命结局，分数直接变为9999。",
-                effectFunc: activateBrassBox,
-                canAppear: true,
-                appearsOnlyOnce: true,
-                hasAppeared: false
-            },
-            TICKET: {
-                name: "✈️ 机票",
-                description: "类似于回去的机票都买不起的那种卑微。",
-                effect: "💓 输入正确答案后方可继续游戏",
-                effectFunc: activateTicket,
-                canAppear: true
-            },
-            CAN_WINDMILL: {
-                name: "🎡 易拉罐风车",
-                description: "苏打水易拉罐diy风车手作。",
-                effect: "💨 黑眼镜示范玩法，随机吹走了现有的9格方块。",
-                effectFunc: activateCanWindmill,
-                canAppear: true
-            }
-        };
+    // 道具恢复时间（毫秒）
+    const ITEM_RECOVERY_TIMES = {
+        mojing: 6000,      // 墨镜：6秒
+        haitang: 8000,     // 海棠：8秒
+        sodawater: 12000,  // 苏打水：12秒
+        qingjunce: 20000   // 清君侧：20秒
+    };
 
-        // 道具定义
-        const ITEMS = {
-            QINGJUNCE: {
-                name: "清君侧",
-                description: "清除游戏区域内的所有方块",
-                effectFunc: clearAllBlocks
-            },
-            SODAWATER: {
-                name: "苏打水",
-                description: "随机改变下一个方块的形状",
-                effectFunc: randomizeNextPiece
-            }
-        };
+    // 方块形状定义
+    const TETROMINOES = {
+        I: {
+            shape: [
+                [0, 0, 0, 0],
+                [1, 1, 1, 1],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0]
+            ],
+            className: 'i'
+        },
+        J: {
+            shape: [
+                [1, 0, 0],
+                [1, 1, 1],
+                [0, 0, 0]
+            ],
+            className: 'j'
+        },
+        L: {
+            shape: [
+                [0, 0, 1],
+                [1, 1, 1],
+                [0, 0, 0]
+            ],
+            className: 'l'
+        },
+        O: {
+            shape: [
+                [1, 1],
+                [1, 1]
+            ],
+            className: 'o'
+        },
+        S: {
+            shape: [
+                [0, 1, 1],
+                [1, 1, 0],
+                [0, 0, 0]
+            ],
+            className: 's'
+        },
+        T: {
+            shape: [
+                [0, 1, 0],
+                [1, 1, 1],
+                [0, 0, 0]
+            ],
+            className: 't'
+        },
+        Z: {
+            shape: [
+                [1, 1, 0],
+                [0, 1, 1],
+                [0, 0, 0]
+            ],
+            className: 'z'
+        }
+    };
 
-        // 游戏变量
-        let board = [];
-        let currentPiece = null;
-        let nextPiece = null;
-        let score = 0;
-        let gameOver = false;
-        let isPaused = false;
-        let gameStarted = false;
-        let dropInterval = null;
-        let dropSpeed = 1000;
-        let originalDropSpeed = 1000;
+    // 剧情定义（黄铜箱子只出现一次）
+    const STORIES = {
+        SHIJUNZHILU: {
+            name: "🍚 食君之禄",
+            type: "剧情",
+            description: "食君之禄，为君分忧。",
+            effect: "👻 需消耗【海棠】🌸x1支付报酬，否则将出现黑色怨气。",
+            effectFunc: handleShijunzhilu,
+            canAppear: true
+        },
+        NIGHTFALL: {
+            name: "🌙 夜幕降临",
+            type: "剧情",
+            description: "太阳没有出来之前，我是无敌的。",
+            effect: "👀 需消耗【墨镜】🕶️x1适应黑暗，否则将被剥夺视线5秒。",
+            effectFunc: handleNightFall,
+            canAppear: true
+        },
+        IMMORTAL: {
+            name: "🧬 长生者",
+            type: "剧情",
+            description: "这个人汉姓姓齐，家族显赫，他没有受过什么正规的教育，在德国有一个音乐和解剖学的学位。",
+            effect: "⏳ 方块下落时间放缓为0.5倍，持续10秒。",
+            effectFunc: activateImmortal,
+            canAppear: true
+        },
+        FRIED_LIVER: {
+            name: "🍲 炒肝",
+            type: "剧情",
+            description: "-今天晚上我想吃炒肝。 -我们能天亮之后去吃吗？天亮之后如果你能到这来，我就带你去吃炒肝。",
+            effect: "⏸️ 小小花开始吃炒肝，停止操作3秒。",
+            effectFunc: activateFriedLiver,
+            canAppear: true
+        },
+        BLOODY_WEATHER: {
+            name: "🌧️ 流血的天气",
+            type: "剧情",
+            description: "今晚要下雨，流血的天气。",
+            effect: "🔴 现有及接下来的5个方块全部变为红色",
+            effectFunc: activateBloodyWeather,
+            canAppear: true
+        },
+        OPERA: {
+            name: "🎭 戏曲",
+            type: "剧情",
+            description: "如果我声带坏了，我就不能唱戏了，很多女孩子会伤心的。",
+            effect: "🎵 解语花路过，更换了BGM。",
+            effectFunc: activateOpera,
+            canAppear: true
+        },
+        SNOOPY: {
+            name: "🐶 史努比",
+            type: "剧情",
+            description: "九点五十分，上床看了会儿史努比的漫画。",
+            effect: "↩️ 解雨臣打开漫画，撤回这一步方块。",
+            effectFunc: activateSnoopy,
+            canAppear: true
+        },
+        BRASS_BOX: {
+            name: "📦 黄铜箱子",
+            type: "剧情",
+            description: "-很久以前的那个黄铜箱子。 -你也有那么想找回来的东西？",
+            effect: "💞 找到宿命结局，分数直接变为9999。",
+            effectFunc: activateBrassBox,
+            canAppear: true,
+            appearsOnlyOnce: true,  // 只出现一次
+            hasAppeared: false      // 是否已经出现过
+        },
+        TICKET: {
+            name: "✈️ 机票",
+            type: "剧情",
+            description: "类似于回去的机票都买不起的那种卑微。",
+            effect: "💓 输入正确答案后方可继续游戏",
+            effectFunc: activateTicket,
+            canAppear: true
+        },
+        CAN_WINDMILL: {
+            name: "🎡 易拉罐风车",
+            type: "剧情",
+            description: "苏打水易拉罐diy风车手作。",
+            effect: "💨 黑眼镜示范玩法，随机吹走了现有的9格方块。",
+            effectFunc: activateCanWindmill,
+            canAppear: true
+        }
+    };
 
-        // 剧情管理系统变量
-        let availableStories = [];
-        let usedStories = [];
-        let storyRound = 1;
-        let storyCount = 0;
+    // 道具定义
+    const ITEMS = {
+        QINGJUNCE: {
+            name: "清君侧",
+            description: "清除游戏区域内的所有方块",
+            effectFunc: clearAllBlocks
+        },
+        SODAWATER: {
+            name: "苏打水",
+            description: "随机改变下一个方块的形状",
+            effectFunc: randomizeNextPiece
+        }
+    };
 
-        // 上一个方块状态
-        let previousBoard = null;
-        let previousPiece = null;
+    // 游戏变量
+    let board = [];
+    let currentPiece = null;
+    let nextPiece = null;
+    let score = 0;
+    let gameOver = false;
+    let isPaused = false;
+    let gameStarted = false;
+    let dropInterval = null;
+    let dropSpeed = 1000;
+    let originalDropSpeed = 1000;
 
-        // 道具和状态变量
-        let items = {
-            mojing: 0,
-            haitang: 0,
-            qingjunce: 0,
-            sodawater: 0
-        };
+    // 剧情管理系统变量
+    let availableStories = []; // 当前可用的剧情列表
+    let usedStories = [];      // 本轮已使用的剧情
+    let storyRound = 1;        // 当前是第几轮
+    let storyCount = 0;        // 已触发的剧情数量（用于控制黄铜箱子在第3个以后出现）
 
-        // 道具恢复计时器
-        let itemRecoveryTimers = {
-            mojing: null,
-            haitang: null,
-            qingjunce: null,
-            sodawater: null
-        };
+    // 上一个方块状态（用于史努比撤回）
+    let previousBoard = null;
+    let previousPiece = null;
 
-        // 道具恢复进度
-        let itemRecoveryProgress = {
-            mojing: 0,
-            haitang: 0,
-            qingjunce: 0,
-            sodawater: 0
-        };
+    // 道具和状态变量
+    let items = {
+        mojing: 0,      // 墨镜
+        haitang: 0,     // 海棠
+        qingjunce: 0,   // 清君侧
+        sodawater: 0    // 苏打水
+    };
 
-        // 状态效果
-        let activeEffects = {
-            nightFall: false,
-            immortal: false,
-            bloodyWeather: false,
-            bloodyWeatherCount: 0,
-            friedLiver: false,
-            friedLiverTimer: null,
-            yuanGhost: false
-        };
+    // 道具恢复计时器
+    let itemRecoveryTimers = {
+        mojing: null,
+        haitang: null,
+        qingjunce: null,
+        sodawater: null
+    };
 
-        // 效果计时器
-        let effectTimers = {
-            nightFall: null,
-            immortal: null,
-            friedLiver: null,
-            yuanGhost: null
-        };
+    // 道具恢复进度
+    let itemRecoveryProgress = {
+        mojing: 0,
+        haitang: 0,
+        qingjunce: 0,
+        sodawater: 0
+    };
 
-        // 音乐变量
-        let backgroundMusic = document.getElementById('background-music');
-        let operaMusic = document.getElementById('opera-music');
-        let isOperaPlaying = false;
-        let operaTimeout = null;
+    // 状态效果（后一个剧情覆盖前一个）
+    let activeEffects = {
+        nightFall: false,           // 夜幕降临
+        immortal: false,            // 长生者
+        bloodyWeather: false,       // 流血的天气
+        bloodyWeatherCount: 0,      // 流血天气剩余方块数
+        friedLiver: false,          // 炒肝（冻结操作）
+        friedLiverTimer: null,      // 炒肝计时器
+        yuanGhost: false            // 冤魂效果（黑色方块）
+    };
 
-        // DOM元素
-        const rulesModal = document.getElementById('rules-modal');
-        const rulesConfirmButton = document.getElementById('rules-confirm-button');
-        const gameBoardElement = document.getElementById('game-board');
-        const nextPieceBoardElement = document.getElementById('next-piece-board');
-        const scoreElement = document.getElementById('score');
-        const gameStatusElement = document.getElementById('game-status');
-        const startRestartButton = document.getElementById('start-restart-button');
-        const pauseResumeButton = document.getElementById('pause-resume-button');
+    // 效果计时器（用于清除效果）
+    let effectTimers = {
+        nightFall: null,
+        immortal: null,
+        friedLiver: null,
+        yuanGhost: null
+    };
 
-        // 道具数量显示元素
-        const mojingCountElement = document.getElementById('mojing-count');
-        const haitangCountElement = document.getElementById('haitang-count');
-        const qingjunceCountElement = document.getElementById('qingjunce-count');
-        const sodawaterCountElement = document.getElementById('sodawater-count');
+    // 音乐变量
+    let backgroundMusic = document.getElementById('background-music');
+    let operaMusic = document.getElementById('opera-music');
+    let isOperaPlaying = false;
+    let operaTimeout = null;
 
-        // 道具项元素
-        const mojingItemElement = document.getElementById('mojing-item');
-        const haitangItemElement = document.getElementById('haitang-item');
-        const qingjunceItemElement = document.getElementById('qingjunce-item');
-        const sodawaterItemElement = document.getElementById('sodawater-item');
+    // DOM元素
+    const rulesModal = document.getElementById('rules-modal');
+    const rulesConfirmButton = document.getElementById('rules-confirm-button');
+    const gameBoardElement = document.getElementById('game-board');
+    const nextPieceBoardElement = document.getElementById('next-piece-board');
+    const scoreElement = document.getElementById('score');
+    const gameStatusElement = document.getElementById('game-status');
+    const startRestartButton = document.getElementById('start-restart-button');
+    const pauseResumeButton = document.getElementById('pause-resume-button');
 
-        // 道具恢复进度条元素
-        const mojingRecoveryElement = document.getElementById('mojing-recovery');
-        const haitangRecoveryElement = document.getElementById('haitang-recovery');
-        const qingjunceRecoveryElement = document.getElementById('qingjunce-recovery');
-        const sodawaterRecoveryElement = document.getElementById('sodawater-recovery');
+    // 道具数量显示元素和道具项
+    const mojingCountElement = document.getElementById('mojing-count');
+    const haitangCountElement = document.getElementById('haitang-count');
+    const qingjunceCountElement = document.getElementById('qingjunce-count');
+    const sodawaterCountElement = document.getElementById('sodawater-count');
 
-        // 事件弹窗元素
-        const eventModal = document.getElementById('event-modal');
-        const eventTitleElement = document.getElementById('event-title');
-        const eventDescriptionElement = document.getElementById('event-description');
-        const eventActionsElement = document.getElementById('event-actions');
+    const mojingItemElement = document.getElementById('mojing-item');
+    const haitangItemElement = document.getElementById('haitang-item');
+    const qingjunceItemElement = document.getElementById('qingjunce-item');
+    const sodawaterItemElement = document.getElementById('sodawater-item');
 
-        // 触摸控制变量
-        let touchStartX = 0;
-        let touchStartY = 0;
-        let touchEndX = 0;
-        let touchEndY = 0;
-        const SWIPE_THRESHOLD = 30;
-        const TAP_THRESHOLD = 10;
+    // 道具恢复进度条元素
+    const mojingRecoveryElement = document.getElementById('mojing-recovery');
+    const haitangRecoveryElement = document.getElementById('haitang-recovery');
+    const qingjunceRecoveryElement = document.getElementById('qingjunce-recovery');
+    const sodawaterRecoveryElement = document.getElementById('sodawater-recovery');
 
-        // 音乐控制函数
-        function playBackgroundMusic() {
-            if (backgroundMusic) {
-                backgroundMusic.currentTime = 0;
-                backgroundMusic.play().catch(e => console.log("背景音乐播放失败:", e));
+    // 事件弹窗元素
+    const eventModal = document.getElementById('event-modal');
+    const eventTitleElement = document.getElementById('event-title');
+    const eventTypeElement = document.getElementById('event-type');
+    const eventDescriptionElement = document.getElementById('event-description');
+    const eventEffectDescElement = document.getElementById('event-effect-desc');
+    const eventActionsElement = document.getElementById('event-actions');
+
+    // 道具选择弹窗元素
+    const itemSelectModal = document.getElementById('item-select-modal');
+    const itemOptionsElement = document.getElementById('item-options');
+    const cancelItemButton = document.getElementById('cancel-item-button');
+
+    // 触摸控制按钮
+    const rotateBtn = document.getElementById('rotate-btn');
+    const leftBtn = document.getElementById('left-btn');
+    const rightBtn = document.getElementById('right-btn');
+    const downBtn = document.getElementById('down-btn');
+    const dropBtn = document.getElementById('drop-btn');
+
+    // 音乐控制函数
+    function playBackgroundMusic() {
+        if (backgroundMusic) {
+            backgroundMusic.currentTime = 0;
+            backgroundMusic.play().catch(e => console.log("背景音乐播放失败:", e));
+        }
+    }
+
+    function pauseBackgroundMusic() {
+        if (backgroundMusic && !backgroundMusic.paused) {
+            backgroundMusic.pause();
+        }
+    }
+
+    function stopOperaMusic() {
+        if (operaMusic && !operaMusic.paused) {
+            operaMusic.pause();
+            operaMusic.currentTime = 0;
+            isOperaPlaying = false;
+            if (operaTimeout) {
+                clearTimeout(operaTimeout);
+                operaTimeout = null;
             }
         }
+    }
 
-        function pauseBackgroundMusic() {
-            if (backgroundMusic && !backgroundMusic.paused) {
-                backgroundMusic.pause();
-            }
+    function playOperaMusic() {
+        if (isOperaPlaying) return;
+
+        isOperaPlaying = true;
+        if (backgroundMusic && !backgroundMusic.paused) {
+            backgroundMusic.pause();
         }
 
-        function stopOperaMusic() {
-            if (operaMusic && !operaMusic.paused) {
-                operaMusic.pause();
-                operaMusic.currentTime = 0;
+        if (operaMusic) {
+            operaMusic.currentTime = 0;
+            operaMusic.play().catch(e => console.log("戏曲音乐播放失败:", e));
+
+            // 监听戏曲音乐结束事件
+            operaMusic.onended = function () {
                 isOperaPlaying = false;
-                if (operaTimeout) {
-                    clearTimeout(operaTimeout);
-                    operaTimeout = null;
+                if (gameStarted && !isPaused && !gameOver) {
+                    playBackgroundMusic();
                 }
-            }
-        }
+            };
 
-        function playOperaMusic() {
-            if (isOperaPlaying) return;
-
-            isOperaPlaying = true;
-            if (backgroundMusic && !backgroundMusic.paused) {
-                backgroundMusic.pause();
-            }
-
-            if (operaMusic) {
-                operaMusic.currentTime = 0;
-                operaMusic.play().catch(e => console.log("戏曲音乐播放失败:", e));
-
-                operaMusic.onended = function () {
-                    isOperaPlaying = false;
+            // 安全起见，设置一个超时恢复背景音乐
+            if (operaTimeout) clearTimeout(operaTimeout);
+            operaTimeout = setTimeout(() => {
+                if (isOperaPlaying) {
+                    stopOperaMusic();
                     if (gameStarted && !isPaused && !gameOver) {
                         playBackgroundMusic();
                     }
-                };
-
-                if (operaTimeout) clearTimeout(operaTimeout);
-                operaTimeout = setTimeout(() => {
-                    if (isOperaPlaying) {
-                        stopOperaMusic();
-                        if (gameStarted && !isPaused && !gameOver) {
-                            playBackgroundMusic();
-                        }
-                    }
-                }, 30000);
-            }
-        }
-
-        // 初始化游戏板
-        function createBoard() {
-            board = Array.from({ length: BOARD_HEIGHT }, () =>
-                Array.from({ length: BOARD_WIDTH }, () => EMPTY_CELL)
-            );
-
-            gameBoardElement.innerHTML = '';
-            gameBoardElement.classList.remove('night-fall', 'blood-weather', 'yuan-ghost');
-
-            for (let row = 0; row < BOARD_HEIGHT; row++) {
-                for (let col = 0; col < BOARD_WIDTH; col++) {
-                    const cell = document.createElement('div');
-                    cell.classList.add('cell');
-                    cell.dataset.row = row;
-                    cell.dataset.col = col;
-                    gameBoardElement.appendChild(cell);
                 }
-            }
-
-            nextPieceBoardElement.innerHTML = '';
-            for (let row = 0; row < 4; row++) {
-                for (let col = 0; col < 4; col++) {
-                    const cell = document.createElement('div');
-                    cell.classList.add('cell');
-                    nextPieceBoardElement.appendChild(cell);
-                }
-            }
-
-            updateItemDisplays();
+            }, 30000); // 30秒后自动恢复
         }
+    }
 
-        // 获取随机方块
-        function getRandomPiece() {
-            const tetrominoNames = Object.keys(TETROMINOES);
-            const randomName = tetrominoNames[Math.floor(Math.random() * tetrominoNames.length)];
-            return {
-                name: randomName,
-                shape: TETROMINOES[randomName].shape,
-                className: TETROMINOES[randomName].className,
-                row: 0,
-                col: Math.floor(BOARD_WIDTH / 2) - Math.floor(TETROMINOES[randomName].shape[0].length / 2)
-            };
-        }
-
-        // 保存当前方块状态
-        function saveCurrentState() {
-            previousBoard = JSON.parse(JSON.stringify(board));
-            previousPiece = currentPiece ? JSON.parse(JSON.stringify(currentPiece)) : null;
-        }
-
-        // 绘制游戏板
-        function drawBoard() {
-            const cells = document.querySelectorAll('#game-board .cell');
-
-            cells.forEach(cell => {
-                cell.className = 'cell';
-                cell.style.backgroundColor = '';
-                cell.style.borderColor = '';
-            });
-
-            // 应用流血天气效果
-            if (activeEffects.bloodyWeather) {
-                gameBoardElement.classList.add('blood-weather');
-            } else {
-                gameBoardElement.classList.remove('blood-weather');
+    // 游戏暂停/恢复时控制音乐
+    function updateMusicForPause() {
+        if (isPaused) {
+            if (backgroundMusic && !backgroundMusic.paused) {
+                backgroundMusic.pause();
             }
-
-            // 应用冤魂效果
-            if (activeEffects.yuanGhost) {
-                gameBoardElement.classList.add('yuan-ghost');
-            } else {
-                gameBoardElement.classList.remove('yuan-ghost');
+            if (operaMusic && !operaMusic.paused) {
+                operaMusic.pause();
             }
-
-            for (let row = 0; row < BOARD_HEIGHT; row++) {
-                for (let col = 0; col < BOARD_WIDTH; col++) {
-                    if (board[row][col] !== EMPTY_CELL) {
-                        const cellIndex = row * BOARD_WIDTH + col;
-                        cells[cellIndex].classList.add('filled', board[row][col]);
-                    }
-                }
-            }
-
-            if (currentPiece) {
-                for (let row = 0; row < currentPiece.shape.length; row++) {
-                    for (let col = 0; col < currentPiece.shape[row].length; col++) {
-                        if (currentPiece.shape[row][col]) {
-                            const boardRow = currentPiece.row + row;
-                            const boardCol = currentPiece.col + col;
-
-                            if (boardRow >= 0 && boardRow < BOARD_HEIGHT &&
-                                boardCol >= 0 && boardCol < BOARD_WIDTH) {
-                                const cellIndex = boardRow * BOARD_WIDTH + boardCol;
-                                cells[cellIndex].classList.add('filled', currentPiece.className);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        // 绘制下一个方块预览
-        function drawNextPiece() {
-            const cells = document.querySelectorAll('#next-piece-board .cell');
-
-            cells.forEach(cell => {
-                cell.className = 'cell';
-                cell.textContent = '';
-                cell.style.backgroundColor = '';
-                cell.style.borderColor = '';
-            });
-
-            if (nextPiece) {
-                const offsetX = Math.floor((4 - nextPiece.shape[0].length) / 2);
-                const offsetY = Math.floor((4 - nextPiece.shape.length) / 2);
-
-                for (let row = 0; row < nextPiece.shape.length; row++) {
-                    for (let col = 0; col < nextPiece.shape[row].length; col++) {
-                        if (nextPiece.shape[row][col]) {
-                            const previewRow = row + offsetY;
-                            const previewCol = col + offsetX;
-                            const cellIndex = previewRow * 4 + previewCol;
-
-                            if (cellIndex >= 0 && cellIndex < cells.length) {
-                                cells[cellIndex].classList.add('filled', nextPiece.className);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        // 更新道具显示和状态
-        function updateItemDisplays() {
-            mojingCountElement.textContent = items.mojing;
-            haitangCountElement.textContent = items.haitang;
-            qingjunceCountElement.textContent = items.qingjunce;
-            sodawaterCountElement.textContent = items.sodawater;
-
-            // 更新恢复进度条
-            updateRecoveryBars();
-
-            // 更新道具项状态
-            updateItemStates();
-        }
-
-        // 更新恢复进度条
-        function updateRecoveryBars() {
-            mojingRecoveryElement.style.width = `${itemRecoveryProgress.mojing}%`;
-            haitangRecoveryElement.style.width = `${itemRecoveryProgress.haitang}%`;
-            qingjunceRecoveryElement.style.width = `${itemRecoveryProgress.qingjunce}%`;
-            sodawaterRecoveryElement.style.width = `${itemRecoveryProgress.sodawater}%`;
-        }
-
-        // 更新道具项状态
-        function updateItemStates() {
-            // 清君侧
-            if (items.qingjunce > 0) {
-                qingjunceItemElement.classList.remove('disabled');
-                qingjunceItemElement.classList.add('recovered');
-            } else {
-                qingjunceItemElement.classList.add('disabled');
-                qingjunceItemElement.classList.remove('recovered');
-            }
-
-            // 苏打水
-            if (items.sodawater > 0) {
-                sodawaterItemElement.classList.remove('disabled');
-                sodawaterItemElement.classList.add('recovered');
-            } else {
-                sodawaterItemElement.classList.add('disabled');
-                sodawaterItemElement.classList.remove('recovered');
-            }
-
-            // 海棠
-            if (items.haitang > 0) {
-                haitangItemElement.classList.remove('disabled');
-                haitangItemElement.classList.add('recovered');
-            } else {
-                haitangItemElement.classList.add('disabled');
-                haitangItemElement.classList.remove('recovered');
-            }
-
-            // 墨镜
-            if (items.mojing > 0) {
-                mojingItemElement.classList.remove('disabled');
-                mojingItemElement.classList.add('recovered');
-            } else {
-                mojingItemElement.classList.add('disabled');
-                mojingItemElement.classList.remove('recovered');
-            }
-        }
-
-        // 开始道具恢复计时器
-        function startItemRecovery(itemType) {
-            if (itemRecoveryTimers[itemType]) {
-                clearInterval(itemRecoveryTimers[itemType]);
-            }
-
-            if (items[itemType] > 0) {
-                itemRecoveryProgress[itemType] = 100;
-            } else {
-                itemRecoveryProgress[itemType] = 0;
-            }
-
-            updateRecoveryBars();
-
-            if (items[itemType] > 0) {
-                return;
-            }
-
-            const recoveryTime = ITEM_RECOVERY_TIMES[itemType];
-            const interval = 100;
-            const steps = recoveryTime / interval;
-            const increment = 100 / steps;
-
-            let accumulatedProgress = itemRecoveryProgress[itemType];
-            let lastUpdateTime = Date.now();
-
-            itemRecoveryTimers[itemType] = setInterval(() => {
-                if (isPaused || !gameStarted) return;
-
-                const currentTime = Date.now();
-                const elapsed = currentTime - lastUpdateTime;
-                lastUpdateTime = currentTime;
-
-                const progressIncrement = (elapsed / recoveryTime) * 100;
-                accumulatedProgress += progressIncrement;
-
-                if (accumulatedProgress > 100) {
-                    accumulatedProgress = 100;
-                }
-
-                itemRecoveryProgress[itemType] = accumulatedProgress;
-                updateRecoveryBars();
-
-                if (accumulatedProgress >= 100) {
-                    clearInterval(itemRecoveryTimers[itemType]);
-                    itemRecoveryTimers[itemType] = null;
-                    itemRecoveryProgress[itemType] = 100;
-                    items[itemType]++;
-                    updateItemDisplays();
-                }
-            }, interval);
-        }
-
-        // 使用道具
-        function useItem(itemType) {
-            if (items[itemType] <= 0) {
-                const itemElement = document.getElementById(`${itemType}-item`);
-                itemElement.style.transform = 'scale(0.95)';
-                setTimeout(() => {
-                    itemElement.style.transform = '';
-                }, 300);
-                return false;
-            }
-
-            items[itemType]--;
-            updateItemDisplays();
-
-            itemRecoveryProgress[itemType] = 0;
-            updateRecoveryBars();
-
-            startItemRecovery(itemType);
-
-            return true;
-        }
-
-        // 检查碰撞
-        function checkCollision(piece, rowOffset = 0, colOffset = 0) {
-            for (let row = 0; row < piece.shape.length; row++) {
-                for (let col = 0; col < piece.shape[row].length; col++) {
-                    if (piece.shape[row][col]) {
-                        const newRow = piece.row + row + rowOffset;
-                        const newCol = piece.col + col + colOffset;
-
-                        if (
-                            newRow >= BOARD_HEIGHT ||
-                            newCol < 0 ||
-                            newCol >= BOARD_WIDTH ||
-                            (newRow >= 0 && board[newRow][newCol] !== EMPTY_CELL)
-                        ) {
-                            return true;
-                        }
-                    }
-                }
-            }
-            return false;
-        }
-
-        // 移动方块
-        function movePiece(rowOffset, colOffset) {
-            if (!currentPiece || gameOver || isPaused || !gameStarted) return false;
-
-            if (activeEffects.friedLiver) return false;
-
-            if (!checkCollision(currentPiece, rowOffset, colOffset)) {
-                currentPiece.row += rowOffset;
-                currentPiece.col += colOffset;
-                drawBoard();
-                return true;
-            }
-
-            if (rowOffset > 0 && colOffset === 0) {
-                lockPiece();
-                return false;
-            }
-
-            return false;
-        }
-
-        // 旋转方块
-        function rotatePiece() {
-            if (!currentPiece || gameOver || isPaused || !gameStarted) return;
-
-            if (activeEffects.friedLiver) return;
-
-            const originalShape = currentPiece.shape;
-            const originalCol = currentPiece.col;
-            const originalRow = currentPiece.row;
-
-            const rotatedShape = [];
-            const rows = originalShape.length;
-            const cols = originalShape[0].length;
-
-            for (let col = 0; col < cols; col++) {
-                const newRow = [];
-                for (let row = rows - 1; row >= 0; row--) {
-                    newRow.push(originalShape[row][col]);
-                }
-                rotatedShape.push(newRow);
-            }
-
-            currentPiece.shape = rotatedShape;
-
-            const kicks = [
-                [0, 0],
-                [0, -1],
-                [0, 1],
-                [-1, 0],
-                [1, 0]
-            ];
-
-            let canRotate = false;
-
-            for (const [rowOffset, colOffset] of kicks) {
-                currentPiece.row = originalRow + rowOffset;
-                currentPiece.col = originalCol + colOffset;
-
-                if (!checkCollision(currentPiece)) {
-                    canRotate = true;
-                    break;
-                }
-            }
-
-            if (!canRotate) {
-                currentPiece.shape = originalShape;
-                currentPiece.row = originalRow;
-                currentPiece.col = originalCol;
-            }
-
-            drawBoard();
-        }
-
-        // 直接落下方块
-        function dropPiece() {
-            if (!currentPiece || gameOver || isPaused || !gameStarted) return;
-
-            if (activeEffects.friedLiver) return;
-
-            while (movePiece(1, 0)) {
-                // 持续向下移动直到碰撞
-            }
-        }
-
-        // 固定方块到游戏板
-        function lockPiece() {
-            if (!currentPiece) return;
-
-            saveCurrentState();
-
-            for (let row = 0; row < currentPiece.shape.length; row++) {
-                for (let col = 0; col < currentPiece.shape[row].length; col++) {
-                    if (currentPiece.shape[row][col]) {
-                        const boardRow = currentPiece.row + row;
-                        const boardCol = currentPiece.col + col;
-
-                        if (boardRow >= 0) {
-                            board[boardRow][boardCol] = currentPiece.className;
-                        }
-                    }
-                }
-            }
-
-            clearLines();
-
-            currentPiece = nextPiece;
-            nextPiece = getRandomPiece();
-            drawNextPiece();
-
-            if (checkCollision(currentPiece)) {
-                gameOver = true;
-                gameStatusElement.textContent = "游戏结束!";
-                clearInterval(dropInterval);
-                dropInterval = null;
-                pauseResumeButton.disabled = true;
-                pauseResumeButton.textContent = "暂停";
-                pauseBackgroundMusic();
-                stopOperaMusic();
-            }
-
-            drawBoard();
-        }
-
-        // 清除完整的行
-        function clearLines() {
-            let linesCleared = 0;
-
-            for (let row = BOARD_HEIGHT - 1; row >= 0; row--) {
-                if (board[row].every(cell => cell !== EMPTY_CELL)) {
-                    board.splice(row, 1);
-                    board.unshift(Array.from({ length: BOARD_WIDTH }, () => EMPTY_CELL));
-                    linesCleared++;
-                    row++;
-                }
-            }
-
-            if (linesCleared > 0) {
-                score += linesCleared * 100;
-                scoreElement.textContent = score;
-                gameStatusElement.textContent = `消除了 ${linesCleared} 行!`;
-
-                setTimeout(() => {
-                    triggerRandomStory();
-                }, 500);
-            } else {
-                if (!gameOver && !isPaused && gameStarted) {
-                    gameStatusElement.textContent = "游戏中";
-                }
-            }
-        }
-
-        // 初始化剧情系统
-        function initStorySystem() {
-            availableStories = [];
-            usedStories = [];
-            storyRound = 1;
-            storyCount = 0;
-
-            for (const key in STORIES) {
-                if (key !== 'BRASS_BOX') {
-                    STORIES[key].canAppear = true;
+        } else {
+            if (gameStarted && !gameOver) {
+                if (isOperaPlaying) {
+                    if (operaMusic) operaMusic.play().catch(e => console.log(e));
                 } else {
-                    STORIES[key].canAppear = false;
-                    STORIES[key].hasAppeared = false;
+                    if (backgroundMusic) backgroundMusic.play().catch(e => console.log(e));
                 }
             }
         }
+    }
 
-        // 打乱数组顺序
-        function shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
+    // 初始化剧情系统
+    function initStorySystem() {
+        // 重置剧情系统
+        availableStories = [];
+        usedStories = [];
+        storyRound = 1;
+        storyCount = 0;
+
+        // 重置所有剧情的出现状态（除了黄铜箱子）
+        for (const key in STORIES) {
+            if (key !== 'BRASS_BOX') {
+                STORIES[key].canAppear = true;
+            } else {
+                STORIES[key].canAppear = false; // 初始不可出现
+                STORIES[key].hasAppeared = false;
             }
-            return array;
         }
 
-        // 获取下一个随机剧情
-        function getNextRandomStory() {
-            storyCount++;
+        console.log(`剧情系统初始化，第${storyRound}轮`);
+    }
 
-            if (storyCount > 3 && !STORIES.BRASS_BOX.hasAppeared) {
-                STORIES.BRASS_BOX.canAppear = true;
+    // 获取下一个随机剧情（保证不重复）
+    function getNextRandomStory() {
+        storyCount++;
+
+        // 如果黄铜箱子还没出现过，并且已经触发了3个以上的剧情，可以出现黄铜箱子
+        if (storyCount > 3 && !STORIES.BRASS_BOX.hasAppeared) {
+            STORIES.BRASS_BOX.canAppear = true;
+        }
+
+        // 构建可用剧情列表
+        availableStories = [];
+        for (const key in STORIES) {
+            if (STORIES[key].canAppear && !usedStories.includes(key)) {
+                // 检查只出现一次的剧情是否已经出现过
+                if (STORIES[key].appearsOnlyOnce && STORIES[key].hasAppeared) {
+                    continue;
+                }
+                availableStories.push(key);
             }
+        }
 
-            availableStories = [];
+        // 如果可用剧情列表为空，重置并进入下一轮
+        if (availableStories.length === 0) {
+            // 重置已使用列表
+            usedStories = [];
+            storyRound++;
+
+            // 重建可用列表（排除已经永久出现过的）
             for (const key in STORIES) {
-                if (STORIES[key].canAppear && !usedStories.includes(key)) {
+                if (STORIES[key].canAppear) {
+                    // 检查只出现一次的剧情是否已经出现过
                     if (STORIES[key].appearsOnlyOnce && STORIES[key].hasAppeared) {
                         continue;
                     }
@@ -1604,833 +2052,1598 @@
                 }
             }
 
-            if (availableStories.length === 0) {
-                usedStories = [];
-                storyRound++;
+            // 打乱顺序（确保每轮顺序不同）
+            shuffleArray(availableStories);
 
-                for (const key in STORIES) {
-                    if (STORIES[key].canAppear) {
-                        if (STORIES[key].appearsOnlyOnce && STORIES[key].hasAppeared) {
-                            continue;
+            console.log(`进入第${storyRound}轮剧情，打乱顺序`);
+        }
+
+        // 从可用剧情中随机选择一个
+        const randomIndex = Math.floor(Math.random() * availableStories.length);
+        const storyKey = availableStories[randomIndex];
+
+        // 从可用列表中移除，添加到已使用列表
+        availableStories.splice(randomIndex, 1);
+        usedStories.push(storyKey);
+
+        // 标记只出现一次的剧情为已出现
+        if (STORIES[storyKey].appearsOnlyOnce) {
+            STORIES[storyKey].hasAppeared = true;
+            STORIES[storyKey].canAppear = false;
+        }
+
+        console.log(`选择剧情: ${STORIES[storyKey].name}，剩余可用: ${availableStories.length}，总触发: ${storyCount}`);
+
+        return STORIES[storyKey];
+    }
+
+    // 打乱数组顺序
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    // 清除所有现有效果（被新剧情覆盖）
+    function clearAllEffects() {
+        console.log("清除所有现有效果");
+
+        // 清除夜幕降临效果
+        if (activeEffects.nightFall) {
+            gameBoardElement.classList.remove('night-fall');
+            activeEffects.nightFall = false;
+            if (effectTimers.nightFall) {
+                clearTimeout(effectTimers.nightFall);
+                effectTimers.nightFall = null;
+            }
+            // 移除提示文字
+            const warning = document.querySelector('.night-warning');
+            if (warning && warning.parentNode) {
+                warning.remove();
+            }
+        }
+
+        // 清除长生者效果
+        if (activeEffects.immortal) {
+            activeEffects.immortal = false;
+            dropSpeed = originalDropSpeed;
+            updateDropSpeed();
+            if (effectTimers.immortal) {
+                clearTimeout(effectTimers.immortal);
+                effectTimers.immortal = null;
+            }
+        }
+
+        // 清除炒肝效果
+        if (activeEffects.friedLiver) {
+            activeEffects.friedLiver = false;
+            if (effectTimers.friedLiver) {
+                clearTimeout(effectTimers.friedLiver);
+                effectTimers.friedLiver = null;
+            }
+            // 移除冻结覆盖层
+            const freezeOverlay = document.querySelector('.freeze-overlay');
+            if (freezeOverlay && freezeOverlay.parentNode) {
+                freezeOverlay.remove();
+            }
+        }
+
+        // 清除流血天气效果
+        if (activeEffects.bloodyWeather) {
+            activeEffects.bloodyWeather = false;
+            activeEffects.bloodyWeatherCount = 0;
+            gameBoardElement.classList.remove('blood-weather');
+        }
+
+        // 清除冤魂效果
+        if (activeEffects.yuanGhost) {
+            activeEffects.yuanGhost = false;
+            if (effectTimers.yuanGhost) {
+                clearTimeout(effectTimers.yuanGhost);
+                effectTimers.yuanGhost = null;
+            }
+        }
+
+        // 重新绘制游戏板
+        drawBoard();
+    }
+
+    // 初始化游戏板
+    function createBoard() {
+        board = Array.from({ length: BOARD_HEIGHT }, () =>
+            Array.from({ length: BOARD_WIDTH }, () => EMPTY_CELL)
+        );
+
+        gameBoardElement.innerHTML = '';
+        gameBoardElement.classList.remove('night-fall', 'blood-weather', 'yuan-ghost');
+
+        for (let row = 0; row < BOARD_HEIGHT; row++) {
+            for (let col = 0; col < BOARD_WIDTH; col++) {
+                const cell = document.createElement('div');
+                cell.classList.add('cell');
+                cell.dataset.row = row;
+                cell.dataset.col = col;
+                gameBoardElement.appendChild(cell);
+            }
+        }
+
+        nextPieceBoardElement.innerHTML = '';
+        for (let row = 0; row < 4; row++) {
+            for (let col = 0; col < 4; col++) {
+                const cell = document.createElement('div');
+                cell.classList.add('cell');
+                nextPieceBoardElement.appendChild(cell);
+            }
+        }
+
+        updateItemDisplays();
+    }
+
+    // 获取随机方块
+    function getRandomPiece() {
+        const tetrominoNames = Object.keys(TETROMINOES);
+        const randomName = tetrominoNames[Math.floor(Math.random() * tetrominoNames.length)];
+        return {
+            name: randomName,
+            shape: TETROMINOES[randomName].shape,
+            className: TETROMINOES[randomName].className,
+            row: 0,
+            col: Math.floor(BOARD_WIDTH / 2) - Math.floor(TETROMINOES[randomName].shape[0].length / 2)
+        };
+    }
+
+    // 保存当前方块状态（用于史努比撤回）
+    function saveCurrentState() {
+        // 深拷贝当前游戏板
+        previousBoard = JSON.parse(JSON.stringify(board));
+        // 保存当前方块
+        previousPiece = currentPiece ? JSON.parse(JSON.stringify(currentPiece)) : null;
+    }
+
+    // 绘制游戏板
+    function drawBoard() {
+        const cells = document.querySelectorAll('#game-board .cell');
+
+        cells.forEach(cell => {
+            cell.className = 'cell';
+            cell.textContent = '';
+            cell.style.backgroundColor = '';
+            cell.style.borderColor = '';
+        });
+
+        // 应用流血天气效果
+        if (activeEffects.bloodyWeather) {
+            gameBoardElement.classList.add('blood-weather');
+        } else {
+            gameBoardElement.classList.remove('blood-weather');
+        }
+
+        // 应用冤魂效果（黑色方块）
+        if (activeEffects.yuanGhost) {
+            gameBoardElement.classList.add('yuan-ghost');
+        } else {
+            gameBoardElement.classList.remove('yuan-ghost');
+        }
+
+        for (let row = 0; row < BOARD_HEIGHT; row++) {
+            for (let col = 0; col < BOARD_WIDTH; col++) {
+                if (board[row][col] !== EMPTY_CELL) {
+                    const cellIndex = row * BOARD_WIDTH + col;
+                    cells[cellIndex].classList.add('filled', board[row][col]);
+
+                    // 如果处于冤魂状态，所有方块显示为黑色
+                    if (activeEffects.yuanGhost) {
+                        cells[cellIndex].style.backgroundColor = '#000000';
+                        cells[cellIndex].style.borderColor = '#444444';
+                    }
+                    // 如果处于流血天气状态，所有方块显示为红色
+                    else if (activeEffects.bloodyWeather) {
+                        cells[cellIndex].style.backgroundColor = '#ff2a2a';
+                        cells[cellIndex].style.borderColor = '#ff7a7a';
+                    }
+                }
+            }
+        }
+
+        if (currentPiece) {
+            for (let row = 0; row < currentPiece.shape.length; row++) {
+                for (let col = 0; col < currentPiece.shape[row].length; col++) {
+                    if (currentPiece.shape[row][col]) {
+                        const boardRow = currentPiece.row + row;
+                        const boardCol = currentPiece.col + col;
+
+                        if (boardRow >= 0 && boardRow < BOARD_HEIGHT &&
+                            boardCol >= 0 && boardCol < BOARD_WIDTH) {
+                            const cellIndex = boardRow * BOARD_WIDTH + boardCol;
+
+                            // 如果处于冤魂状态，当前方块也显示为黑色
+                            if (activeEffects.yuanGhost) {
+                                cells[cellIndex].classList.add('filled');
+                                cells[cellIndex].style.backgroundColor = '#000000';
+                                cells[cellIndex].style.borderColor = '#444444';
+                            }
+                            // 如果处于流血天气状态，当前方块也显示为红色
+                            else if (activeEffects.bloodyWeather) {
+                                cells[cellIndex].classList.add('filled');
+                                cells[cellIndex].style.backgroundColor = '#ff2a2a';
+                                cells[cellIndex].style.borderColor = '#ff7a7a';
+                            } else {
+                                cells[cellIndex].classList.add('filled', currentPiece.className);
+                            }
                         }
-                        availableStories.push(key);
                     }
                 }
-
-                shuffleArray(availableStories);
             }
+        }
+    }
 
-            const randomIndex = Math.floor(Math.random() * availableStories.length);
-            const storyKey = availableStories[randomIndex];
+    // 绘制下一个方块预览
+    function drawNextPiece() {
+        const cells = document.querySelectorAll('#next-piece-board .cell');
 
-            availableStories.splice(randomIndex, 1);
-            usedStories.push(storyKey);
+        cells.forEach(cell => {
+            cell.className = 'cell';
+            cell.textContent = '';
+            cell.style.backgroundColor = '';
+            cell.style.borderColor = '';
+        });
 
-            if (STORIES[storyKey].appearsOnlyOnce) {
-                STORIES[storyKey].hasAppeared = true;
-                STORIES[storyKey].canAppear = false;
+        if (nextPiece) {
+            const offsetX = Math.floor((4 - nextPiece.shape[0].length) / 2);
+            const offsetY = Math.floor((4 - nextPiece.shape.length) / 2);
+
+            for (let row = 0; row < nextPiece.shape.length; row++) {
+                for (let col = 0; col < nextPiece.shape[row].length; col++) {
+                    if (nextPiece.shape[row][col]) {
+                        const previewRow = row + offsetY;
+                        const previewCol = col + offsetX;
+                        const cellIndex = previewRow * 4 + previewCol;
+
+                        if (cellIndex >= 0 && cellIndex < cells.length) {
+                            // 如果处于流血天气状态，预览方块也显示为红色
+                            if (activeEffects.bloodyWeather && activeEffects.bloodyWeatherCount > 0) {
+                                cells[cellIndex].classList.add('filled');
+                                cells[cellIndex].style.backgroundColor = '#ff2a2a';
+                                cells[cellIndex].style.borderColor = '#ff7a7a';
+                            } else {
+                                cells[cellIndex].classList.add('filled', nextPiece.className);
+                            }
+                        }
+                    }
+                }
             }
+        }
+    }
 
-            return STORIES[storyKey];
+    // 更新道具显示和状态
+    function updateItemDisplays() {
+        mojingCountElement.textContent = items.mojing;
+        haitangCountElement.textContent = items.haitang;
+        qingjunceCountElement.textContent = items.qingjunce;
+        sodawaterCountElement.textContent = items.sodawater;
+
+        // 更新恢复进度条
+        updateRecoveryBars();
+
+        // 更新道具项状态（是否可用）
+        updateItemStates();
+    }
+
+    // 更新恢复进度条
+    function updateRecoveryBars() {
+        mojingRecoveryElement.style.width = `${itemRecoveryProgress.mojing}%`;
+        haitangRecoveryElement.style.width = `${itemRecoveryProgress.haitang}%`;
+        qingjunceRecoveryElement.style.width = `${itemRecoveryProgress.qingjunce}%`;
+        sodawaterRecoveryElement.style.width = `${itemRecoveryProgress.sodawater}%`;
+    }
+
+    // 更新道具项状态（是否可用）
+    function updateItemStates() {
+        // 清君侧
+        if (items.qingjunce > 0) {
+            qingjunceItemElement.classList.remove('disabled');
+            qingjunceItemElement.classList.add('recovered');
+        } else {
+            qingjunceItemElement.classList.add('disabled');
+            qingjunceItemElement.classList.remove('recovered');
         }
 
-        // 清除所有现有效果
-        function clearAllEffects() {
-            // 清除夜幕降临效果
-            if (activeEffects.nightFall) {
-                gameBoardElement.classList.remove('night-fall');
-                activeEffects.nightFall = false;
-                if (effectTimers.nightFall) {
-                    clearTimeout(effectTimers.nightFall);
-                    effectTimers.nightFall = null;
-                }
-                const warning = document.querySelector('.night-warning');
-                if (warning && warning.parentNode) {
-                    warning.remove();
-                }
+        // 苏打水
+        if (items.sodawater > 0) {
+            sodawaterItemElement.classList.remove('disabled');
+            sodawaterItemElement.classList.add('recovered');
+        } else {
+            sodawaterItemElement.classList.add('disabled');
+            sodawaterItemElement.classList.remove('recovered');
+        }
+
+        // 海棠
+        if (items.haitang > 0) {
+            haitangItemElement.classList.remove('disabled');
+            haitangItemElement.classList.add('recovered');
+        } else {
+            haitangItemElement.classList.add('disabled');
+            haitangItemElement.classList.remove('recovered');
+        }
+
+        // 墨镜
+        if (items.mojing > 0) {
+            mojingItemElement.classList.remove('disabled');
+            mojingItemElement.classList.add('recovered');
+        } else {
+            mojingItemElement.classList.add('disabled');
+            mojingItemElement.classList.remove('recovered');
+        }
+    }
+
+    // 开始道具恢复计时器（暂停时会自动暂停）
+    function startItemRecovery(itemType) {
+        // 如果已经有计时器在运行，先清除
+        if (itemRecoveryTimers[itemType]) {
+            clearInterval(itemRecoveryTimers[itemType]);
+        }
+
+        // 重置恢复进度（如果已经有道具，则从100%开始）
+        if (items[itemType] > 0) {
+            itemRecoveryProgress[itemType] = 100;
+        } else {
+            itemRecoveryProgress[itemType] = 0;
+        }
+
+        // 立即更新一次进度条
+        updateRecoveryBars();
+
+        // 如果道具数已经大于0（表示已经有可用道具），不启动恢复计时器
+        if (items[itemType] > 0) {
+            return;
+        }
+
+        // 计算恢复间隔（每100毫秒更新一次）
+        const recoveryTime = ITEM_RECOVERY_TIMES[itemType];
+        const interval = 100;
+        const steps = recoveryTime / interval;
+        const increment = 100 / steps;
+
+        let accumulatedProgress = itemRecoveryProgress[itemType];
+        let lastUpdateTime = Date.now();
+
+        // 开始恢复计时器
+        itemRecoveryTimers[itemType] = setInterval(() => {
+            if (isPaused || !gameStarted) return;
+
+            const currentTime = Date.now();
+            const elapsed = currentTime - lastUpdateTime;
+            lastUpdateTime = currentTime;
+
+            // 根据实际经过的时间计算进度
+            const progressIncrement = (elapsed / recoveryTime) * 100;
+            accumulatedProgress += progressIncrement;
+
+            // 确保不超过100%
+            if (accumulatedProgress > 100) {
+                accumulatedProgress = 100;
             }
 
-            // 清除长生者效果
-            if (activeEffects.immortal) {
-                activeEffects.immortal = false;
-                dropSpeed = originalDropSpeed;
-                updateDropSpeed();
-                if (effectTimers.immortal) {
-                    clearTimeout(effectTimers.immortal);
-                    effectTimers.immortal = null;
+            itemRecoveryProgress[itemType] = accumulatedProgress;
+
+            // 更新进度条
+            updateRecoveryBars();
+
+            // 恢复完成
+            if (accumulatedProgress >= 100) {
+                clearInterval(itemRecoveryTimers[itemType]);
+                itemRecoveryTimers[itemType] = null;
+                // 保持100%
+                itemRecoveryProgress[itemType] = 100;
+                items[itemType]++;
+                updateItemDisplays();
+
+                // 显示获得提示
+                let itemName = '';
+                if (itemType === 'mojing') itemName = '墨镜';
+                else if (itemType === 'haitang') itemName = '海棠';
+                else if (itemType === 'qingjunce') itemName = '清君侧';
+                else if (itemType === 'sodawater') itemName = '苏打水';
+
+                showItemAddedMessage(itemName);
+            }
+        }, interval);
+    }
+
+    // 暂停所有道具恢复计时器
+    function pauseAllItemRecovery() {
+        for (const itemType in itemRecoveryTimers) {
+            if (itemRecoveryTimers[itemType]) {
+                // 不清除计时器，但在恢复函数中检查暂停状态
+                console.log(`暂停 ${itemType} 恢复`);
+            }
+        }
+    }
+
+    // 恢复所有道具恢复计时器
+    function resumeAllItemRecovery() {
+        for (const itemType in itemRecoveryTimers) {
+            if (itemRecoveryTimers[itemType]) {
+                // 恢复函数已经在检查暂停状态
+                console.log(`恢复 ${itemType} 恢复`);
+            }
+        }
+    }
+
+    // 使用道具（会触发恢复计时器）
+    function useItem(itemType) {
+        if (items[itemType] <= 0) {
+            // 道具不可用，给用户反馈
+            const itemElement = document.getElementById(`${itemType}-item`);
+            itemElement.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                itemElement.style.transform = '';
+            }, 300);
+            return false;
+        }
+
+        items[itemType]--;
+        updateItemDisplays();
+
+        // 道具使用后，立即将恢复进度重置为0
+        itemRecoveryProgress[itemType] = 0;
+        updateRecoveryBars();
+
+        // 开始恢复计时器（从0开始恢复）
+        startItemRecovery(itemType);
+
+        return true;
+    }
+
+    // 显示道具获得提示
+    function showItemAddedMessage(itemName) {
+        const message = document.createElement('div');
+        message.className = 'item-added';
+        message.textContent = `获得道具：${itemName}`;
+        document.body.appendChild(message);
+
+        // 3秒后移除提示
+        setTimeout(() => {
+            if (message.parentNode) {
+                message.remove();
+            }
+        }, 3000);
+    }
+
+    // 检查碰撞
+    function checkCollision(piece, rowOffset = 0, colOffset = 0) {
+        for (let row = 0; row < piece.shape.length; row++) {
+            for (let col = 0; col < piece.shape[row].length; col++) {
+                if (piece.shape[row][col]) {
+                    const newRow = piece.row + row + rowOffset;
+                    const newCol = piece.col + col + colOffset;
+
+                    if (
+                        newRow >= BOARD_HEIGHT ||
+                        newCol < 0 ||
+                        newCol >= BOARD_WIDTH ||
+                        (newRow >= 0 && board[newRow][newCol] !== EMPTY_CELL)
+                    ) {
+                        return true;
+                    }
                 }
             }
+        }
+        return false;
+    }
 
-            // 清除炒肝效果
-            if (activeEffects.friedLiver) {
-                activeEffects.friedLiver = false;
-                if (effectTimers.friedLiver) {
-                    clearTimeout(effectTimers.friedLiver);
-                    effectTimers.friedLiver = null;
-                }
-                const freezeOverlay = document.querySelector('.freeze-overlay');
-                if (freezeOverlay && freezeOverlay.parentNode) {
-                    freezeOverlay.remove();
-                }
-            }
+    // 移动方块（考虑炒肝冻结效果）
+    function movePiece(rowOffset, colOffset) {
+        if (!currentPiece || gameOver || isPaused || !gameStarted) return false;
 
-            // 清除流血天气效果
-            if (activeEffects.bloodyWeather) {
-                activeEffects.bloodyWeather = false;
-                activeEffects.bloodyWeatherCount = 0;
-                gameBoardElement.classList.remove('blood-weather');
-            }
+        // 炒肝效果：玩家不能操作，但游戏正常进行
+        if (activeEffects.friedLiver) return false;
 
-            // 清除冤魂效果
-            if (activeEffects.yuanGhost) {
-                activeEffects.yuanGhost = false;
-                if (effectTimers.yuanGhost) {
-                    clearTimeout(effectTimers.yuanGhost);
-                    effectTimers.yuanGhost = null;
-                }
-            }
-
+        if (!checkCollision(currentPiece, rowOffset, colOffset)) {
+            currentPiece.row += rowOffset;
+            currentPiece.col += colOffset;
             drawBoard();
+            return true;
         }
 
-        // 触发随机剧情
-        function triggerRandomStory() {
-            if (gameOver || isPaused) return;
-
-            clearInterval(dropInterval);
-            isPaused = true;
-
-            const story = getNextRandomStory();
-            showStoryModal(story);
+        if (rowOffset > 0 && colOffset === 0) {
+            lockPiece();
+            return false;
         }
 
-        // 显示剧情弹窗
-        function showStoryModal(story) {
-            eventTitleElement.textContent = story.name;
-            eventDescriptionElement.textContent = story.description + "\n\n" + story.effect;
+        return false;
+    }
 
-            eventActionsElement.innerHTML = '';
+    // 旋转方块（考虑炒肝冻结效果）
+    function rotatePiece() {
+        if (!currentPiece || gameOver || isPaused || !gameStarted) return;
 
-            if (story.name.includes("食君之禄")) {
-                const consumeButton = document.createElement('button');
-                consumeButton.className = 'event-button consume';
-                consumeButton.textContent = `支付1朵【海棠】🌸`;
-                consumeButton.onclick = () => {
-                    if (items.haitang > 0) {
-                        items.haitang--;
-                        updateItemDisplays();
-                        startItemRecovery('haitang');
-                        clearAllEffects();
-                        resumeGame();
-                    } else {
-                        handleYuanGhost();
-                    }
-                };
+        // 炒肝效果：玩家不能操作，但游戏正常进行
+        if (activeEffects.friedLiver) return;
 
-                const cancelButton = document.createElement('button');
-                cancelButton.className = 'event-button cancel';
-                cancelButton.textContent = '拒绝支付';
-                cancelButton.onclick = () => {
-                    handleYuanGhost();
-                };
+        const originalShape = currentPiece.shape;
+        const originalCol = currentPiece.col;
+        const originalRow = currentPiece.row;
 
-                eventActionsElement.appendChild(consumeButton);
-                eventActionsElement.appendChild(cancelButton);
+        const rotatedShape = [];
+        const rows = originalShape.length;
+        const cols = originalShape[0].length;
 
-            } else if (story.name.includes("夜幕降临")) {
-                const consumeButton = document.createElement('button');
-                consumeButton.className = 'event-button consume';
-                consumeButton.textContent = `使用1副【墨镜】🕶️`;
-                consumeButton.onclick = () => {
-                    if (items.mojing > 0) {
-                        items.mojing--;
-                        updateItemDisplays();
-                        startItemRecovery('mojing');
-                        clearAllEffects();
-                        resumeGame();
-                    } else {
-                        handleNightFallWithoutMojing();
-                    }
-                };
-
-                const cancelButton = document.createElement('button');
-                cancelButton.className = 'event-button cancel';
-                cancelButton.textContent = '拒绝使用';
-                cancelButton.onclick = () => {
-                    handleNightFallWithoutMojing();
-                };
-
-                eventActionsElement.appendChild(consumeButton);
-                eventActionsElement.appendChild(cancelButton);
-
-            } else {
-                const confirmButton = document.createElement('button');
-                confirmButton.className = 'event-button';
-                confirmButton.textContent = '确认继续';
-                confirmButton.onclick = () => {
-                    clearAllEffects();
-                    resumeGame();
-                    story.effectFunc();
-                };
-
-                eventActionsElement.appendChild(confirmButton);
+        for (let col = 0; col < cols; col++) {
+            const newRow = [];
+            for (let row = rows - 1; row >= 0; row--) {
+                newRow.push(originalShape[row][col]);
             }
-
-            eventModal.classList.add('active');
+            rotatedShape.push(newRow);
         }
 
-        // 恢复游戏
-        function resumeGame() {
-            eventModal.classList.remove('active');
-            isPaused = false;
-            if (!gameOver && gameStarted) {
-                dropInterval = setInterval(() => {
-                    movePiece(1, 0);
-                }, dropSpeed);
+        currentPiece.shape = rotatedShape;
+
+        const kicks = [
+            [0, 0],
+            [0, -1],
+            [0, 1],
+            [-1, 0],
+            [1, 0]
+        ];
+
+        let canRotate = false;
+
+        for (const [rowOffset, colOffset] of kicks) {
+            currentPiece.row = originalRow + rowOffset;
+            currentPiece.col = originalCol + colOffset;
+
+            if (!checkCollision(currentPiece)) {
+                canRotate = true;
+                break;
+            }
+        }
+
+        if (!canRotate) {
+            currentPiece.shape = originalShape;
+            currentPiece.row = originalRow;
+            currentPiece.col = originalCol;
+        }
+
+        drawBoard();
+    }
+
+    // 直接落下方块（考虑炒肝冻结效果）
+    function dropPiece() {
+        if (!currentPiece || gameOver || isPaused || !gameStarted) return;
+
+        // 炒肝效果：玩家不能操作，但游戏正常进行
+        if (activeEffects.friedLiver) return;
+
+        while (movePiece(1, 0)) {
+            // 持续向下移动直到碰撞
+        }
+    }
+
+    // 固定方块到游戏板
+    function lockPiece() {
+        if (!currentPiece) return;
+
+        // 在固定方块前保存状态（用于史努比撤回）
+        saveCurrentState();
+
+        for (let row = 0; row < currentPiece.shape.length; row++) {
+            for (let col = 0; col < currentPiece.shape[row].length; col++) {
+                if (currentPiece.shape[row][col]) {
+                    const boardRow = currentPiece.row + row;
+                    const boardCol = currentPiece.col + col;
+
+                    if (boardRow >= 0) {
+                        // 如果处于流血天气状态，固定为红色方块
+                        if (activeEffects.bloodyWeather && activeEffects.bloodyWeatherCount > 0) {
+                            board[boardRow][boardCol] = 'z'; // 使用z类作为红色方块标识
+                        } else {
+                            board[boardRow][boardCol] = currentPiece.className;
+                        }
+                    }
+                }
+            }
+        }
+
+        // 减少流血天气计数器
+        if (activeEffects.bloodyWeather && activeEffects.bloodyWeatherCount > 0) {
+            activeEffects.bloodyWeatherCount--;
+            if (activeEffects.bloodyWeatherCount <= 0) {
+                activeEffects.bloodyWeather = false;
+                gameStatusElement.textContent = "流血天气结束";
+                setTimeout(() => {
+                    if (!gameOver && !isPaused && gameStarted) {
+                        gameStatusElement.textContent = "游戏中";
+                    }
+                }, 2000);
+            }
+        }
+
+        clearLines();
+
+        // 获取下一个方块
+        currentPiece = nextPiece;
+
+        // 如果处于流血天气状态，生成红色方块
+        if (activeEffects.bloodyWeather && activeEffects.bloodyWeatherCount > 0) {
+            nextPiece = {
+                name: 'Z',
+                shape: TETROMINOES.Z.shape,
+                className: 'z', // 红色方块
+                row: 0,
+                col: Math.floor(BOARD_WIDTH / 2) - Math.floor(TETROMINOES.Z.shape[0].length / 2)
+            };
+        } else {
+            nextPiece = getRandomPiece();
+        }
+
+        drawNextPiece();
+
+        // 检查游戏是否结束
+        if (checkCollision(currentPiece)) {
+            gameOver = true;
+            gameStatusElement.textContent = "游戏结束!";
+            clearInterval(dropInterval);
+            dropInterval = null;
+            pauseResumeButton.disabled = true;
+            pauseResumeButton.textContent = "暂停";
+            pauseBackgroundMusic();
+            stopOperaMusic();
+        }
+
+        drawBoard();
+    }
+
+    // 清除完整的行
+    function clearLines() {
+        let linesCleared = 0;
+
+        for (let row = BOARD_HEIGHT - 1; row >= 0; row--) {
+            if (board[row].every(cell => cell !== EMPTY_CELL)) {
+                board.splice(row, 1);
+                board.unshift(Array.from({ length: BOARD_WIDTH }, () => EMPTY_CELL));
+                linesCleared++;
+                row++;
+            }
+        }
+
+        if (linesCleared > 0) {
+            // 更新分数
+            score += linesCleared * 100;
+            scoreElement.textContent = score;
+
+            gameStatusElement.textContent = `消除了 ${linesCleared} 行!`;
+
+            // 每次消除都会触发随机剧情
+            setTimeout(() => {
+                triggerRandomStory();
+            }, 500);
+        } else {
+            if (!gameOver && !isPaused && gameStarted) {
                 gameStatusElement.textContent = "游戏中";
             }
         }
+    }
 
-        // 处理食君之禄剧情
-        function handleShijunzhilu() {
-            console.log("食君之禄剧情处理");
+    // 触发随机剧情
+    // 触发随机剧情
+    function triggerRandomStory() {
+        if (gameOver || isPaused) return;
+
+        console.log("触发随机剧情...");
+
+        // 暂停游戏
+        clearInterval(dropInterval);
+        isPaused = true;
+
+        // 获取下一个随机剧情（保证不重复）
+        const story = getNextRandomStory();
+
+        console.log("获取到剧情:", story.name);
+
+        // 显示剧情弹窗
+        showStoryModal(story);
+    }
+
+    // 显示剧情弹窗
+    function showStoryModal(story) {
+        console.log("显示剧情弹窗，剧情名称:", story.name);
+
+        eventTitleElement.textContent = story.name;
+        // 隐藏类型标签
+        if (eventTypeElement) {
+            eventTypeElement.style.display = 'none';
+        }
+        eventDescriptionElement.textContent = story.effect;
+        eventEffectDescElement.textContent = story.description;
+
+        // 如果是黄铜箱子，添加特殊样式
+        if (story.name.includes("黄铜箱子")) {
+            const eventContent = eventModal.querySelector('.event-content');
+            eventContent.classList.add('brass-box-special');
         }
 
-        // 处理冤魂效果
-        function handleYuanGhost() {
-            clearAllEffects();
-            activeEffects.yuanGhost = true;
+        // 清空之前的动作按钮
+        eventActionsElement.innerHTML = '';
 
-            eventModal.classList.remove('active');
-
-            const yuanModal = document.createElement('div');
-            yuanModal.className = 'event-modal active';
-            yuanModal.innerHTML = `
-                    <div class="event-content">
-                        <div style="font-size: 6rem; color: white; margin: 20px 0;">冤</div>
-                        <div class="event-description">黑眼镜把发票贴成一个冤字</div>
-                        <button class="event-button" id="confirm-yuan-button">确认</button>
-                    </div>
-                `;
-
-            document.body.appendChild(yuanModal);
-
-            drawBoard();
-
-            effectTimers.yuanGhost = setTimeout(() => {
-                activeEffects.yuanGhost = false;
-                drawBoard();
-                gameStatusElement.textContent = "冤魂散去";
-                setTimeout(() => {
-                    if (!gameOver && !isPaused && gameStarted) {
-                        gameStatusElement.textContent = "游戏中";
-                    }
-                }, 2000);
-            }, 20000);
-
-            document.getElementById('confirm-yuan-button').onclick = () => {
-                yuanModal.remove();
-                resumeGame();
+        // 根据剧情类型添加不同的动作按钮
+        if (story.name.includes("食君之禄")) {
+            console.log("创建食君之禄按钮");
+            // 食君之禄：需要消耗海棠
+            const consumeButton = document.createElement('button');
+            consumeButton.className = 'event-button consume';
+            consumeButton.textContent = `支付1朵【海棠】🌸`;
+            consumeButton.onclick = () => {
+                console.log("点击支付海棠按钮");
+                if (items.haitang > 0) {
+                    items.haitang--;
+                    updateItemDisplays();
+                    // 开始海棠恢复计时器
+                    startItemRecovery('haitang');
+                    // 清除所有现有效果
+                    clearAllEffects();
+                    resumeGame();
+                } else {
+                    // 没有海棠，触发冤魂效果
+                    console.log("没有海棠，触发怨气效果");
+                    handleYuanGhost();
+                }
             };
-        }
 
-        // 处理夜幕降临（没有墨镜的情况）
-        function handleNightFallWithoutMojing() {
-            clearAllEffects();
-            eventModal.classList.remove('active');
+            const cancelButton = document.createElement('button');
+            cancelButton.className = 'event-button cancel';
+            cancelButton.textContent = '拒绝支付';
+            cancelButton.onclick = () => {
+                console.log("点击拒绝支付按钮");
+                // 拒绝消耗海棠，触发冤魂效果
+                handleYuanGhost();
+            };
 
-            activeEffects.nightFall = true;
-            gameBoardElement.classList.add('night-fall');
+            eventActionsElement.appendChild(consumeButton);
+            eventActionsElement.appendChild(cancelButton);
 
-            const warning = document.createElement('div');
-            warning.style.position = 'absolute';
-            warning.style.top = '50%';
-            warning.style.left = '50%';
-            warning.style.transform = 'translate(-50%, -50%)';
-            warning.style.color = 'white';
-            warning.style.fontSize = '1.5rem';
-            warning.style.textAlign = 'center';
-            warning.textContent = "夜幕降临\n5秒后恢复";
-            gameBoardElement.appendChild(warning);
-
-            resumeGame();
-
-            effectTimers.nightFall = setTimeout(() => {
-                activeEffects.nightFall = false;
-                gameBoardElement.classList.remove('night-fall');
-                if (warning.parentNode) {
-                    warning.remove();
+        } else if (story.name.includes("夜幕降临")) {
+            console.log("创建夜幕降临按钮");
+            // 夜幕降临：需要消耗墨镜
+            const consumeButton = document.createElement('button');
+            consumeButton.className = 'event-button consume';
+            consumeButton.textContent = `使用1副【墨镜】🕶️`;
+            consumeButton.onclick = () => {
+                console.log("点击使用墨镜按钮");
+                if (items.mojing > 0) {
+                    items.mojing--;
+                    updateItemDisplays();
+                    // 开始墨镜恢复计时器
+                    startItemRecovery('mojing');
+                    // 清除所有现有效果
+                    clearAllEffects();
+                    resumeGame();
+                } else {
+                    // 没有墨镜，触发黑夜效果
+                    console.log("没有墨镜，触发黑夜效果");
+                    handleNightFallWithoutMojing();
                 }
-                gameStatusElement.textContent = "夜幕散去";
-                setTimeout(() => {
-                    if (!gameOver && !isPaused && gameStarted) {
-                        gameStatusElement.textContent = "游戏中";
-                    }
-                }, 2000);
-            }, 5000);
-        }
+            };
 
-        // 长生者效果
-        function activateImmortal() {
-            clearAllEffects();
-            activeEffects.immortal = true;
-            originalDropSpeed = dropSpeed;
-            dropSpeed *= 2;
-            updateDropSpeed();
-            gameStatusElement.textContent = "方块下落速度变慢";
+            const cancelButton = document.createElement('button');
+            cancelButton.className = 'event-button cancel';
+            cancelButton.textContent = '拒绝使用';
+            cancelButton.onclick = () => {
+                console.log("点击拒绝使用按钮");
+                // 拒绝消耗墨镜，触发黑夜效果
+                handleNightFallWithoutMojing();
+            };
 
-            effectTimers.immortal = setTimeout(() => {
-                if (activeEffects.immortal) {
-                    activeEffects.immortal = false;
-                    dropSpeed = originalDropSpeed;
-                    updateDropSpeed();
-                    gameStatusElement.textContent = "变慢效果结束";
-                    setTimeout(() => {
-                        if (!gameOver && !isPaused && gameStarted) {
-                            gameStatusElement.textContent = "游戏中";
-                        }
-                    }, 1000);
-                }
-            }, 10000);
-        }
+            eventActionsElement.appendChild(consumeButton);
+            eventActionsElement.appendChild(cancelButton);
 
-        // 炒肝效果
-        function activateFriedLiver() {
-            clearAllEffects();
+        } else if (story.name.includes("机票")) {
+            console.log("创建机票输入框");
+            // 机票：需要输入正确文本
+            const inputContainer = document.createElement('div');
+            inputContainer.className = 'input-container';
 
-            setTimeout(() => {
-                if (activeEffects.friedLiver) return;
+            const inputText = document.createElement('div');
+            inputText.className = 'input-text';
+            inputText.textContent = '卑微的_____ ';
 
-                activeEffects.friedLiver = true;
-                gameStatusElement.textContent = "操作被冻结3秒";
+            const textInput = document.createElement('input');
+            textInput.type = 'text';
+            textInput.className = 'text-input';
+            textInput.placeholder = '请输入答案';
 
-                const freezeOverlay = document.createElement('div');
-                freezeOverlay.style.position = 'absolute';
-                freezeOverlay.style.top = '0';
-                freezeOverlay.style.left = '0';
-                freezeOverlay.style.width = '100%';
-                freezeOverlay.style.height = '100%';
-                freezeOverlay.style.backgroundColor = 'rgba(139, 69, 19, 0.3)';
-                freezeOverlay.style.display = 'flex';
-                freezeOverlay.style.justifyContent = 'center';
-                freezeOverlay.style.alignItems = 'center';
-                freezeOverlay.style.borderRadius = '6px';
+            const confirmButton = document.createElement('button');
+            confirmButton.className = 'event-button';
+            confirmButton.textContent = '确认';
 
-                const freezeText = document.createElement('div');
-                freezeText.textContent = "🌸 吃炒肝中";
-                freezeText.style.color = '#ff9ec9';
-                freezeText.style.fontSize = '2rem';
-                freezeText.style.fontWeight = 'bold';
-                freezeOverlay.appendChild(freezeText);
-                gameBoardElement.appendChild(freezeOverlay);
-
-                effectTimers.friedLiver = setTimeout(() => {
-                    activeEffects.friedLiver = false;
-                    if (freezeOverlay.parentNode) {
-                        freezeOverlay.remove();
-                    }
-                    gameStatusElement.textContent = "炒肝吃完啦";
+            confirmButton.onclick = () => {
+                console.log("点击确认按钮，输入值:", textInput.value);
+                if (textInput.value.trim() === '爱情') {
+                    console.log("输入正确");
+                    // 机票剧情不需要清除效果，直接恢复游戏
+                    // 不要调用 clearAllEffects(); ← 移除这行
+                    resumeGame();
                     setTimeout(() => {
                         if (!gameOver && !isPaused && gameStarted) {
                             gameStatusElement.textContent = "游戏中";
                         }
                     }, 2000);
-                }, 3000);
-            }, 100);
-        }
-
-        // 流血天气效果
-        function activateBloodyWeather() {
-            clearAllEffects();
-            activeEffects.bloodyWeather = true;
-            activeEffects.bloodyWeatherCount = 5;
-            gameStatusElement.textContent = "接下来5个方块变为红色";
-            drawBoard();
-            drawNextPiece();
-        }
-
-        // 戏曲效果
-        function activateOpera() {
-            gameStatusElement.textContent = "播放BGM《霸王别姬》";
-            playOperaMusic();
-            setTimeout(() => {
-                if (!gameOver && !isPaused && gameStarted) {
-                    gameStatusElement.textContent = "游戏中";
+                } else {
+                    console.log("输入错误");
+                    // 输入错误，保持弹窗显示，给出提示
+                    alert('❌ 输入错误！提示：友情/爱情/亲情');
+                    textInput.value = '';
+                    textInput.focus();
+                    // 不关闭弹窗，让用户继续尝试
                 }
-            }, 3000);
-        }
-
-        // 史努比效果
-        function activateSnoopy() {
-            if (previousBoard && previousPiece) {
-                clearAllEffects();
-                board = JSON.parse(JSON.stringify(previousBoard));
-                currentPiece = JSON.parse(JSON.stringify(previousPiece));
-                drawBoard();
-                gameStatusElement.textContent = "撤回了一步";
-                setTimeout(() => {
-                    if (!gameOver && !isPaused && gameStarted) {
-                        gameStatusElement.textContent = "游戏中";
-                    }
-                }, 2000);
-            } else {
-                gameStatusElement.textContent = "史努比出现，但没有可撤回的步骤";
-                setTimeout(() => {
-                    if (!gameOver && !isPaused && gameStarted) {
-                        gameStatusElement.textContent = "游戏中";
-                    }
-                }, 2000);
-            }
-        }
-
-        // 黄铜箱子效果
-        function activateBrassBox() {
-            clearAllEffects();
-            score = 9999;
-            scoreElement.textContent = score;
-            gameStatusElement.textContent = "分数变为9999";
-            setTimeout(() => {
-                if (!gameOver && !isPaused && gameStarted) {
-                    gameStatusElement.textContent = "游戏中";
-                }
-            }, 2000);
-        }
-
-        // 机票效果
-        function activateTicket() {
-            console.log("机票剧情激活");
-        }
-
-        // 易拉罐风车效果
-        function activateCanWindmill() {
-            clearAllEffects();
-
-            const filledCells = [];
-            for (let row = 0; row < BOARD_HEIGHT; row++) {
-                for (let col = 0; col < BOARD_WIDTH; col++) {
-                    if (board[row][col] !== EMPTY_CELL) {
-                        filledCells.push({ row, col });
-                    }
-                }
-            }
-
-            if (filledCells.length === 0) {
-                gameStatusElement.textContent = "易拉罐风车转动，但没有方块可消除";
-                setTimeout(() => {
-                    if (!gameOver && !isPaused && gameStarted) {
-                        gameStatusElement.textContent = "游戏中";
-                    }
-                }, 2000);
-                return;
-            }
-
-            const cellsToRemove = Math.min(9, filledCells.length);
-            const removedPositions = [];
-
-            for (let i = 0; i < cellsToRemove; i++) {
-                const randomIndex = Math.floor(Math.random() * filledCells.length);
-                const cell = filledCells[randomIndex];
-                removedPositions.push({ ...cell });
-                filledCells.splice(randomIndex, 1);
-                board[cell.row][cell.col] = EMPTY_CELL;
-            }
-
-            for (const pos of removedPositions) {
-                for (let row = pos.row - 1; row >= 0; row--) {
-                    if (board[row][pos.col] !== EMPTY_CELL) {
-                        board[row + 1][pos.col] = board[row][pos.col];
-                        board[row][pos.col] = EMPTY_CELL;
-                    }
-                }
-            }
-
-            drawBoard();
-            gameStatusElement.textContent = `消除了${cellsToRemove}个方块`;
-            setTimeout(() => {
-                if (!gameOver && !isPaused && gameStarted) {
-                    gameStatusElement.textContent = "游戏中";
-                }
-            }, 2000);
-        }
-
-        // 道具效果函数
-        function clearAllBlocks() {
-            for (let row = 0; row < BOARD_HEIGHT; row++) {
-                for (let col = 0; col < BOARD_WIDTH; col++) {
-                    board[row][col] = EMPTY_CELL;
-                }
-            }
-            drawBoard();
-            gameStatusElement.textContent = "所有方块已清除";
-            setTimeout(() => {
-                if (!gameOver && !isPaused && gameStarted) {
-                    gameStatusElement.textContent = "游戏中";
-                }
-            }, 2000);
-        }
-
-        function randomizeNextPiece() {
-            nextPiece = getRandomPiece();
-            drawNextPiece();
-            gameStatusElement.textContent = "下一个方块已改变";
-            setTimeout(() => {
-                if (!gameOver && !isPaused && gameStarted) {
-                    gameStatusElement.textContent = "游戏中";
-                }
-            }, 2000);
-        }
-
-        // 更新下落速度
-        function updateDropSpeed() {
-            if (dropInterval) {
-                clearInterval(dropInterval);
-                dropInterval = setInterval(() => {
-                    movePiece(1, 0);
-                }, dropSpeed);
-            }
-        }
-
-        // 开始/重新开始游戏
-        function startOrRestartGame() {
-            if (gameStarted && !gameOver) {
-                resetGame();
-                startGame();
-            } else {
-                resetGame();
-                showRulesModal();
-            }
-        }
-
-        // 显示规则弹窗
-        function showRulesModal() {
-            rulesModal.classList.add('active');
-            startRestartButton.disabled = true;
-            pauseResumeButton.disabled = true;
-        }
-
-        // 隐藏规则弹窗并开始游戏
-        function hideRulesModalAndStartGame() {
-            rulesModal.classList.remove('active');
-            startRestartButton.disabled = false;
-            startGame();
-        }
-
-        // 开始游戏
-        function startGame() {
-            gameStarted = true;
-            gameOver = false;
-            isPaused = false;
-            gameStatusElement.textContent = "游戏中";
-            startRestartButton.textContent = "重新开始";
-            pauseResumeButton.disabled = false;
-
-            initStorySystem();
-
-            items = {
-                mojing: 0,
-                haitang: 0,
-                qingjunce: 0,
-                sodawater: 0
             };
 
-            for (const itemType in itemRecoveryTimers) {
-                if (itemRecoveryTimers[itemType]) {
-                    clearInterval(itemRecoveryTimers[itemType]);
-                    itemRecoveryTimers[itemType] = null;
+            inputContainer.appendChild(inputText);
+            inputContainer.appendChild(textInput);
+            eventActionsElement.appendChild(inputContainer);
+            eventActionsElement.appendChild(confirmButton);
+
+            // 添加回车键支持
+            textInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    confirmButton.click();
                 }
-                itemRecoveryProgress[itemType] = 0;
+            });
+
+            // 自动聚焦到输入框
+            setTimeout(() => {
+                textInput.focus();
+            }, 100);
+
+        } else {
+            console.log("创建默认确认按钮");
+            // 其他剧情：直接确认继续
+            const confirmButton = document.createElement('button');
+            confirmButton.className = 'event-button';
+            confirmButton.textContent = '确认继续';
+            confirmButton.onclick = () => {
+                console.log("点击确认继续按钮");
+                // 清除所有现有效果
+                clearAllEffects();
+                resumeGame();
+                // 触发剧情效果
+                story.effectFunc();
+            };
+
+            eventActionsElement.appendChild(confirmButton);
+        }
+
+        console.log("显示弹窗");
+        eventModal.classList.add('active');
+    }
+
+    // 恢复游戏
+    function resumeGame() {
+        eventModal.classList.remove('active');
+        // 移除黄铜箱子的特殊样式
+        const eventContent = eventModal.querySelector('.event-content');
+        eventContent.classList.remove('brass-box-special');
+
+        isPaused = false;
+        if (!gameOver && gameStarted) {
+            dropInterval = setInterval(() => {
+                movePiece(1, 0);
+            }, dropSpeed);
+            gameStatusElement.textContent = "游戏中";
+            updateMusicForPause();
+        }
+    }
+
+    // 处理食君之禄剧情
+    function handleShijunzhilu() {
+        // 这个函数不会被直接调用，因为食君之禄有特殊的弹窗处理
+        console.log("食君之禄剧情处理");
+    }
+
+    // 处理冤魂效果（没有海棠的情况）
+    // 处理冤魂效果（没有海棠的情况）
+    function handleYuanGhost() {
+        // 清除所有现有效果
+        clearAllEffects();
+
+        // 触发冤魂效果
+        activeEffects.yuanGhost = true;
+
+        // 显示冤字弹窗
+        eventModal.classList.remove('active');
+
+        // 创建冤字弹窗
+        const yuanModal = document.createElement('div');
+        yuanModal.className = 'event-modal active';
+        yuanModal.innerHTML = `
+        <div class="event-content">
+            <div class="yuan-character" style="color: white !important; text-shadow: 0 0 20px rgba(255, 255, 255, 0.7) !important;">冤</div>
+            <div class="event-description" style="color: #ff9ec9;">黑眼镜把发票贴成一个冤字</div>
+            <button class="confirm-button" id="confirm-yuan-button">确认</button>
+        </div>
+    `;
+
+        document.body.appendChild(yuanModal);
+
+        // 更新游戏板显示（黑色方块）
+        drawBoard();
+
+        // 设置定时器，20秒后自动清除效果
+        effectTimers.yuanGhost = setTimeout(() => {
+            activeEffects.yuanGhost = false;
+            drawBoard();
+            gameStatusElement.textContent = "冤魂散去";
+            setTimeout(() => {
+                if (!gameOver && !isPaused && gameStarted) {
+                    gameStatusElement.textContent = "游戏中";
+                }
+            }, 2000);
+        }, 20000);
+
+        // 确认按钮事件
+        document.getElementById('confirm-yuan-button').onclick = () => {
+            yuanModal.remove();
+            resumeGame();
+        };
+    }
+
+    // 处理夜幕降临剧情（有墨镜消耗）
+    function handleNightFall() {
+        // 这个函数不会被直接调用，因为夜幕降临有特殊的弹窗处理
+        console.log("夜幕降临剧情处理");
+    }
+
+    // 处理夜幕降临（没有墨镜的情况）
+    function handleNightFallWithoutMojing() {
+        // 清除所有现有效果
+        clearAllEffects();
+
+        eventModal.classList.remove('active');
+
+        // 触发夜幕降临效果（覆盖之前的效果）
+        activeEffects.nightFall = true;
+        gameBoardElement.classList.add('night-fall');
+
+        // 添加提示文字
+        const warning = document.createElement('div');
+        warning.className = 'night-warning';
+        warning.textContent = "夜幕降临，5秒后恢复";
+        gameBoardElement.appendChild(warning);
+
+        // 游戏正常进行，只是玩家看不到
+        resumeGame();
+
+        // 5秒后恢复
+        effectTimers.nightFall = setTimeout(() => {
+            activeEffects.nightFall = false;
+            gameBoardElement.classList.remove('night-fall');
+            if (warning.parentNode) {
+                warning.remove();
             }
+            gameStatusElement.textContent = "夜幕散去";
+            setTimeout(() => {
+                if (!gameOver && !isPaused && gameStarted) {
+                    gameStatusElement.textContent = "游戏中";
+                }
+            }, 2000);
+        }, 5000);
+    }
 
-            startItemRecovery('mojing');
-            startItemRecovery('haitang');
-            startItemRecovery('qingjunce');
-            startItemRecovery('sodawater');
+    // 长生者效果
+    function activateImmortal() {
+        // 清除之前的效果
+        clearAllEffects();
 
-            updateItemDisplays();
+        activeEffects.immortal = true;
+        originalDropSpeed = dropSpeed;
+        dropSpeed *= 2; // 速度减半
+        updateDropSpeed();
+        gameStatusElement.textContent = "方块下落速度变慢";
 
+        // 长生者效果持续20秒
+        effectTimers.immortal = setTimeout(() => {
+            if (activeEffects.immortal) {
+                activeEffects.immortal = false;
+                dropSpeed = originalDropSpeed;
+                updateDropSpeed();
+                gameStatusElement.textContent = "变慢效果结束";
+                setTimeout(() => {
+                    if (!gameOver && !isPaused && gameStarted) {
+                        gameStatusElement.textContent = "游戏中";
+                    }
+                }, 1000);
+            }
+        }, 10000);
+    }
+
+    // 炒肝效果 - 玩家不能操作，但游戏正常进行
+    // 炒肝效果 - 玩家不能操作，但游戏正常进行
+    function activateFriedLiver() {
+        // 清除之前的效果
+        clearAllEffects();
+
+        // 炒肝效果在确认后触发
+        setTimeout(() => {
+            if (activeEffects.friedLiver) return;
+
+            activeEffects.friedLiver = true;
+            gameStatusElement.textContent = "操作被冻结3秒";
+
+            // 创建冻结效果覆盖层
+            const freezeOverlay = document.createElement('div');
+            freezeOverlay.className = 'freeze-overlay';
+            const freezeText = document.createElement('div');
+            freezeText.className = 'freeze-text';
+            freezeText.textContent = "🌸 吃炒肝中";  // 修改这里的文字
+            freezeText.style.animation = 'none';  // 移除动画效果
+            freezeText.style.fontSize = '2.5rem';  // 调整字体大小
+            freezeText.style.color = '#ff9ec9';    // 粉色文字
+            freezeText.style.textShadow = '0 2px 4px rgba(0, 0, 0, 0.5)';
+            freezeOverlay.appendChild(freezeText);
+            gameBoardElement.appendChild(freezeOverlay);
+
+            // 3秒后解除冻结
+            effectTimers.friedLiver = setTimeout(() => {
+                activeEffects.friedLiver = false;
+                if (freezeOverlay.parentNode) {
+                    freezeOverlay.remove();
+                }
+                gameStatusElement.textContent = "炒肝吃完啦";
+                setTimeout(() => {
+                    if (!gameOver && !isPaused && gameStarted) {
+                        gameStatusElement.textContent = "游戏中";
+                    }
+                }, 2000);
+            }, 3000);
+        }, 100);
+    }
+
+    // 流血天气效果
+    function activateBloodyWeather() {
+        // 清除之前的效果
+        clearAllEffects();
+
+        activeEffects.bloodyWeather = true;
+        activeEffects.bloodyWeatherCount = 5; // 接下来的5个方块
+        gameStatusElement.textContent = "接下来5个方块变为红色";
+        drawBoard();
+        drawNextPiece();
+    }
+
+    // 戏曲效果
+    function activateOpera() {
+        gameStatusElement.textContent = "播放BGM《霸王别姬》";
+        playOperaMusic();
+        setTimeout(() => {
+            if (!gameOver && !isPaused && gameStarted) {
+                gameStatusElement.textContent = "游戏中";
+            }
+        }, 3000);
+    }
+
+    // 史努比效果 - 撤回这一步方块
+    function activateSnoopy() {
+        if (previousBoard && previousPiece) {
+            // 清除之前的效果
             clearAllEffects();
 
-            gameBoardElement.classList.remove('night-fall', 'blood-weather', 'yuan-ghost');
+            // 恢复之前的游戏板状态
+            board = JSON.parse(JSON.stringify(previousBoard));
+            currentPiece = JSON.parse(JSON.stringify(previousPiece));
 
-            if (!currentPiece) {
-                currentPiece = getRandomPiece();
+            drawBoard();
+            gameStatusElement.textContent = "撤回了一步";
+            setTimeout(() => {
+                if (!gameOver && !isPaused && gameStarted) {
+                    gameStatusElement.textContent = "游戏中";
+                }
+            }, 2000);
+        } else {
+            gameStatusElement.textContent = "史努比出现，但没有可撤回的步骤";
+            setTimeout(() => {
+                if (!gameOver && !isPaused && gameStarted) {
+                    gameStatusElement.textContent = "游戏中";
+                }
+            }, 2000);
+        }
+    }
+
+    // 黄铜箱子效果 - 分数变成9999
+    function activateBrassBox() {
+        // 清除之前的效果
+        clearAllEffects();
+
+        score = 9999;
+        scoreElement.textContent = score;
+        gameStatusElement.textContent = "分数变为9999";
+        setTimeout(() => {
+            if (!gameOver && !isPaused && gameStarted) {
+                gameStatusElement.textContent = "游戏中";
             }
+        }, 2000);
+    }
 
-            if (!nextPiece) {
-                nextPiece = getRandomPiece();
-                drawNextPiece();
+    // 机票效果 - 需要输入正确文本（已在showStoryModal中处理）
+    function activateTicket() {
+        // 效果在showStoryModal中处理，这里只需记录
+        console.log("机票剧情激活");
+    }
+
+    // 易拉罐风车效果 - 随机消除3块已经存在的方块
+    function activateCanWindmill() {
+        // 清除之前的效果
+        clearAllEffects();
+
+        // 收集所有已填充的方块位置
+        const filledCells = [];
+        for (let row = 0; row < BOARD_HEIGHT; row++) {
+            for (let col = 0; col < BOARD_WIDTH; col++) {
+                if (board[row][col] !== EMPTY_CELL) {
+                    filledCells.push({ row, col });
+                }
             }
+        }
 
-            dropSpeed = 1000;
-            originalDropSpeed = 1000;
+        if (filledCells.length === 0) {
+            gameStatusElement.textContent = "易拉罐风车转动，但没有方块可消除";
+            setTimeout(() => {
+                if (!gameOver && !isPaused && gameStarted) {
+                    gameStatusElement.textContent = "游戏中";
+                }
+            }, 2000);
+            return;
+        }
 
-            if (dropInterval) {
-                clearInterval(dropInterval);
+        // 随机选择3个方块（如果总数不足9个，则选择所有）
+        const cellsToRemove = Math.min(9, filledCells.length);
+        const removedPositions = [];
+
+        for (let i = 0; i < cellsToRemove; i++) {
+            const randomIndex = Math.floor(Math.random() * filledCells.length);
+            const cell = filledCells[randomIndex];
+            removedPositions.push({ ...cell });
+            filledCells.splice(randomIndex, 1);
+
+            // 标记为需要移除
+            board[cell.row][cell.col] = EMPTY_CELL;
+        }
+
+        // 处理方块下落
+        for (const pos of removedPositions) {
+            // 从被移除的位置开始，上方的方块下落
+            for (let row = pos.row - 1; row >= 0; row--) {
+                if (board[row][pos.col] !== EMPTY_CELL) {
+                    board[row + 1][pos.col] = board[row][pos.col];
+                    board[row][pos.col] = EMPTY_CELL;
+                }
             }
+        }
+
+        drawBoard();
+        gameStatusElement.textContent = `消除了${cellsToRemove}个方块`;
+        setTimeout(() => {
+            if (!gameOver && !isPaused && gameStarted) {
+                gameStatusElement.textContent = "游戏中";
+            }
+        }, 2000);
+    }
+
+    // 道具效果函数
+    function clearAllBlocks() {
+        // 清除所有方块
+        for (let row = 0; row < BOARD_HEIGHT; row++) {
+            for (let col = 0; col < BOARD_WIDTH; col++) {
+                board[row][col] = EMPTY_CELL;
+            }
+        }
+        drawBoard();
+        gameStatusElement.textContent = "所有方块已清除";
+        setTimeout(() => {
+            if (!gameOver && !isPaused && gameStarted) {
+                gameStatusElement.textContent = "游戏中";
+            }
+        }, 2000);
+    }
+
+    function randomizeNextPiece() {
+        // 随机改变下一个方块的形状
+        nextPiece = getRandomPiece();
+        drawNextPiece();
+        gameStatusElement.textContent = "下一个方块已改变";
+        setTimeout(() => {
+            if (!gameOver && !isPaused && gameStarted) {
+                gameStatusElement.textContent = "游戏中";
+            }
+        }, 2000);
+    }
+
+    // 更新下落速度
+    function updateDropSpeed() {
+        if (dropInterval) {
+            clearInterval(dropInterval);
+            dropInterval = setInterval(() => {
+                movePiece(1, 0);
+            }, dropSpeed);
+        }
+    }
+
+    // 开始/重新开始游戏
+    // 开始/重新开始游戏
+    function startOrRestartGame() {
+        console.log("点击开始/重新开始按钮，当前状态 - gameStarted:", gameStarted, "gameOver:", gameOver);
+
+        if (gameStarted && !gameOver) {
+            // 重新开始游戏：直接开始，不显示规则
+            console.log("重新开始游戏");
+            resetGame();
+            startGame();
+        } else {
+            // 第一次开始游戏：先显示规则
+            console.log("第一次开始游戏，显示规则");
+            resetGame();
+            showRulesModal();
+        }
+    }
+
+    // 显示规则弹窗
+    function showRulesModal() {
+        console.log("显示游戏规则弹窗");
+        rulesModal.classList.add('active');
+
+        // 禁用其他按钮
+        startRestartButton.disabled = true;
+        pauseResumeButton.disabled = true;
+    }
+
+    // 隐藏规则弹窗并开始游戏
+    function hideRulesModalAndStartGame() {
+        console.log("关闭规则弹窗，开始游戏");
+        rulesModal.classList.remove('active');
+
+        // 启用其他按钮
+        startRestartButton.disabled = false;
+
+        // 开始游戏
+        startGame();
+    }
+
+    // 开始游戏
+    // 开始游戏
+    function startGame() {
+        gameStarted = true;
+        gameOver = false;
+        isPaused = false;
+        gameStatusElement.textContent = "游戏中";
+        startRestartButton.textContent = "重新开始";
+        pauseResumeButton.disabled = false;
+
+        // 初始化剧情系统
+        initStorySystem();
+
+        // 初始化道具（初始值为0，会自动恢复）
+        items = {
+            mojing: 0,
+            haitang: 0,
+            qingjunce: 0,
+            sodawater: 0
+        };
+
+        // 清除所有恢复计时器
+        for (const itemType in itemRecoveryTimers) {
+            if (itemRecoveryTimers[itemType]) {
+                clearInterval(itemRecoveryTimers[itemType]);
+                itemRecoveryTimers[itemType] = null;
+            }
+            itemRecoveryProgress[itemType] = 0;
+        }
+
+        // 开始所有道具的恢复计时器
+        startItemRecovery('mojing');
+        startItemRecovery('haitang');
+        startItemRecovery('qingjunce');
+        startItemRecovery('sodawater');
+
+        updateItemDisplays();
+
+        // 清除所有效果
+        clearAllEffects();
+
+        gameBoardElement.classList.remove('night-fall', 'blood-weather', 'yuan-ghost');
+
+        // 确保有当前方块和下一个方块
+        if (!currentPiece) {
+            currentPiece = getRandomPiece();
+        }
+
+        if (!nextPiece) {
+            nextPiece = getRandomPiece();
+            drawNextPiece();
+        }
+
+        // 重置下落速度
+        dropSpeed = 1000;
+        originalDropSpeed = 1000;
+
+        // 清除之前的定时器
+        if (dropInterval) {
+            clearInterval(dropInterval);
+        }
+
+        // 开始新的定时器
+        dropInterval = setInterval(() => {
+            movePiece(1, 0);
+        }, dropSpeed);
+
+        // 开始播放背景音乐（从规则弹窗确认后播放）
+        playBackgroundMusic();
+
+        drawBoard();
+
+        console.log("游戏开始完成");
+    }
+
+    // 规则弹窗确认按钮事件
+    rulesConfirmButton.addEventListener('click', hideRulesModalAndStartGame);
+
+    // 也可以在规则弹窗区域点击其他地方关闭（可选）
+    rulesModal.addEventListener('click', function (e) {
+        if (e.target === rulesModal) {
+            hideRulesModalAndStartGame();
+        }
+    });
+
+    // 暂停/继续游戏
+    function togglePauseResume() {
+        if (gameOver || !gameStarted) return;
+
+        isPaused = !isPaused;
+
+        if (isPaused) {
+            clearInterval(dropInterval);
+            gameStatusElement.textContent = "已暂停";
+            pauseResumeButton.textContent = "继续";
+            pauseAllItemRecovery();
+        } else {
+            gameStatusElement.textContent = "游戏中";
+            pauseResumeButton.textContent = "暂停";
 
             dropInterval = setInterval(() => {
                 movePiece(1, 0);
             }, dropSpeed);
-
-            playBackgroundMusic();
-
-            drawBoard();
+            resumeAllItemRecovery();
         }
 
-        // 暂停/继续游戏
-        function togglePauseResume() {
-            if (gameOver || !gameStarted) return;
+        updateMusicForPause();
+    }
 
-            isPaused = !isPaused;
+    // 重置游戏状态
+    // 重置游戏状态
+    function resetGame() {
+        // 清除定时器
+        if (dropInterval) {
+            clearInterval(dropInterval);
+            dropInterval = null;
+        }
 
-            if (isPaused) {
-                clearInterval(dropInterval);
-                gameStatusElement.textContent = "已暂停";
-                pauseResumeButton.textContent = "继续";
-            } else {
-                gameStatusElement.textContent = "游戏中";
-                pauseResumeButton.textContent = "暂停";
+        // 清除道具恢复计时器
+        for (const itemType in itemRecoveryTimers) {
+            if (itemRecoveryTimers[itemType]) {
+                clearInterval(itemRecoveryTimers[itemType]);
+                itemRecoveryTimers[itemType] = null;
+            }
+            itemRecoveryProgress[itemType] = 0;
+        }
 
-                dropInterval = setInterval(() => {
-                    movePiece(1, 0);
-                }, dropSpeed);
+        // 清除效果计时器
+        for (const timer in effectTimers) {
+            if (effectTimers[timer]) {
+                clearTimeout(effectTimers[timer]);
+                effectTimers[timer] = null;
             }
         }
 
-        // 重置游戏状态
-        function resetGame() {
-            if (dropInterval) {
-                clearInterval(dropInterval);
-                dropInterval = null;
-            }
+        // 重置游戏变量
+        score = 0;
+        gameOver = false;
+        isPaused = false;
+        gameStarted = false;
+        dropSpeed = 1000;
 
-            for (const itemType in itemRecoveryTimers) {
-                if (itemRecoveryTimers[itemType]) {
-                    clearInterval(itemRecoveryTimers[itemType]);
-                    itemRecoveryTimers[itemType] = null;
-                }
-                itemRecoveryProgress[itemType] = 0;
-            }
+        // 清除所有效果
+        clearAllEffects();
 
-            for (const timer in effectTimers) {
-                if (effectTimers[timer]) {
-                    clearTimeout(effectTimers[timer]);
-                    effectTimers[timer] = null;
-                }
-            }
+        // 重置剧情状态
+        previousBoard = null;
+        previousPiece = null;
 
-            score = 0;
-            gameOver = false;
-            isPaused = false;
-            gameStarted = false;
-            dropSpeed = 1000;
+        // 隐藏规则弹窗（如果显示的话）
+        rulesModal.classList.remove('active');
 
-            clearAllEffects();
+        // 确保开始按钮可用
+        startRestartButton.disabled = false;
 
-            previousBoard = null;
-            previousPiece = null;
+        // 停止音乐
+        pauseBackgroundMusic();
+        stopOperaMusic();
+        isOperaPlaying = false;
 
-            rulesModal.classList.remove('active');
+        // 更新UI
+        scoreElement.textContent = score;
+        gameStatusElement.textContent = "准备开始";
+        startRestartButton.textContent = "开始游戏";
+        pauseResumeButton.textContent = "暂停";
+        pauseResumeButton.disabled = true;
 
-            startRestartButton.disabled = false;
+        // 重置游戏板
+        createBoard();
+        currentPiece = getRandomPiece();
+        nextPiece = getRandomPiece();
+        drawNextPiece();
+        drawBoard();
+    }
 
-            pauseBackgroundMusic();
-            stopOperaMusic();
-            isOperaPlaying = false;
+    // 键盘控制
+    function handleKeyDown(event) {
+        if (!gameStarted && event.key !== 'Enter') return;
 
-            scoreElement.textContent = score;
-            gameStatusElement.textContent = "准备开始";
-            startRestartButton.textContent = "开始游戏";
-            pauseResumeButton.textContent = "暂停";
-            pauseResumeButton.disabled = true;
-
-            createBoard();
-            currentPiece = getRandomPiece();
-            nextPiece = getRandomPiece();
-            drawNextPiece();
-            drawBoard();
+        switch (event.key) {
+            case 'ArrowLeft':
+                event.preventDefault();
+                movePiece(0, -1);
+                break;
+            case 'ArrowRight':
+                event.preventDefault();
+                movePiece(0, 1);
+                break;
+            case 'ArrowDown':
+                event.preventDefault();
+                movePiece(1, 0);
+                break;
+            case 'ArrowUp':
+                event.preventDefault();
+                rotatePiece();
+                break;
+            case ' ':
+                event.preventDefault();
+                dropPiece();
+                break;
+            case 'p':
+            case 'P':
+                event.preventDefault();
+                togglePauseResume();
+                break;
+            case 'r':
+            case 'R':
+                event.preventDefault();
+                resetGame();
+                startGame();
+                break;
+            case 'Enter':
+                event.preventDefault();
+                startOrRestartGame();
+                break;
         }
+    }
 
-        // 设置触摸控制
-        function setupTouchControls() {
-            // 棋盘触摸事件
-            gameBoardElement.addEventListener('touchstart', handleTouchStart);
-            gameBoardElement.addEventListener('touchmove', handleTouchMove);
-            gameBoardElement.addEventListener('touchend', handleTouchEnd);
-
-            // 道具点击事件
-            qingjunceItemElement.addEventListener('click', () => {
-                if (useItem('qingjunce')) {
-                    ITEMS.QINGJUNCE.effectFunc();
-                }
+    // 设置触摸控制和道具点击
+    function setupTouchControls() {
+        // 旋转按钮
+        const rotateBtn = document.querySelector('.touch-btn.rotate');
+        if (rotateBtn) {
+            rotateBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                rotatePiece();
             });
 
-            sodawaterItemElement.addEventListener('click', () => {
-                if (useItem('sodawater')) {
-                    ITEMS.SODAWATER.effectFunc();
-                }
+            rotateBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                rotatePiece();
+            });
+        }
+
+        // 移动按钮
+        const leftBtn = document.querySelector('.touch-btn.left');
+        if (leftBtn) {
+            leftBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                movePiece(0, -1);
             });
 
-            // 防止触摸滚动
-            gameBoardElement.addEventListener('touchmove', (e) => {
+            leftBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                movePiece(0, -1);
+            });
+        }
+
+        const rightBtn = document.querySelector('.touch-btn.right');
+        if (rightBtn) {
+            rightBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                movePiece(0, 1);
+            });
+
+            rightBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                movePiece(0, 1);
+            });
+        }
+
+        const downBtn = document.querySelector('.touch-btn.down');
+        if (downBtn) {
+            downBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                movePiece(1, 0);
+            });
+
+            downBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                movePiece(1, 0);
+            });
+        }
+
+        const dropBtn = document.querySelector('.touch-btn.drop');
+        if (dropBtn) {
+            dropBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                dropPiece();
+            });
+
+            dropBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                dropPiece();
+            });
+        }
+
+        // 道具点击事件
+        qingjunceItemElement.addEventListener('click', () => {
+            if (useItem('qingjunce')) {
+                ITEMS.QINGJUNCE.effectFunc();
+            }
+        });
+
+        sodawaterItemElement.addEventListener('click', () => {
+            if (useItem('sodawater')) {
+                ITEMS.SODAWATER.effectFunc();
+            }
+        });
+
+        // 防止触摸滚动
+        document.querySelectorAll('.touch-btn').forEach(btn => {
+            btn.addEventListener('touchmove', (e) => {
                 e.preventDefault();
             });
-        }
+        });
 
-        // 触摸开始处理
-        function handleTouchStart(e) {
-            if (!gameStarted || isPaused || gameOver) return;
+        // 道具项也防止触摸滚动
+        document.querySelectorAll('.item').forEach(item => {
+            item.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+            });
+        });
+    }
 
-            const touch = e.touches[0];
-            touchStartX = touch.clientX;
-            touchStartY = touch.clientY;
+    // 初始化游戏
+    function init() {
+        createBoard();
+        resetGame();
 
-            e.preventDefault();
-        }
+        // 添加事件监听器
+        document.addEventListener('keydown', handleKeyDown);
+        startRestartButton.addEventListener('click', startOrRestartGame);
+        pauseResumeButton.addEventListener('click', togglePauseResume);
 
-        // 触摸移动处理
-        function handleTouchMove(e) {
-            if (!gameStarted || isPaused || gameOver) return;
-            e.preventDefault();
-        }
+        // 设置触摸控制
+        setupTouchControls();
 
-        // 触摸结束处理
-        function handleTouchEnd(e) {
-            if (!gameStarted || isPaused || gameOver || !touchStartX || !touchStartY) return;
+        // 初始绘制
+        drawBoard();
+        drawNextPiece();
+    }
 
-            const touch = e.changedTouches[0];
-            touchEndX = touch.clientX;
-            touchEndY = touch.clientY;
+    // 页面加载完成后初始化游戏
+    window.addEventListener('DOMContentLoaded', init);
+</script>
 
-            const deltaX = touchEndX - touchStartX;
-            const deltaY = touchEndY - touchStartY;
-
-            // 判断滑动方向
-            if (Math.abs(deltaX) > Math.abs(deltaY)) {
-                // 水平滑动
-                if (Math.abs(deltaX) > SWIPE_THRESHOLD) {
-                    if (deltaX > 0) {
-                        // 右滑 - 右移
-                        movePiece(0, 1);
-                    } else {
-                        // 左滑 - 左移
-                        movePiece(0, -1);
-                    }
-                }
-            } else {
-                // 垂直滑动
-                if (Math.abs(deltaY) > SWIPE_THRESHOLD) {
-                    if (deltaY > 0) {
-                        // 下滑 - 加速下落
-                        let moved = false;
-                        while (movePiece(1, 0)) {
-                            moved = true;
-                        }
-                        if (!moved) {
-                            // 如果不能再下落，尝试旋转
-                            rotatePiece();
-                        }
-                    } else {
-                        // 上滑 - 旋转
-                        rotatePiece();
-                    }
-                } else {
-                    // 轻触 - 快速下落
-                    if (Math.abs(deltaX) < TAP_THRESHOLD && Math.abs(deltaY) < TAP_THRESHOLD) {
-                        dropPiece();
-                    }
-                }
-            }
-
-            // 重置触摸位置
-            touchStartX = 0;
-            touchStartY = 0;
-            touchEndX = 0;
-            touchEndY = 0;
-
-            e.preventDefault();
-        }
-
-        // 键盘控制（可选）
-        function handleKeyDown(event) {
-            if (!gameStarted && event.key !== 'Enter') return;
-
-            switch (event.key) {
-                case 'ArrowLeft':
-                    event.preventDefault();
-                    movePiece(0, -1);
-                    break;
-                case 'ArrowRight':
-                    event.preventDefault();
-                    movePiece(0, 1);
-                    break;
-                case 'ArrowDown':
-                    event.preventDefault();
-                    movePiece(1, 0);
-                    break;
-                case 'ArrowUp':
-                    event.preventDefault();
-                    rotatePiece();
-                    break;
-                case ' ':
-                    event.preventDefault();
-                    dropPiece();
-                    break;
-                case 'p':
-                case 'P':
-                    event.preventDefault();
-                    togglePauseResume();
-                    break;
-                case 'Enter':
-                    event.preventDefault();
-                    startOrRestartGame();
-                    break;
-            }
-        }
-
-        // 初始化游戏
-        function init() {
-            createBoard();
-            resetGame();
-
-            document.addEventListener('keydown', handleKeyDown);
-            startRestartButton.addEventListener('click', startOrRestartGame);
-            pauseResumeButton.addEventListener('click', togglePauseResume);
-            rulesConfirmButton.addEventListener('click', hideRulesModalAndStartGame);
-
-            setupTouchControls();
-
-            drawBoard();
-            drawNextPiece();
-
-            // 调整棋盘大小以确保格子是正方形
-            setTimeout(adjustBoardSize, 100);
-        }
-
-        // 调整棋盘大小
-        function adjustBoardSize() {
-            const boardContainer = document.querySelector('.game-board-container');
-            const board = document.querySelector('.game-board');
-
-            if (boardContainer && board) {
-                const containerWidth = boardContainer.clientWidth;
-                const containerHeight = boardContainer.clientHeight;
-
-                // 保持10:20的比例，确保格子是正方形
-                const cellSize = Math.min(containerWidth / 10, containerHeight / 20);
-                const boardWidth = cellSize * 10;
-                const boardHeight = cellSize * 20;
-
-                board.style.width = boardWidth + 'px';
-                board.style.height = boardHeight + 'px';
-            }
-        }
-
-        // 监听窗口大小变化
-        window.addEventListener('resize', adjustBoardSize);
-
-        // 页面加载完成后初始化游戏
-        window.addEventListener('DOMContentLoaded', init);
-    </script>
-</body>
 </html>
