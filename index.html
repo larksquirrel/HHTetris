@@ -5,6 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>黑黑花花的俄罗斯方块</title>
     <style>
+        /* ========== 字体 ========== */
+        @font-face {
+            font-family: 'Font1';
+            src: url('font1.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+        }
+
+        /* ========== 基础 ========== */
         * {
             margin: 0;
             padding: 0;
@@ -12,10 +22,57 @@
             -webkit-tap-highlight-color: transparent;
         }
 
+        :root {
+            /* 主色：粉棕白 */
+            --cream: #fdf6f0;
+            --cream-2: #f7e9e0;
+            --white: #ffffff;
+            --pink: #f4a6b8;
+            --pink-soft: #fbd3dc;
+            --pink-deep: #e07a95;
+            --brown: #a97b6b;
+            --brown-soft: #c9a99a;
+            --brown-deep: #8a5f52;
+
+            /* 重色：用于平衡 */
+            --ink: #5a3a32;
+            --ink-2: #7a4a3e;
+            --ink-3: #3f2822;
+
+            /* 辅助色 */
+            --yellow: #f7d98b;
+            --yellow-soft: #fbeec4;
+            --blue: #a8cbe0;
+            --blue-soft: #d4e6f0;
+            --mint: #b8d8c8;
+
+            /* 文字 */
+            --text: #5a4038;
+            --text-soft: #8a6f66;
+            --text-light: #b39a91;
+
+            /* 线条 */
+            --line: rgba(169, 123, 107, 0.22);
+            --line-strong: rgba(138, 95, 82, 0.42);
+
+            /* 圆角 */
+            --radius-s: 8px;
+            --radius-m: 14px;
+            --radius-l: 20px;
+
+            /* 柔和投影 */
+            --shadow-soft: 0 8px 24px rgba(90, 58, 50, 0.10);
+            --shadow-glow-pink: 0 0 16px rgba(244, 166, 184, 0.55);
+            --shadow-glow-yellow: 0 0 16px rgba(247, 217, 139, 0.55);
+            --shadow-glow-blue: 0 0 16px rgba(168, 203, 224, 0.55);
+        }
+
+        html, body { height: 100%; }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
-            background: linear-gradient(135deg, #0f0b1e 0%, #1a0f2e 100%);
-            color: #fff;
+            background-color: var(--cream);
+            color: var(--text);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -23,61 +80,114 @@
             min-height: 100vh;
             padding: 5px;
             overflow-x: hidden;
+            position: relative;
         }
 
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                radial-gradient(circle at 12% 18%, rgba(244, 166, 184, 0.16) 0, transparent 26%),
+                radial-gradient(circle at 88% 12%, rgba(247, 217, 139, 0.14) 0, transparent 24%),
+                radial-gradient(circle at 78% 82%, rgba(168, 203, 224, 0.14) 0, transparent 26%),
+                radial-gradient(circle at 18% 86%, rgba(184, 216, 200, 0.12) 0, transparent 24%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: radial-gradient(circle, rgba(90, 58, 50, 0.07) 1px, transparent 1px);
+            background-size: 22px 22px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ========== 顶部标题 ========== */
         .header {
             text-align: center;
             margin: 5px 0 10px;
             width: 340px;
+            position: relative;
+            z-index: 1;
         }
 
         h1 {
-            font-size: 1.8rem;
-            margin-bottom: 3px;
-            background: linear-gradient(to right, #ff2a8f, #ff7eb3);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 2px 10px rgba(255, 42, 143, 0.3);
+            font-family: 'Font1', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            font-size: 1.75rem;
+            letter-spacing: 0.16em;
+            margin-bottom: 6px;
+            color: var(--ink-2);
+            text-shadow: 0 0 16px rgba(244, 166, 184, 0.55);
         }
 
         .subtitle {
-            color: #ff9ec9;
-            font-size: 0.8rem;
-            opacity: 0.9;
+            color: var(--text-soft);
+            font-size: 0.72rem;
+            letter-spacing: 0.22em;
+            opacity: 0.85;
         }
 
+        .subtitle::before,
+        .subtitle::after {
+            content: '·';
+            margin: 0 8px;
+            color: var(--ink-2);
+        }
+
+        /* ========== 布局 ========== */
         .game-container {
             display: flex;
             flex-direction: column;
             align-items: center;
             width: 340px;
             height: 550px;
-            margin-left: 5px; /* 添加左边距 */
+            margin-left: 5px;
+            position: relative;
+            z-index: 1;
         }
 
         .main-game {
             display: grid;
             grid-template-columns: 210px 100px;
-            grid-template-rows: 320px 100px 70px; /* 改为三行：第一行游戏棋盘和分数道具，第二行操作键，第三行左边按钮 */
+            grid-template-rows: 320px 100px 70px;
             gap: 10px;
             width: 320px;
-            height: 500px; /* 调整总高度 */
+            height: 500px;
             margin-bottom: 10px;
         }
 
-        /* 左上：游戏棋盘区域 */
+        /* ========== 棋盘容器 ========== */
         .game-board-container {
             grid-column: 1;
-            grid-row: 1 / span 2; /* 跨两行，包含游戏棋盘和左边按钮的位置 */
+            grid-row: 1 / span 2;
             position: relative;
-            background: linear-gradient(145deg, rgba(20, 10, 30, 0.9), rgba(30, 15, 40, 0.9));
-            border-radius: 12px;
+            background-color: var(--white);
+            border-radius: var(--radius-m);
             padding: 8px;
-            box-shadow: 0 8px 20px rgba(255, 42, 143, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 122, 179, 0.2);
+            box-shadow: var(--shadow-soft);
+            border: 1.5px solid var(--line-strong);
             width: 210px;
-            height: 440px; /* 保持原高度，但位置变了 */
-            box-sizing: border-box;
+            height: 440px;
+            overflow: hidden;
+        }
+
+        .game-board-container::before {
+            content: '';
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: var(--pink);
+            box-shadow:
+                -12px 0 0 var(--yellow),
+                -24px 0 0 var(--blue);
+            pointer-events: none;
         }
 
         .game-board {
@@ -86,21 +196,32 @@
             grid-template-rows: repeat(20, 1fr);
             width: 194px;
             height: 388px;
-            background-color: rgba(10, 5, 20, 0.9);
-            border: 2px solid rgba(255, 122, 179, 0.3);
-            border-radius: 6px;
+            background-color: #fdf9f6;
+            border: 1.5px solid var(--line-strong);
+            border-radius: var(--radius-s);
             overflow: hidden;
+            position: relative;
             transition: background-color 0.5s, filter 0.5s;
-            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.6);
         }
 
-        /* 夜幕降临效果 - 全黑 */
+        .game-board::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background-image:
+                linear-gradient(rgba(90, 58, 50, 0.08) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(90, 58, 50, 0.08) 1px, transparent 1px);
+            background-size: calc(100% / 10) calc(100% / 20);
+            z-index: 2;
+        }
+
         .night-fall {
-            background-color: #000 !important;
-            filter: brightness(0.1);
+            background-color: #2b2320 !important;
+            filter: brightness(0.35);
         }
 
-        /* 冤魂效果 - 黑色方块 */
         .yuan-ghost .cell.filled.i,
         .yuan-ghost .cell.filled.j,
         .yuan-ghost .cell.filled.l,
@@ -108,11 +229,10 @@
         .yuan-ghost .cell.filled.s,
         .yuan-ghost .cell.filled.t,
         .yuan-ghost .cell.filled.z {
-            background-color: #000000 !important;
-            border-color: #444444 !important;
+            background-color: #4a3f3a !important;
+            border-color: #6a5a52 !important;
         }
 
-        /* 流血天气效果 - 红色方块 */
         .blood-weather .cell.filled.i,
         .blood-weather .cell.filled.j,
         .blood-weather .cell.filled.l,
@@ -120,11 +240,11 @@
         .blood-weather .cell.filled.s,
         .blood-weather .cell.filled.t,
         .blood-weather .cell.filled.z {
-            background-color: #ff2a2a !important;
-            border-color: #ff7a7a !important;
+            background-color: #e88a8a !important;
+            border-color: #f4b8b8 !important;
         }
 
-        /* 右上：信息区域 */
+        /* ========== 右侧 ========== */
         .right-section {
             grid-column: 2;
             grid-row: 1;
@@ -135,18 +255,30 @@
             height: 340px;
         }
 
-
-        /* 修改合并的分数和下一个方块面板 */
         .combined-panel {
-            background: linear-gradient(145deg, rgba(20, 10, 30, 0.9), rgba(30, 15, 40, 0.9));
-            border-radius: 12px;
+            background-color: var(--white);
+            border-radius: var(--radius-m);
             padding: 10px;
-            box-shadow: 0 4px 15px rgba(255, 42, 143, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 122, 179, 0.2);
-            height: 90px; /* 降低高度，因为是并排 */
+            box-shadow: var(--shadow-soft);
+            border: 1.5px solid var(--line-strong);
+            height: 90px;
+            position: relative;
         }
 
-        /* 水平布局 */
+        .combined-panel::before {
+            content: '';
+            position: absolute;
+            top: 6px;
+            left: 10px;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background-color: var(--pink);
+            box-shadow:
+                8px 0 0 var(--yellow),
+                16px 0 0 var(--blue);
+        }
+
         .combined-content.horizontal {
             display: flex;
             flex-direction: row;
@@ -156,34 +288,7 @@
             height: 100%;
         }
 
-        /* 分数区域调整 */
-        .score-section {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            flex: 1;
-            height: 100%;
-        }
-
-            .score-section .info-title {
-                margin-bottom: 8px;
-                color: #ff7eb3;
-                font-size: 2rem;
-                font-weight: 600;
-                text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
-            }
-
-        .score-display {
-            font-size: 1rem; /* 可以适当调整大小 */
-            text-align: center;
-            font-weight: bold;
-            color: #ff4d9e;
-            text-shadow: 0 2px 8px rgba(255, 77, 158, 0.5);
-            margin: 0;
-        }
-
-        /* 下一个方块区域调整 */
+        .score-section,
         .next-section {
             display: flex;
             flex-direction: column;
@@ -193,74 +298,36 @@
             height: 100%;
         }
 
-            .next-section .info-title {
-                margin-bottom: 8px;
-                color: #ff7eb3;
-                font-size: 1rem;
-                font-weight: 600;
-                text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
-            }
-
-        .next-piece-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
+        .info-title {
+            margin-bottom: 6px;
+            color: var(--ink-2);
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.18em;
+            text-shadow: 0 0 10px rgba(169, 123, 107, 0.22);
         }
-
-        .next-piece-board {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            grid-template-rows: repeat(4, 1fr);
-            width: 70px; /* 调整为适合并排的大小 */
-            height: 70px;
-            background-color: rgba(10, 5, 20, 0.9);
-            border-radius: 6px;
-            border: 1px solid rgba(255, 122, 179, 0.3);
-        }
-
-
-        /* 分数区域 */
-        .score-section {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 70px;
-        }
-
-            .score-section .info-title {
-                margin-bottom: 5px;
-                color: #ff7eb3;
-                font-size: 0.85rem;
-                font-weight: 600;
-                text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
-            }
 
         .score-display {
-            font-size: 1rem;
+            font-family: 'Font1', 'Courier New', monospace;
+            font-variant-numeric: tabular-nums;
+            font-size: 1.15rem;
             text-align: center;
             font-weight: bold;
-            color: #ff4d9e;
-            text-shadow: 0 2px 8px rgba(255, 77, 158, 0.5);
+            color: var(--ink);
+            text-shadow: 0 0 12px rgba(244, 166, 184, 0.6);
             margin: 0;
+            letter-spacing: 0.06em;
         }
 
-        /* 下一个方块区域 */
-        .next-section {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 90px;
+        .score-display.pop {
+            animation: scorePop 0.35s ease;
         }
 
-            .next-section .info-title {
-                margin-bottom: 5px;
-                color: #ff7eb3;
-                font-size: 0.85rem;
-                font-weight: 600;
-                text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
-            }
+        @keyframes scorePop {
+            0%   { transform: scale(1); }
+            40%  { transform: scale(1.16); }
+            100% { transform: scale(1); }
+        }
 
         .next-piece-container {
             display: flex;
@@ -274,143 +341,115 @@
             grid-template-rows: repeat(4, 1fr);
             width: 50px;
             height: 50px;
-            background-color: rgba(10, 5, 20, 0.9);
+            background-color: #fdf9f6;
             border-radius: 6px;
-            border: 1px solid rgba(255, 122, 179, 0.3);
+            border: 1.5px solid var(--line-strong);
         }
 
-        /* 道具栏 */
+        /* ========== 道具栏 ========== */
         .items-panel {
             flex: 1;
-            background: linear-gradient(145deg, rgba(20, 10, 30, 0.9), rgba(30, 15, 40, 0.9));
-            border-radius: 12px;
-            padding: 8px; /* 改为8px */
-            box-shadow: 0 4px 15px rgba(255, 42, 143, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 122, 179, 0.2);
-            height: 200px; /* 改为200px */
+            background-color: var(--white);
+            border-radius: var(--radius-m);
+            padding: 8px;
+            box-shadow: var(--shadow-soft);
+            border: 1.5px solid var(--line-strong);
+            height: 200px;
             overflow-y: auto;
         }
 
-            /* 道具栏标题 */
-            .items-panel .info-title {
-                margin-bottom: 8px; /* 改为8px */
-                color: #ff7eb3;
-                font-size: 0.85rem; /* 改为0.85rem */
-                font-weight: 600;
-                text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
-                text-align: center;
-            }
+        .items-panel .info-title {
+            margin-bottom: 8px;
+            font-size: 0.72rem;
+            text-align: center;
+        }
 
-        /* 道具样式 */
+        /* 道具项：去掉底衬，只保留左侧色条 */
         .item {
             position: relative;
             overflow: hidden;
-            border-radius: 8px;
+            border-radius: var(--radius-s);
             border-left: 3px solid;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-            background: linear-gradient(145deg, rgba(30, 15, 40, 0.9), rgba(20, 10, 30, 0.9));
-            margin-bottom: 6px; /* 改为6px */
-            height: 42px; /* 改为42px */
+            transition: all 0.25s ease;
+            background-color: transparent; /* 去掉底衬 */
+            margin-bottom: 6px;
+            height: 42px;
         }
 
-            .item:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
-            }
-
-            .item:active {
-                transform: translateY(0);
-            }
-
-            .item.disabled {
-                opacity: 0.5;
-                filter: grayscale(0.7);
-                cursor: not-allowed;
-                pointer-events: none;
-            }
-
-            /* 道具恢复完成的状态 */
-            .item.recovered {
-                border-left-width: 4px;
-                box-shadow: 0 5px 15px rgba(255, 255, 255, 0.2);
-            }
-
-                .item.recovered .item-name {
-                    color: #ffffff;
-                    text-shadow: 0 0 10px currentColor;
-                    font-weight: bold;
-                }
-
-                .item.recovered .item-count {
-                    color: #ffffff;
-                    text-shadow: 0 0 10px #ffffff;
-                    font-weight: bold;
-                    animation: count-glow 1.5s infinite alternate;
-                }
-
-        @keyframes count-glow {
-            from {
-                transform: scale(1);
-                text-shadow: 0 0 5px #ffffff;
-            }
-
-            to {
-                transform: scale(1.1);
-                text-shadow: 0 0 15px #ffffff;
-            }
+        .item:hover {
+            background-color: rgba(244, 166, 184, 0.08);
+            box-shadow: 0 0 12px rgba(244, 166, 184, 0.35);
+            transform: translateX(2px);
         }
 
-        /* 道具颜色调整 */
-        .item.mojing {
-            border-left-color: #ffffff; /* 墨镜 - 黑色 */
+        .item:active {
+            transform: translateX(0) scale(0.985);
         }
 
-        .item.haitang {
-            border-left-color: #ff4081; /* 海棠 - 粉色 */
+        .item.disabled {
+            opacity: 0.4;
+            filter: grayscale(0.6);
+            cursor: not-allowed;
+            pointer-events: none;
         }
 
-        .item.sodawater {
-            border-left-color: #2196f3; /* 苏打水 - 蓝色 */
+        .item.recovered {
+            border-left-width: 4px;
         }
 
-        .item.qingjunce {
-            border-left-color: #ffc107; /* 清君侧 - 黄色 */
+        .item.recovered .item-name {
+            color: var(--ink);
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(244, 166, 184, 0.7);
         }
 
-        /* 道具内容 */
+        .item.recovered .item-count {
+            color: var(--pink-deep);
+            text-shadow: 0 0 12px rgba(244, 166, 184, 0.9);
+            font-weight: bold;
+            animation: countGlow 1.6s ease-in-out infinite alternate;
+        }
+
+        @keyframes countGlow {
+            from { transform: scale(1);   text-shadow: 0 0 6px rgba(244, 166, 184, 0.7); }
+            to   { transform: scale(1.08); text-shadow: 0 0 16px rgba(244, 166, 184, 1); }
+        }
+
+        .item.mojing    { border-left-color: var(--ink-2); }
+        .item.haitang   { border-left-color: var(--pink-deep); }
+        .item.sodawater { border-left-color: var(--blue); }
+        .item.qingjunce { border-left-color: var(--yellow); }
+
         .item-content {
             position: relative;
             z-index: 2;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 6px 8px; /* 改为6px 8px */
+            padding: 6px 8px;
             height: 100%;
         }
 
-        /* 道具名称 */
         .item-name {
-            font-weight: 600; /* 改为600 */
-            font-size: 0.8rem; /* 改为0.8rem */
-            color: #fff;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+            font-weight: 600;
+            font-size: 0.76rem;
+            color: var(--text);
             transition: all 0.3s ease;
-            max-width: 70px; /* 新增限制宽度 */
+            max-width: 70px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
 
-        /* 道具数量 */
         .item-count {
-            font-size: 0.9rem; /* 改为0.9rem */
-            font-weight: 700; /* 改为700 */
-            min-width: 20px; /* 改为20px */
+            font-family: 'Font1', monospace;
+            font-variant-numeric: tabular-nums;
+            font-size: 0.88rem;
+            font-weight: 700;
+            min-width: 20px;
             text-align: center;
-            color: #ff7eb3;
-            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+            color: var(--ink-2);
             transition: all 0.3s ease;
         }
 
@@ -422,26 +461,32 @@
             width: 0%;
             z-index: 1;
             transition: width 0.3s ease;
-            opacity: 0.5;
+            opacity: 0.28;
+            overflow: hidden;
         }
 
-        .item.mojing .item-recovery {
-            background: linear-gradient(90deg, #000000 0%, #333333 100%);
+        .item-recovery::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -60%;
+            width: 60%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+            animation: recoveryShine 1.6s linear infinite;
         }
 
-        .item.haitang .item-recovery {
-            background: linear-gradient(90deg, #ff2a8f 0%, #ff7eb3 100%);
+        @keyframes recoveryShine {
+            0%   { left: -60%; }
+            100% { left: 120%; }
         }
 
-        .item.sodawater .item-recovery {
-            background: linear-gradient(90deg, #2196f3 0%, #64b5f6 100%);
-        }
+        .item.mojing    .item-recovery { background-color: var(--brown-soft); }
+        .item.haitang   .item-recovery { background-color: var(--pink-soft); }
+        .item.sodawater .item-recovery { background-color: var(--blue-soft); }
+        .item.qingjunce .item-recovery { background-color: var(--yellow-soft); }
 
-        .item.qingjunce .item-recovery {
-            background: linear-gradient(90deg, #ffc107 0%, #ffd54f 100%);
-        }
-
-        /* 左下：按钮区域 */
+        /* ========== 左按钮 ========== */
         .left-buttons {
             grid-column: 1;
             grid-row: 2;
@@ -457,49 +502,50 @@
             flex: 1;
             height: 30px;
             padding: 0 10px;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             font-weight: bold;
+            letter-spacing: 0.1em;
             border-radius: 25px;
-            border: none;
-            background: linear-gradient(to bottom, #ff2a8f, #ff4d9e);
-            color: white;
+            border: 1.5px solid var(--line-strong);
+            background-color: var(--pink-soft);
+            color: var(--ink); /* 重色文字 */
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 10px rgba(255, 42, 143, 0.3);
+            transition: all 0.25s ease;
+            box-shadow: 0 0 0 rgba(244, 166, 184, 0);
             min-width: 0;
             position: relative;
             overflow: hidden;
         }
 
-            .game-button::after {
-                content: '';
-                position: absolute;
-                top: 0;
-                left: -100%;
-                width: 100%;
-                height: 100%;
-                background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-                transition: left 0.5s;
-            }
+        .game-button:hover {
+            background-color: var(--pink);
+            color: var(--white);
+            box-shadow: var(--shadow-glow-pink);
+        }
 
-            .game-button:hover::after {
-                left: 100%;
-            }
+        .game-button:active {
+            transform: scale(0.97);
+            box-shadow: 0 0 10px rgba(244, 166, 184, 0.4);
+        }
 
-            .game-button:hover, .game-button:active {
-                transform: translateY(-2px);
-                box-shadow: 0 6px 15px rgba(255, 42, 143, 0.4);
-            }
+        .game-button.pause {
+            background-color: var(--yellow-soft);
+            color: var(--ink);
+        }
 
-            .game-button:active {
-                transform: translateY(1px);
-            }
+        .game-button.pause:hover {
+            background-color: var(--yellow);
+            color: var(--ink-3);
+            box-shadow: var(--shadow-glow-yellow);
+        }
 
-            .game-button.pause {
-                background: linear-gradient(to bottom, #ff7eb3, #ff9ec9);
-            }
+        .game-button:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+            filter: grayscale(0.4);
+        }
 
-        /* 右下：触摸操作区域 */
+        /* ========== 触摸控制 ========== */
         .controls-container {
             grid-column: 2;
             grid-row: 2;
@@ -521,500 +567,652 @@
         }
 
         .touch-btn {
-            background: linear-gradient(145deg, rgba(40, 20, 50, 0.9), rgba(30, 15, 40, 0.9));
-            border: 2px solid rgba(255, 122, 179, 0.4);
-            border-radius: 10px;
+            background-color: var(--white);
+            border: 1.5px solid var(--line-strong);
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
-            color: #ff7eb3;
+            font-size: 1.3rem;
+            color: var(--ink-2);
             cursor: pointer;
             transition: all 0.2s ease;
             user-select: none;
-            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+            text-shadow: 0 0 10px rgba(169, 123, 107, 0.35);
         }
 
-            .touch-btn:active {
-                background: linear-gradient(145deg, rgba(50, 25, 60, 0.9), rgba(40, 20, 50, 0.9));
-                transform: scale(0.95);
-                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-            }
+        .touch-btn:hover {
+            color: var(--pink-deep);
+            border-color: var(--pink);
+            box-shadow: var(--shadow-glow-pink);
+        }
 
-            /* 触摸按钮位置 */
-            .touch-btn.rotate {
-                grid-column: 2;
-                grid-row: 1;
-            }
+        .touch-btn:active {
+            background-color: var(--pink-soft);
+            color: var(--ink);
+            transform: scale(0.9);
+            box-shadow: 0 0 14px rgba(244, 166, 184, 0.6);
+        }
 
-            .touch-btn.left {
-                grid-column: 1;
-                grid-row: 2;
-            }
+        .touch-btn.rotate { grid-column: 2; grid-row: 1; }
+        .touch-btn.left   { grid-column: 1; grid-row: 2; }
+        .touch-btn.down   { grid-column: 2; grid-row: 2; }
+        .touch-btn.right  { grid-column: 3; grid-row: 2; }
+        .touch-btn.drop   { grid-column: 2; grid-row: 3; }
 
-            .touch-btn.down {
-                grid-column: 2;
-                grid-row: 2;
-            }
-
-            .touch-btn.right {
-                grid-column: 3;
-                grid-row: 2;
-            }
-
-            .touch-btn.drop {
-                grid-column: 2;
-                grid-row: 3;
-            }
-
+        /* ========== 格子 ========== */
         .cell {
             width: 100%;
             height: 100%;
-            border: 1px solid rgba(255, 122, 179, 0.1);
-            transition: background-color 0.3s;
+            border: 1px solid rgba(90, 58, 50, 0.06);
+            transition: background-color 0.25s;
+            position: relative;
+            z-index: 1;
         }
-
-            .cell:hover {
-                transform: scale(1.05);
-            }
 
         .filled {
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 2px;
-            box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 3px;
+            box-shadow: 0 0 6px rgba(255, 255, 255, 0.25);
+            animation: blockPop 0.18s ease;
         }
 
-        /* 方块颜色 - 经典俄罗斯方块颜色 */
-        .i {
-            background-color: #00bcd4;
+        @keyframes blockPop {
+            0%   { transform: scale(0.85); filter: brightness(1.3); }
+            100% { transform: scale(1);    filter: brightness(1); }
         }
-        /* I型 - 青色 */
-        .j {
-            background-color: #2196f3;
-        }
-        /* J型 - 蓝色 */
-        .l {
-            background-color: #ff9800;
-        }
-        /* L型 - 橙色 */
-        .o {
-            background-color: #ffeb3b;
-        }
-        /* O型 - 黄色 */
-        .s {
-            background-color: #4caf50;
-        }
-        /* S型 - 绿色 */
-        .t {
-            background-color: #9c27b0;
-        }
-        /* T型 - 紫色 */
-        .z {
-            background-color: #f44336;
-        }
-        /* Z型 - 红色 */
 
+        .ghost {
+            border: 1px dashed rgba(90, 58, 50, 0.4);
+            background-color: rgba(90, 58, 50, 0.07) !important;
+            box-shadow: none;
+        }
+
+        .cell.line-flash {
+            animation: lineFlash 0.35s ease;
+        }
+
+        @keyframes lineFlash {
+            0%   { background-color: #fff !important; box-shadow: 0 0 18px #fff; }
+            100% { background-color: inherit; box-shadow: none; }
+        }
+
+        /* 方块颜色：低饱和暖色系小清新 */
+        .i { background-color: #a8d8d8; }
+        .j { background-color: #a8cbe0; }
+        .l { background-color: #f7c9a8; }
+        .o { background-color: #f7e3a1; }
+        .s { background-color: #b8d8c8; }
+        .t { background-color: #d8b8d8; }
+        .z { background-color: #f4a6b8; }
+
+        /* ========== 状态文字 ========== */
         .game-status {
             grid-column: 1 / span 2;
             text-align: center;
-            font-size: 1rem;
+            font-size: 0.9rem;
             font-weight: bold;
+            letter-spacing: 0.14em;
             height: 30px;
-            color: #ff7eb3;
-            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+            color: var(--ink-2);
+            text-shadow: 0 0 10px rgba(169, 123, 107, 0.28);
             margin-top: 5px;
+            transition: opacity 0.3s ease;
         }
 
-        /* 事件弹窗样式 */
-        .event-modal {
+        /* ========== 弹窗 ========== */
+        .event-modal,
+        .rules-modal {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(15, 8, 25, 0.95);
+            inset: 0;
+            background-color: rgba(253, 246, 240, 0.82);
+            backdrop-filter: blur(10px) saturate(1.1);
+            -webkit-backdrop-filter: blur(10px) saturate(1.1);
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 1000;
             opacity: 0;
             visibility: hidden;
-            transition: opacity 0.3s, visibility 0.3s;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
         }
 
-            .event-modal.active {
-                opacity: 1;
-                visibility: visible;
-            }
+        .rules-modal { z-index: 2000; }
 
-        .event-content {
-            background: linear-gradient(145deg, rgba(25, 12, 35, 0.95), rgba(35, 17, 45, 0.95));
-            border-radius: 16px;
-            padding: 20px;
+        .event-modal.active,
+        .rules-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .event-content,
+        .rules-content {
+            background-color: var(--white);
+            border-radius: var(--radius-l);
+            padding: 22px 20px;
             max-width: 300px;
             width: 90%;
             text-align: center;
-            box-shadow: 0 15px 35px rgba(255, 42, 143, 0.2);
-            border: 2px solid rgba(255, 122, 179, 0.3);
-            transform: translateY(-20px);
-            transition: transform 0.3s;
+            box-shadow: 0 16px 48px rgba(90, 58, 50, 0.18);
+            border: 1.5px solid var(--line-strong);
+            transform: translateY(16px) scale(0.97);
+            opacity: 0;
+            transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.35s ease;
+            position: relative;
+            overflow: hidden;
         }
 
-        .event-modal.active .event-content {
-            transform: translateY(0);
+        .event-modal.active .event-content,
+        .rules-modal.active .rules-content {
+            transform: translateY(0) scale(1);
+            opacity: 1;
         }
 
-        .event-title {
-            font-size: 1rem;
-            margin-bottom: 15px;
-            color: #ff7eb3;
-            text-shadow: 0 2px 10px rgba(255, 126, 179, 0.5);
+        .rules-content {
+            max-width: 330px;
+            max-height: 82vh;
+            overflow-y: auto;
+            padding: 24px 20px;
         }
 
-        .event-type {
+        .event-title,
+        .rules-title {
+            font-family: 'Font1', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            font-size: 1.05rem;
+            letter-spacing: 0.16em;
+            margin-bottom: 16px;
+            color: var(--ink-2);
+            text-shadow: 0 0 14px rgba(244, 166, 184, 0.5);
+            position: relative;
             display: inline-block;
-            padding: 6px 18px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            font-weight: bold;
-            margin-bottom: 20px;
+            padding: 0 16px;
         }
 
-            .event-type.item {
-                background: linear-gradient(to right, #ff4d9e, #ff2a8f);
-                color: white;
-                box-shadow: 0 3px 8px rgba(255, 77, 158, 0.3);
-            }
+        .event-title::before,
+        .event-title::after,
+        .rules-title::before,
+        .rules-title::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 26px;
+            height: 1px;
+            background-color: var(--pink);
+            opacity: 0.6;
+        }
 
-            .event-type.story {
-                background: linear-gradient(to right, #ff7eb3, #ff4d9e);
-                color: white;
-                box-shadow: 0 3px 8px rgba(255, 126, 179, 0.3);
-            }
+        .event-title::before,
+        .rules-title::before { right: 100%; }
+        .event-title::after,
+        .rules-title::after  { left: 100%; }
+
+        .event-type { display: none !important; }
 
         .event-description {
-            font-size: 0.85rem;
-            line-height: 1.5;
-            margin-bottom: 20px;
-            color: #ff9ec9;
+            font-size: 0.82rem;
+            line-height: 1.6;
+            margin-bottom: 18px;
+            color: var(--text-soft);
         }
 
         .event-effect {
-            background: rgba(255, 122, 179, 0.1);
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            border-left: 4px solid #ff7eb3;
-            font-size: 0.85rem;
+            background-color: #fdf9f6;
+            padding: 14px;
+            border-radius: var(--radius-s);
+            margin-bottom: 18px;
+            border-left: 3px solid var(--pink);
+            font-size: 0.82rem;
+            color: var(--text-soft);
+            text-align: left;
         }
 
         .event-effect-title {
             font-weight: bold;
-            color: #ff7eb3;
+            color: var(--ink-2);
             margin-bottom: 8px;
-            font-size: 0.85rem;
+            font-size: 0.82rem;
+            letter-spacing: 0.08em;
         }
 
         .event-actions {
             display: flex;
-            flex-direction: column;
-            gap: 15px;
+            flex-direction: row;
+            gap: 10px;
             justify-content: center;
-            margin-top: 20px;
-            font-size: 0.85rem;
+            margin-top: 18px;
+            font-size: 0.82rem;
+            flex-wrap: wrap;
         }
 
         .event-button {
-            background: linear-gradient(to bottom, #ff2a8f, #ff4d9e);
-            color: white;
-            border: none;
+            flex: 1;
+            min-width: 100px;
+            background-color: var(--pink-soft);
+            color: var(--ink);
+            border: 1.5px solid var(--line-strong);
             border-radius: 50px;
-            padding: 12px 24px;
-            font-size: 0.85rem;
+            padding: 11px 18px;
+            font-size: 0.82rem;
             font-weight: bold;
+            letter-spacing: 0.06em;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(255, 42, 143, 0.3);
+            transition: all 0.25s ease;
         }
 
-            .event-button:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 6px 16px rgba(255, 42, 143, 0.4);
-            }
+        .event-button:hover {
+            background-color: var(--pink);
+            color: var(--white);
+            box-shadow: var(--shadow-glow-pink);
+        }
 
-            .event-button.consume {
-                background: linear-gradient(to bottom, #ff4d9e, #ff2a8f);
-            }
+        .event-button:active {
+            transform: scale(0.97);
+        }
 
-            .event-button.cancel {
-                background: linear-gradient(to bottom, #666666, #444444);
-            }
+        .event-button.consume {
+            background-color: var(--pink-soft);
+        }
 
-        .event-type {
-            display: none !important;
+        .event-button.consume:hover {
+            background-color: var(--pink);
+        }
+
+        .event-button.cancel {
+            background-color: var(--cream-2);
+            color: var(--ink-2);
+            border-color: var(--line);
+        }
+
+        .event-button.cancel:hover {
+            background-color: var(--brown);
+            color: var(--white);
+            box-shadow: 0 0 12px rgba(169, 123, 107, 0.35);
         }
 
         .yuan-character {
-            font-size: 6rem;
-            color: #000000;
-            text-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
-            font-family: 'SimHei', 'Microsoft YaHei', sans-serif;
-            margin: 20px 0;
-            animation: pulse 1s infinite;
+            font-family: 'Font1', 'SimHei', 'Microsoft YaHei', sans-serif;
+            font-size: 5rem;
+            color: var(--ink);
+            text-shadow:
+                0 0 18px rgba(169, 123, 107, 0.5),
+                0 0 40px rgba(244, 166, 184, 0.4);
+            margin: 16px 0;
+            animation: pulse 1.2s ease-in-out infinite;
+            letter-spacing: 0.05em;
         }
 
         @keyframes pulse {
-            0% {
-                transform: scale(1);
-                opacity: 0.8;
-            }
-
-            50% {
-                transform: scale(1.1);
-                opacity: 1;
-            }
-
-            100% {
-                transform: scale(1);
-                opacity: 0.8;
-            }
+            0%, 100% { transform: scale(1);    opacity: 0.85; }
+            50%      { transform: scale(1.06); opacity: 1; }
         }
 
         .confirm-button {
-            background: linear-gradient(to bottom, #ff2a8f, #ff4d9e);
-            color: white;
-            border: none;
+            background-color: var(--pink-soft);
+            color: var(--ink);
+            border: 1.5px solid var(--line-strong);
             border-radius: 50px;
             padding: 12px 30px;
-            font-size: 1.2rem;
+            font-size: 0.95rem;
             font-weight: bold;
+            letter-spacing: 0.1em;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(255, 42, 143, 0.3);
+            transition: all 0.25s ease;
         }
 
-            .confirm-button:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 8px 20px rgba(255, 42, 143, 0.4);
-            }
+        .confirm-button:hover {
+            background-color: var(--pink);
+            color: var(--white);
+            box-shadow: var(--shadow-glow-pink);
+        }
 
         .input-container {
-            margin: 20px 0;
+            margin: 16px 0;
+            width: 100%;
         }
 
         .input-text {
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             margin-bottom: 10px;
-            color: #ff9ec9;
+            color: var(--text-soft);
+            letter-spacing: 0.08em;
         }
 
         .text-input {
             width: 100%;
             padding: 12px;
-            font-size: 0.85rem;
-            border: 2px solid #ff2a8f;
-            border-radius: 8px;
-            background-color: rgba(255, 255, 255, 0.1);
-            color: white;
+            font-size: 0.9rem;
+            border: 1.5px solid var(--line-strong);
+            border-radius: var(--radius-s);
+            background-color: #fdf9f6;
+            color: var(--text);
             text-align: center;
-            margin-bottom: 15px;
-            transition: all 0.3s ease;
+            margin-bottom: 14px;
+            transition: all 0.25s ease;
+            letter-spacing: 0.08em;
         }
 
-            .text-input:focus {
-                outline: none;
-                border-color: #ff7eb3;
-                box-shadow: 0 0 15px rgba(255, 126, 179, 0.5);
-                background-color: rgba(255, 255, 255, 0.15);
-            }
-
-        /* 规则弹窗样式 */
-        .rules-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(15, 8, 25, 0.95);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 2000;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s, visibility 0.3s;
+        .text-input:focus {
+            outline: none;
+            border-color: var(--pink);
+            box-shadow: var(--shadow-glow-pink);
+            background-color: var(--white);
         }
 
-            .rules-modal.active {
-                opacity: 1;
-                visibility: visible;
-            }
-
-        .rules-content {
-            background: linear-gradient(145deg, rgba(25, 12, 35, 0.95), rgba(35, 17, 45, 0.95));
-            border-radius: 16px;
-            padding: 20px;
-            max-width: 320px;
-            width: 90%;
-            max-height: 80vh;
-            overflow-y: auto;
-            text-align: center;
-            box-shadow: 0 15px 35px rgba(255, 42, 143, 0.2);
-            border: 2px solid rgba(255, 122, 179, 0.3);
-            transform: translateY(-20px);
-            transition: transform 0.3s;
-        }
-
-        .rules-modal.active .rules-content {
-            transform: translateY(0);
-        }
-
-        .rules-title {
-            font-size: 1rem;
-            margin-bottom: 20px;
-            color: #ff7eb3;
-            text-shadow: 0 2px 10px rgba(255, 126, 179, 0.5);
-        }
-
+        /* ========== 规则弹窗重排版 ========== */
         .rules-text {
             text-align: left;
-            font-size: 0.85rem;
-            line-height: 1.5;
-            color: #ff9ec9;
-            margin-bottom: 25px;
+            font-size: 0.82rem;
+            line-height: 1.65;
+            color: var(--text-soft);
+            margin-bottom: 20px;
         }
 
-            .rules-text p {
-                margin-bottom: 15px;
-            }
+        .rules-text p {
+            margin-bottom: 10px;
+        }
 
-        .rule-item {
-            padding: 12px;
-            border-radius: 10px;
-            margin: 15px 0;
-            border-left: 4px solid;
+        /* 生日区块：最前，带烟花 */
+        .birthday-block {
             position: relative;
+            margin: 0 0 20px;
+            padding: 20px 14px 16px;
+            border-radius: var(--radius-m);
+            background-color: #fdf0f3;
+            border: 1.5px dashed var(--pink);
+            text-align: center;
             overflow: hidden;
-            transition: all 0.3s ease;
         }
 
-            .rule-item:hover {
-                transform: translateX(10px);
-            }
+        .birthday-block::before,
+        .birthday-block::after {
+            content: '✦';
+            position: absolute;
+            top: 8px;
+            font-size: 0.7rem;
+            color: var(--pink-deep);
+            opacity: 0.8;
+        }
 
-            /* 墨镜 - 黑色主题 */
-            .rule-item.mojing-rule {
-                background: linear-gradient(145deg, rgba(0, 0, 0, 0.15), rgba(50, 50, 50, 0.1));
-                border-left-color: #ffffff;
-                color: #ffffff;
-            }
+        .birthday-block::before { left: 10px; }
+        .birthday-block::after  { right: 10px; }
 
-                .rule-item.mojing-rule strong {
-                    color: #ffffff;
-                    text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
-                }
+        .birthday-main {
+            font-family: 'Font1', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            font-size: 1rem;
+            color: var(--ink-2);
+            letter-spacing: 0.14em;
+            margin-bottom: 6px;
+            text-shadow: 0 0 14px rgba(244, 166, 184, 0.65);
+            position: relative;
+            z-index: 2;
+        }
 
-            /* 海棠 - 粉色主题 */
-            .rule-item.haitang-rule {
-                background: linear-gradient(145deg, rgba(255, 42, 143, 0.15), rgba(255, 126, 179, 0.1));
-                border-left-color: #ff2a8f;
-                color: #ff9ec9;
-            }
+        .birthday-sub {
+            font-size: 0.74rem;
+            color: var(--text-soft);
+            letter-spacing: 0.18em;
+            position: relative;
+            z-index: 2;
+        }
 
-                .rule-item.haitang-rule strong {
-                    color: #ff7eb3;
-                    text-shadow: 0 0 5px rgba(255, 126, 179, 0.5);
-                }
+        .birthday-hearts {
+            margin-top: 10px;
+            font-size: 0.8rem;
+            letter-spacing: 0.4em;
+            color: var(--pink-deep);
+            opacity: 0.9;
+            position: relative;
+            z-index: 2;
+        }
 
-            /* 苏打水 - 蓝色主题 */
-            .rule-item.sodawater-rule {
-                background: linear-gradient(145deg, rgba(33, 150, 243, 0.15), rgba(100, 181, 246, 0.1));
-                border-left-color: #2196f3;
-                color: #90caf9;
-            }
+        /* 烟花容器 */
+        .fireworks {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            z-index: 1;
+            overflow: hidden;
+        }
 
-                .rule-item.sodawater-rule strong {
-                    color: #64b5f6;
-                    text-shadow: 0 0 5px rgba(100, 181, 246, 0.5);
-                }
+        .firework {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: var(--pink);
+            box-shadow:
+                0 0 8px var(--pink),
+                0 0 16px var(--pink);
+            animation: fireworkBurst 2.4s ease-out infinite;
+            opacity: 0;
+        }
 
-            /* 清君侧 - 黄色主题 */
-            .rule-item.qingjunce-rule {
-                background: linear-gradient(145deg, rgba(255, 193, 7, 0.15), rgba(255, 213, 79, 0.1));
-                border-left-color: #ffc107;
-                color: #ffd54f;
-            }
+        .firework.f1 { top: 20%; left: 15%; background-color: var(--pink); box-shadow: 0 0 8px var(--pink), 0 0 16px var(--pink); animation-delay: 0s; }
+        .firework.f2 { top: 30%; right: 18%; background-color: var(--yellow); box-shadow: 0 0 8px var(--yellow), 0 0 16px var(--yellow); animation-delay: 0.4s; }
+        .firework.f3 { top: 60%; left: 22%; background-color: var(--blue); box-shadow: 0 0 8px var(--blue), 0 0 16px var(--blue); animation-delay: 0.8s; }
+        .firework.f4 { top: 70%; right: 20%; background-color: var(--pink-deep); box-shadow: 0 0 8px var(--pink-deep), 0 0 16px var(--pink-deep); animation-delay: 1.2s; }
+        .firework.f5 { top: 40%; left: 50%; background-color: var(--yellow); box-shadow: 0 0 8px var(--yellow), 0 0 16px var(--yellow); animation-delay: 1.6s; }
 
-                .rule-item.qingjunce-rule strong {
-                    color: #ffd54f;
-                    text-shadow: 0 0 5px rgba(255, 213, 79, 0.5);
-                }
+        /* 烟花粒子 */
+        .firework::before,
+        .firework::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 3px;
+            height: 3px;
+            border-radius: 50%;
+            background-color: inherit;
+            box-shadow: inherit;
+        }
 
-            .rule-item strong {
-                color: #ffffff;
-                font-size: 0.84rem;
-                display: block;
-                margin-bottom: 8px;
-                text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
-            }
+        .firework::before {
+            animation: particle1 2.4s ease-out infinite;
+        }
+
+        .firework::after {
+            animation: particle2 2.4s ease-out infinite;
+        }
+
+        @keyframes fireworkBurst {
+            0%   { opacity: 0; transform: scale(0.2); }
+            15%  { opacity: 1; transform: scale(1.4); }
+            30%  { opacity: 0.9; transform: scale(1); }
+            70%  { opacity: 0.4; transform: scale(1.6); }
+            100% { opacity: 0; transform: scale(2.2); }
+        }
+
+        @keyframes particle1 {
+            0%   { opacity: 0; transform: translate(0, 0) scale(0.5); }
+            20%  { opacity: 1; transform: translate(-14px, -18px) scale(1); }
+            60%  { opacity: 0.6; transform: translate(-22px, -28px) scale(0.8); }
+            100% { opacity: 0; transform: translate(-30px, -40px) scale(0.4); }
+        }
+
+        @keyframes particle2 {
+            0%   { opacity: 0; transform: translate(0, 0) scale(0.5); }
+            20%  { opacity: 1; transform: translate(16px, -12px) scale(1); }
+            60%  { opacity: 0.6; transform: translate(26px, -20px) scale(0.8); }
+            100% { opacity: 0; transform: translate(36px, -30px) scale(0.4); }
+        }
+
+        /* 蜡烛闪烁 */
+        .birthday-candle {
+            display: inline-block;
+            animation: candleFlicker 1.2s ease-in-out infinite;
+            transform-origin: center bottom;
+        }
+
+        @keyframes candleFlicker {
+            0%, 100% { transform: scale(1) rotate(-2deg); }
+            50%      { transform: scale(1.08) rotate(2deg); }
+        }
+
+        /* 章节标题 */
+        .rules-section-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 18px 0 12px;
+            font-size: 0.78rem;
+            font-weight: bold;
+            color: var(--ink-2);
+            letter-spacing: 0.16em;
+        }
+
+        .rules-section-title::before {
+            content: '';
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background-color: var(--pink-deep);
+            flex-shrink: 0;
+        }
+
+        .rules-section-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background-color: var(--line-strong);
+        }
+
+        /* 规则项：平面卡片 */
+        .rule-item {
+            padding: 12px 14px;
+            border-radius: var(--radius-s);
+            margin: 10px 0;
+            border-left: 3px solid;
+            position: relative;
+            transition: all 0.25s ease;
+            background-color: #fdf9f6;
+        }
+
+        .rule-item:hover {
+            transform: translateX(4px);
+            box-shadow: 0 0 12px rgba(244, 166, 184, 0.25);
+        }
+
+        .rule-item.mojing-rule {
+            border-left-color: var(--ink-2);
+            background-color: #f7f0eb;
+        }
+
+        .rule-item.haitang-rule {
+            border-left-color: var(--pink-deep);
+            background-color: #fdf0f3;
+        }
+
+        .rule-item.sodawater-rule {
+            border-left-color: var(--blue);
+            background-color: #f0f6fa;
+        }
+
+        .rule-item.qingjunce-rule {
+            border-left-color: var(--yellow);
+            background-color: #fdf8ec;
+        }
+
+        .rule-item strong {
+            color: var(--ink-2);
+            font-size: 0.82rem;
+            display: block;
+            margin-bottom: 6px;
+            letter-spacing: 0.06em;
+        }
+
+        .rule-item p {
+            margin: 0;
+            font-size: 0.78rem;
+            color: var(--text-soft);
+            line-height: 1.5;
+        }
 
         .rules-confirm-button {
-            background: linear-gradient(to bottom, #ff2a8f, #ff4d9e);
-            color: white;
-            border: none;
+            background-color: var(--pink-soft);
+            color: var(--ink);
+            border: 1.5px solid var(--line-strong);
             border-radius: 50px;
-            padding: 10px 30px;
-            font-size: 0.85rem;
+            padding: 12px 30px;
+            font-size: 0.86rem;
             font-weight: bold;
+            letter-spacing: 0.12em;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(255, 42, 143, 0.3);
-            margin-top: 10px;
-            min-width: 150px;
+            transition: all 0.25s ease;
+            margin-top: 14px;
+            min-width: 160px;
         }
 
-            .rules-confirm-button:hover {
-                transform: translateY(-3px);
-                box-shadow: 0 8px 20px rgba(255, 42, 143, 0.4);
-            }
+        .rules-confirm-button:hover {
+            background-color: var(--pink);
+            color: var(--white);
+            box-shadow: var(--shadow-glow-pink);
+        }
 
-            .rules-confirm-button:active {
-                transform: translateY(1px);
-            }
+        .rules-confirm-button:active {
+            transform: scale(0.97);
+        }
 
+        /* ========== 页脚 ========== */
         .footer {
             margin-top: 15px;
             margin-bottom: 10px;
-            color: #ff9ec9;
-            font-size: 0.7rem;
+            color: var(--text-light);
+            font-size: 0.68rem;
             text-align: center;
             opacity: 0.7;
+            letter-spacing: 0.1em;
         }
 
+        .footer-info {
+            position: fixed;
+            bottom: 5px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 0.6rem;
+            color: var(--text-light);
+            opacity: 0.65;
+            padding: 5px;
+            z-index: 100;
+            letter-spacing: 0.12em;
+        }
+
+        .footer-info div {
+            display: inline-block;
+            margin: 0 8px;
+        }
+
+        .footer-info div:not(:last-child)::after {
+            content: '·';
+            margin-left: 16px;
+            color: var(--pink-deep);
+        }
+
+        /* 冻结覆盖 */
         .freeze-overlay {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(139, 69, 19, 0.3);
+            inset: 0;
+            background-color: rgba(169, 123, 107, 0.18);
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 100;
-            border-radius: 4px;
+            border-radius: 6px;
             pointer-events: none;
+            backdrop-filter: blur(2px);
         }
 
         .freeze-text {
-            font-size: 1rem;
+            font-size: 0.9rem;
             font-weight: bold;
-            color: white;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-            animation: pulse 1s infinite;
-            background-color: rgba(139, 69, 19, 0.7);
+            color: var(--ink);
+            background-color: var(--white);
             padding: 8px 16px;
             border-radius: 10px;
+            letter-spacing: 0.12em;
+            border: 1.5px solid var(--line-strong);
+            box-shadow: var(--shadow-glow-pink);
         }
 
         .night-warning {
@@ -1022,187 +1220,174 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 1rem;
+            font-size: 0.9rem;
             font-weight: bold;
-            color: white;
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
+            color: var(--white);
+            text-shadow: 0 0 14px rgba(255, 255, 255, 0.9);
             z-index: 101;
             text-align: center;
             width: 100%;
+            letter-spacing: 0.12em;
         }
 
+        /* 暂停遮罩 */
+        .pause-overlay {
+            position: absolute;
+            inset: 0;
+            background-color: rgba(253, 246, 240, 0.78);
+            backdrop-filter: blur(4px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 50;
+            border-radius: var(--radius-s);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .pause-overlay.active { opacity: 1; }
+
+        .pause-overlay span {
+            font-family: 'Font1', sans-serif;
+            font-size: 1.3rem;
+            letter-spacing: 0.4em;
+            color: var(--ink-2);
+            text-shadow: 0 0 18px rgba(244, 166, 184, 0.8);
+        }
+
+        /* 获得道具提示 */
         .item-added {
             position: fixed;
             top: 20px;
             right: 20px;
-            background: linear-gradient(to right, #ff4d9e, #ff2a8f);
-            color: white;
+            background-color: var(--white);
+            color: var(--ink);
             padding: 10px 20px;
-            border-radius: 10px;
+            border-radius: var(--radius-s);
             font-weight: bold;
+            font-size: 0.8rem;
+            letter-spacing: 0.06em;
             z-index: 999;
-            animation: slideIn 0.5s, fadeOut 0.5s 2s forwards;
-            box-shadow: 0 5px 15px rgba(255, 77, 158, 0.4);
-            font-size: 0.85rem;
+            border: 1.5px solid var(--line-strong);
+            border-left: 4px solid var(--pink-deep);
+            animation: slideIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), fadeOut 0.5s 2.2s forwards;
+            box-shadow: var(--shadow-glow-pink);
         }
 
         @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
+            from { transform: translateX(120%); opacity: 0; }
+            to   { transform: translateX(0);    opacity: 1; }
         }
 
         @keyframes fadeOut {
-            to {
-                opacity: 0;
-            }
+            to { opacity: 0; transform: translateX(20px); }
         }
 
+        /* 黄铜箱子 */
         .brass-box-special {
-            position: relative;
-            border: 2px solid #ffd700 !important;
-            background: linear-gradient(145deg, rgba(50, 35, 10, 0.9), rgba(70, 50, 20, 0.9)) !important;
-            animation: glow 1.5s infinite alternate;
+            border: 1.5px solid var(--yellow) !important;
+            background-color: #fdf8ec !important;
+            animation: brassGlow 2s ease-in-out infinite alternate;
         }
 
-        @keyframes glow {
-            from {
-                box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
-            }
-
-            to {
-                box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
-            }
+        @keyframes brassGlow {
+            from { box-shadow: 0 16px 48px rgba(90, 58, 50, 0.18), 0 0 20px rgba(247, 217, 139, 0.5); }
+            to   { box-shadow: 0 16px 48px rgba(90, 58, 50, 0.18), 0 0 36px rgba(247, 217, 139, 0.85); }
         }
 
-        /* 移除所有响应式设计，保持固定布局 */
-
-
-        /* 底部信息样式 */
-        .footer-info {
-            position: fixed;
-            bottom: 10px;
-            left: 0;
-            right: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 20px;
-            padding: 8px 15px;
-            background: rgba(20, 10, 30, 0.8);
-            border-top: 1px solid rgba(255, 122, 179, 0.3);
-            backdrop-filter: blur(5px);
-            z-index: 100;
-            font-size: 0.7rem;
-            color: #ff9ec9;
-            text-align: center;
-        }
-
-        /* 适应小屏幕 */
+        /* 小屏 */
         @media (max-width: 350px) {
             .footer-info {
                 flex-direction: column;
                 gap: 5px;
-                font-size: 0.65rem;
+                font-size: 0.62rem;
             }
+            .footer-info div:not(:last-child)::after { content: ''; margin-left: 0; }
         }
-
-        /* 或者用更简单的样式 */
-        .footer-info.simple {
-            position: fixed;
-            bottom: 5px;
-            left: 0;
-            right: 0;
-            text-align: center;
-            font-size: 0.6rem;
-            color: #ff7eb3;
-            opacity: 0.7;
-            padding: 5px;
-            z-index: 100;
-        }
-
-            .footer-info.simple div {
-                display: inline-block;
-                margin: 0 8px;
-            }
     </style>
 </head>
 <body>
     <div class="header">
         <h1>黑黑花花俄罗斯方块</h1>
-        <div class="subtitle">🕶️ 黑眼镜 · 🎮  · 解雨臣 🌸</div>
+        <div class="subtitle">🕶️ 黑眼镜 · 🎮 · 解雨臣 🌸</div>
     </div>
 
     <!-- 游戏规则弹窗 -->
     <div class="rules-modal" id="rules-modal">
         <div class="rules-content">
             <h2 class="rules-title">游戏规则</h2>
+
+            <!-- 生日祝福：最前，带烟花 -->
+            <div class="birthday-block">
+                <div class="fireworks">
+                    <span class="firework f1"></span>
+                    <span class="firework f2"></span>
+                    <span class="firework f3"></span>
+                    <span class="firework f4"></span>
+                    <span class="firework f5"></span>
+                </div>
+                <div class="birthday-main">
+                    <span class="birthday-candle">🎉</span> 解雨臣 1003 生日快乐 <span class="birthday-candle">🎉</span>
+                </div>
+                <div class="birthday-hearts">🌸 🌸 🌸</div>
+            </div>
+
             <div class="rules-text">
-                <p style="text-align: center; font-weight: bold; margin: 20px 0;">🎉 欢迎来到黑黑花花的俄罗斯方块！🎉</p>
-                <p>本游戏在传统的俄罗斯方块上增加了4种【道具】和10种【剧情】</p>
-                <p>在消除一行方块后会触发随机【剧情】，需完成相应要求后才能继续游戏</p>
-                <p>在游戏过程中可使用右侧【道具】，介绍如下：</p>
+                <div class="rules-section-title">玩法简介</div>
+                <p>本游戏在传统俄罗斯方块上增加了 4 种【道具】和 10 种【剧情】。</p>
+                <p>每消除一行方块后会触发随机【剧情】，完成相应要求后才能继续游戏。</p>
+
+                <div class="rules-section-title">道具一览</div>
 
                 <div class="rule-item mojing-rule">
-                    <strong>🕶️ 【墨镜】</strong>
+                    <strong>🕶️ 墨镜</strong>
                     <p>用于适应剧情【夜幕降临】</p>
                 </div>
 
                 <div class="rule-item haitang-rule">
-                    <strong>🌸 【海棠】</strong>
+                    <strong>🌸 海棠</strong>
                     <p>用于支付剧情【食君之禄】</p>
                 </div>
 
                 <div class="rule-item sodawater-rule">
-                    <strong>🥤 【苏打水】</strong>
-                    <p>随机改变下一方块的形状。</p>
+                    <strong>🥤 苏打水</strong>
+                    <p>随机改变下一方块的形状</p>
                 </div>
 
                 <div class="rule-item qingjunce-rule">
-                    <strong>⚔️ 【清君侧】</strong>
-                    <p>清除现有全部方块。</p>
+                    <strong>⚔️ 清君侧</strong>
+                    <p>清除现有全部方块</p>
                 </div>
-
             </div>
+
             <button class="rules-confirm-button" id="rules-confirm-button">开始游戏</button>
         </div>
     </div>
 
-
     <div class="game-container">
         <div class="main-game">
-            <!-- 左边：游戏棋盘区域 -->
             <div class="left-section">
                 <div class="game-board-container">
                     <div class="game-board" id="game-board"></div>
+                    <div class="pause-overlay" id="pause-overlay"><span>PAUSED</span></div>
                     <div class="game-status" id="game-status">准备开始</div>
                 </div>
 
-                <!-- 左边的两个按钮 -->
                 <div class="left-buttons">
                     <button class="game-button" id="start-restart-button">开始游戏</button>
                     <button class="game-button pause" id="pause-resume-button" disabled>暂停</button>
                 </div>
             </div>
 
-            <!-- 右边：信息区域 -->
             <div class="right-section">
-                <!-- 分数和下一个方块并排 -->
                 <div class="info-panel combined-panel">
                     <div class="combined-content horizontal">
-                        <!-- 左侧：分数 -->
                         <div class="score-section">
                             <div class="info-title">分数</div>
                             <div class="score-display" id="score">0</div>
                         </div>
 
-                        <!-- 右侧：下一个方块 -->
                         <div class="next-section">
                             <div class="info-title">下一个</div>
                             <div class="next-piece-container">
@@ -1212,7 +1397,6 @@
                     </div>
                 </div>
 
-                <!-- 道具栏应该放在这里，在分数和下一个的下面 -->
                 <div class="info-panel items-panel">
                     <div class="info-title">道具栏</div>
 
@@ -1248,8 +1432,8 @@
                         </div>
                     </div>
                 </div>
-            </div> <!-- 这是right-section的结束 -->
-            <!-- 触摸控制（保持原来的位置） -->
+            </div>
+
             <div class="controls-container">
                 <div class="touch-controls">
                     <div class="touch-btn rotate">↻</div>
@@ -1261,7 +1445,6 @@
             </div>
         </div>
 
-        <!-- 音频元素 -->
         <audio id="background-music" loop preload="auto">
             <source src="backgroundmusic.mp3" type="audio/mpeg">
         </audio>
@@ -1269,7 +1452,6 @@
             <source src="xiqu.mp3" type="audio/mpeg">
         </audio>
 
-        <!-- 事件弹窗 -->
         <div class="event-modal" id="event-modal">
             <div class="event-content">
                 <h2 class="event-title" id="event-title">事件标题</h2>
@@ -1279,196 +1461,108 @@
                     <div class="event-effect-title"></div>
                     <div id="event-effect-desc"></div>
                 </div>
-                <div class="event-actions" id="event-actions">
-                    <!-- 按钮会动态添加 -->
-                </div>
+                <div class="event-actions" id="event-actions"></div>
             </div>
         </div>
 
         <div class="footer-info">
             <div class="copyright">©2026 黑黑花花系列</div>
-            <div class="version">1.0.0版本</div>
+            <div class="version">2.0版本</div>
             <div class="developer">云雀Lark</div>
         </div>
-
-</body>
-
+    </div>
 
 <script>
-    // 游戏常量
     const BOARD_WIDTH = 10;
     const BOARD_HEIGHT = 20;
     const EMPTY_CELL = 'empty';
 
-    // 道具恢复时间（毫秒）
     const ITEM_RECOVERY_TIMES = {
-        mojing: 6000,      // 墨镜：6秒
-        haitang: 8000,     // 海棠：8秒
-        sodawater: 12000,  // 苏打水：12秒
-        qingjunce: 20000   // 清君侧：20秒
+        mojing: 6000,
+        haitang: 8000,
+        sodawater: 12000,
+        qingjunce: 20000
     };
 
-    // 方块形状定义
     const TETROMINOES = {
-        I: {
-            shape: [
-                [0, 0, 0, 0],
-                [1, 1, 1, 1],
-                [0, 0, 0, 0],
-                [0, 0, 0, 0]
-            ],
-            className: 'i'
-        },
-        J: {
-            shape: [
-                [1, 0, 0],
-                [1, 1, 1],
-                [0, 0, 0]
-            ],
-            className: 'j'
-        },
-        L: {
-            shape: [
-                [0, 0, 1],
-                [1, 1, 1],
-                [0, 0, 0]
-            ],
-            className: 'l'
-        },
-        O: {
-            shape: [
-                [1, 1],
-                [1, 1]
-            ],
-            className: 'o'
-        },
-        S: {
-            shape: [
-                [0, 1, 1],
-                [1, 1, 0],
-                [0, 0, 0]
-            ],
-            className: 's'
-        },
-        T: {
-            shape: [
-                [0, 1, 0],
-                [1, 1, 1],
-                [0, 0, 0]
-            ],
-            className: 't'
-        },
-        Z: {
-            shape: [
-                [1, 1, 0],
-                [0, 1, 1],
-                [0, 0, 0]
-            ],
-            className: 'z'
-        }
+        I: { shape: [[0,0,0,0],[1,1,1,1],[0,0,0,0],[0,0,0,0]], className: 'i' },
+        J: { shape: [[1,0,0],[1,1,1],[0,0,0]], className: 'j' },
+        L: { shape: [[0,0,1],[1,1,1],[0,0,0]], className: 'l' },
+        O: { shape: [[1,1],[1,1]], className: 'o' },
+        S: { shape: [[0,1,1],[1,1,0],[0,0,0]], className: 's' },
+        T: { shape: [[0,1,0],[1,1,1],[0,0,0]], className: 't' },
+        Z: { shape: [[1,1,0],[0,1,1],[0,0,0]], className: 'z' }
     };
 
-    // 剧情定义（黄铜箱子只出现一次）
     const STORIES = {
         SHIJUNZHILU: {
-            name: "🍚 食君之禄",
-            type: "剧情",
+            name: "🍚 食君之禄", type: "剧情",
             description: "食君之禄，为君分忧。",
             effect: "👻 需消耗【海棠】🌸x1支付报酬，否则将出现黑色怨气。",
-            effectFunc: handleShijunzhilu,
-            canAppear: true
+            effectFunc: handleShijunzhilu, canAppear: true
         },
         NIGHTFALL: {
-            name: "🌙 夜幕降临",
-            type: "剧情",
+            name: "🌙 夜幕降临", type: "剧情",
             description: "太阳没有出来之前，我是无敌的。",
             effect: "👀 需消耗【墨镜】🕶️x1适应黑暗，否则将被剥夺视线5秒。",
-            effectFunc: handleNightFall,
-            canAppear: true
+            effectFunc: handleNightFall, canAppear: true
         },
         IMMORTAL: {
-            name: "🧬 长生者",
-            type: "剧情",
+            name: "🧬 长生者", type: "剧情",
             description: "这个人汉姓姓齐，家族显赫，他没有受过什么正规的教育，在德国有一个音乐和解剖学的学位。",
             effect: "⏳ 方块下落时间放缓为0.5倍，持续10秒。",
-            effectFunc: activateImmortal,
-            canAppear: true
+            effectFunc: activateImmortal, canAppear: true
         },
         FRIED_LIVER: {
-            name: "🍲 炒肝",
-            type: "剧情",
+            name: "🍲 炒肝", type: "剧情",
             description: "-今天晚上我想吃炒肝。 -我们能天亮之后去吃吗？天亮之后如果你能到这来，我就带你去吃炒肝。",
             effect: "⏸️ 小小花开始吃炒肝，停止操作3秒。",
-            effectFunc: activateFriedLiver,
-            canAppear: true
+            effectFunc: activateFriedLiver, canAppear: true
         },
         BLOODY_WEATHER: {
-            name: "🌧️ 流血的天气",
-            type: "剧情",
+            name: "🌧️ 流血的天气", type: "剧情",
             description: "今晚要下雨，流血的天气。",
             effect: "🔴 现有及接下来的5个方块全部变为红色",
-            effectFunc: activateBloodyWeather,
-            canAppear: true
+            effectFunc: activateBloodyWeather, canAppear: true
         },
         OPERA: {
-            name: "🎭 戏曲",
-            type: "剧情",
+            name: "🎭 戏曲", type: "剧情",
             description: "如果我声带坏了，我就不能唱戏了，很多女孩子会伤心的。",
             effect: "🎵 解语花路过，更换了BGM。",
-            effectFunc: activateOpera,
-            canAppear: true
+            effectFunc: activateOpera, canAppear: true
         },
         SNOOPY: {
-            name: "🐶 史努比",
-            type: "剧情",
+            name: "🐶 史努比", type: "剧情",
             description: "九点五十分，上床看了会儿史努比的漫画。",
             effect: "↩️ 解雨臣打开漫画，撤回这一步方块。",
-            effectFunc: activateSnoopy,
-            canAppear: true
+            effectFunc: activateSnoopy, canAppear: true
         },
         BRASS_BOX: {
-            name: "📦 黄铜箱子",
-            type: "剧情",
+            name: "📦 黄铜箱子", type: "剧情",
             description: "-很久以前的那个黄铜箱子。 -你也有那么想找回来的东西？",
             effect: "💞 找到宿命结局，分数直接变为9999。",
-            effectFunc: activateBrassBox,
-            canAppear: true,
-            appearsOnlyOnce: true,  // 只出现一次
-            hasAppeared: false      // 是否已经出现过
+            effectFunc: activateBrassBox, canAppear: true,
+            appearsOnlyOnce: true, hasAppeared: false
         },
         TICKET: {
-            name: "✈️ 机票",
-            type: "剧情",
+            name: "✈️ 机票", type: "剧情",
             description: "类似于回去的机票都买不起的那种卑微。",
             effect: "💓 输入正确答案后方可继续游戏",
-            effectFunc: activateTicket,
-            canAppear: true
+            effectFunc: activateTicket, canAppear: true
         },
         CAN_WINDMILL: {
-            name: "🎡 易拉罐风车",
-            type: "剧情",
+            name: "🎡 易拉罐风车", type: "剧情",
             description: "苏打水易拉罐diy风车手作。",
             effect: "💨 黑眼镜示范玩法，随机吹走了现有的9格方块。",
-            effectFunc: activateCanWindmill,
-            canAppear: true
+            effectFunc: activateCanWindmill, canAppear: true
         }
     };
 
-    // 道具定义
     const ITEMS = {
-        QINGJUNCE: {
-            name: "清君侧",
-            description: "清除游戏区域内的所有方块",
-            effectFunc: clearAllBlocks
-        },
-        SODAWATER: {
-            name: "苏打水",
-            description: "随机改变下一个方块的形状",
-            effectFunc: randomizeNextPiece
-        }
+        QINGJUNCE: { name: "清君侧", description: "清除游戏区域内的所有方块", effectFunc: clearAllBlocks },
+        SODAWATER: { name: "苏打水", description: "随机改变下一个方块的形状", effectFunc: randomizeNextPiece }
     };
 
-    // 游戏变量
     let board = [];
     let currentPiece = null;
     let nextPiece = null;
@@ -1480,66 +1574,29 @@
     let dropSpeed = 1000;
     let originalDropSpeed = 1000;
 
-    // 剧情管理系统变量
-    let availableStories = []; // 当前可用的剧情列表
-    let usedStories = [];      // 本轮已使用的剧情
-    let storyRound = 1;        // 当前是第几轮
-    let storyCount = 0;        // 已触发的剧情数量（用于控制黄铜箱子在第3个以后出现）
+    let availableStories = [];
+    let usedStories = [];
+    let storyRound = 1;
+    let storyCount = 0;
 
-    // 上一个方块状态（用于史努比撤回）
     let previousBoard = null;
     let previousPiece = null;
 
-    // 道具和状态变量
-    let items = {
-        mojing: 0,      // 墨镜
-        haitang: 0,     // 海棠
-        qingjunce: 0,   // 清君侧
-        sodawater: 0    // 苏打水
-    };
+    let items = { mojing: 0, haitang: 0, qingjunce: 0, sodawater: 0 };
+    let itemRecoveryTimers = { mojing: null, haitang: null, qingjunce: null, sodawater: null };
+    let itemRecoveryProgress = { mojing: 0, haitang: 0, qingjunce: 0, sodawater: 0 };
 
-    // 道具恢复计时器
-    let itemRecoveryTimers = {
-        mojing: null,
-        haitang: null,
-        qingjunce: null,
-        sodawater: null
-    };
-
-    // 道具恢复进度
-    let itemRecoveryProgress = {
-        mojing: 0,
-        haitang: 0,
-        qingjunce: 0,
-        sodawater: 0
-    };
-
-    // 状态效果（后一个剧情覆盖前一个）
     let activeEffects = {
-        nightFall: false,           // 夜幕降临
-        immortal: false,            // 长生者
-        bloodyWeather: false,       // 流血的天气
-        bloodyWeatherCount: 0,      // 流血天气剩余方块数
-        friedLiver: false,          // 炒肝（冻结操作）
-        friedLiverTimer: null,      // 炒肝计时器
-        yuanGhost: false            // 冤魂效果（黑色方块）
+        nightFall: false, immortal: false, bloodyWeather: false, bloodyWeatherCount: 0,
+        friedLiver: false, friedLiverTimer: null, yuanGhost: false
     };
+    let effectTimers = { nightFall: null, immortal: null, friedLiver: null, yuanGhost: null };
 
-    // 效果计时器（用于清除效果）
-    let effectTimers = {
-        nightFall: null,
-        immortal: null,
-        friedLiver: null,
-        yuanGhost: null
-    };
-
-    // 音乐变量
     let backgroundMusic = document.getElementById('background-music');
     let operaMusic = document.getElementById('opera-music');
     let isOperaPlaying = false;
     let operaTimeout = null;
 
-    // DOM元素
     const rulesModal = document.getElementById('rules-modal');
     const rulesConfirmButton = document.getElementById('rules-confirm-button');
     const gameBoardElement = document.getElementById('game-board');
@@ -1548,8 +1605,8 @@
     const gameStatusElement = document.getElementById('game-status');
     const startRestartButton = document.getElementById('start-restart-button');
     const pauseResumeButton = document.getElementById('pause-resume-button');
+    const pauseOverlay = document.getElementById('pause-overlay');
 
-    // 道具数量显示元素和道具项
     const mojingCountElement = document.getElementById('mojing-count');
     const haitangCountElement = document.getElementById('haitang-count');
     const qingjunceCountElement = document.getElementById('qingjunce-count');
@@ -1560,13 +1617,11 @@
     const qingjunceItemElement = document.getElementById('qingjunce-item');
     const sodawaterItemElement = document.getElementById('sodawater-item');
 
-    // 道具恢复进度条元素
     const mojingRecoveryElement = document.getElementById('mojing-recovery');
     const haitangRecoveryElement = document.getElementById('haitang-recovery');
     const qingjunceRecoveryElement = document.getElementById('qingjunce-recovery');
     const sodawaterRecoveryElement = document.getElementById('sodawater-recovery');
 
-    // 事件弹窗元素
     const eventModal = document.getElementById('event-modal');
     const eventTitleElement = document.getElementById('event-title');
     const eventTypeElement = document.getElementById('event-type');
@@ -1574,19 +1629,6 @@
     const eventEffectDescElement = document.getElementById('event-effect-desc');
     const eventActionsElement = document.getElementById('event-actions');
 
-    // 道具选择弹窗元素
-    const itemSelectModal = document.getElementById('item-select-modal');
-    const itemOptionsElement = document.getElementById('item-options');
-    const cancelItemButton = document.getElementById('cancel-item-button');
-
-    // 触摸控制按钮
-    const rotateBtn = document.getElementById('rotate-btn');
-    const leftBtn = document.getElementById('left-btn');
-    const rightBtn = document.getElementById('right-btn');
-    const downBtn = document.getElementById('down-btn');
-    const dropBtn = document.getElementById('drop-btn');
-
-    // 音乐控制函数
     function playBackgroundMusic() {
         if (backgroundMusic) {
             backgroundMusic.currentTime = 0;
@@ -1595,9 +1637,7 @@
     }
 
     function pauseBackgroundMusic() {
-        if (backgroundMusic && !backgroundMusic.paused) {
-            backgroundMusic.pause();
-        }
+        if (backgroundMusic && !backgroundMusic.paused) backgroundMusic.pause();
     }
 
     function stopOperaMusic() {
@@ -1605,55 +1645,35 @@
             operaMusic.pause();
             operaMusic.currentTime = 0;
             isOperaPlaying = false;
-            if (operaTimeout) {
-                clearTimeout(operaTimeout);
-                operaTimeout = null;
-            }
+            if (operaTimeout) { clearTimeout(operaTimeout); operaTimeout = null; }
         }
     }
 
     function playOperaMusic() {
         if (isOperaPlaying) return;
-
         isOperaPlaying = true;
-        if (backgroundMusic && !backgroundMusic.paused) {
-            backgroundMusic.pause();
-        }
-
+        if (backgroundMusic && !backgroundMusic.paused) backgroundMusic.pause();
         if (operaMusic) {
             operaMusic.currentTime = 0;
             operaMusic.play().catch(e => console.log("戏曲音乐播放失败:", e));
-
-            // 监听戏曲音乐结束事件
             operaMusic.onended = function () {
                 isOperaPlaying = false;
-                if (gameStarted && !isPaused && !gameOver) {
-                    playBackgroundMusic();
-                }
+                if (gameStarted && !isPaused && !gameOver) playBackgroundMusic();
             };
-
-            // 安全起见，设置一个超时恢复背景音乐
             if (operaTimeout) clearTimeout(operaTimeout);
             operaTimeout = setTimeout(() => {
                 if (isOperaPlaying) {
                     stopOperaMusic();
-                    if (gameStarted && !isPaused && !gameOver) {
-                        playBackgroundMusic();
-                    }
+                    if (gameStarted && !isPaused && !gameOver) playBackgroundMusic();
                 }
-            }, 30000); // 30秒后自动恢复
+            }, 30000);
         }
     }
 
-    // 游戏暂停/恢复时控制音乐
     function updateMusicForPause() {
         if (isPaused) {
-            if (backgroundMusic && !backgroundMusic.paused) {
-                backgroundMusic.pause();
-            }
-            if (operaMusic && !operaMusic.paused) {
-                operaMusic.pause();
-            }
+            if (backgroundMusic && !backgroundMusic.paused) backgroundMusic.pause();
+            if (operaMusic && !operaMusic.paused) operaMusic.pause();
         } else {
             if (gameStarted && !gameOver) {
                 if (isOperaPlaying) {
@@ -1665,91 +1685,57 @@
         }
     }
 
-    // 初始化剧情系统
     function initStorySystem() {
-        // 重置剧情系统
         availableStories = [];
         usedStories = [];
         storyRound = 1;
         storyCount = 0;
-
-        // 重置所有剧情的出现状态（除了黄铜箱子）
         for (const key in STORIES) {
             if (key !== 'BRASS_BOX') {
                 STORIES[key].canAppear = true;
             } else {
-                STORIES[key].canAppear = false; // 初始不可出现
+                STORIES[key].canAppear = false;
                 STORIES[key].hasAppeared = false;
             }
         }
-
-        console.log(`剧情系统初始化，第${storyRound}轮`);
     }
 
-    // 获取下一个随机剧情（保证不重复）
     function getNextRandomStory() {
         storyCount++;
+        if (storyCount > 3 && !STORIES.BRASS_BOX.hasAppeared) STORIES.BRASS_BOX.canAppear = true;
 
-        // 如果黄铜箱子还没出现过，并且已经触发了3个以上的剧情，可以出现黄铜箱子
-        if (storyCount > 3 && !STORIES.BRASS_BOX.hasAppeared) {
-            STORIES.BRASS_BOX.canAppear = true;
-        }
-
-        // 构建可用剧情列表
         availableStories = [];
         for (const key in STORIES) {
             if (STORIES[key].canAppear && !usedStories.includes(key)) {
-                // 检查只出现一次的剧情是否已经出现过
-                if (STORIES[key].appearsOnlyOnce && STORIES[key].hasAppeared) {
-                    continue;
-                }
+                if (STORIES[key].appearsOnlyOnce && STORIES[key].hasAppeared) continue;
                 availableStories.push(key);
             }
         }
 
-        // 如果可用剧情列表为空，重置并进入下一轮
         if (availableStories.length === 0) {
-            // 重置已使用列表
             usedStories = [];
             storyRound++;
-
-            // 重建可用列表（排除已经永久出现过的）
             for (const key in STORIES) {
                 if (STORIES[key].canAppear) {
-                    // 检查只出现一次的剧情是否已经出现过
-                    if (STORIES[key].appearsOnlyOnce && STORIES[key].hasAppeared) {
-                        continue;
-                    }
+                    if (STORIES[key].appearsOnlyOnce && STORIES[key].hasAppeared) continue;
                     availableStories.push(key);
                 }
             }
-
-            // 打乱顺序（确保每轮顺序不同）
             shuffleArray(availableStories);
-
-            console.log(`进入第${storyRound}轮剧情，打乱顺序`);
         }
 
-        // 从可用剧情中随机选择一个
         const randomIndex = Math.floor(Math.random() * availableStories.length);
         const storyKey = availableStories[randomIndex];
-
-        // 从可用列表中移除，添加到已使用列表
         availableStories.splice(randomIndex, 1);
         usedStories.push(storyKey);
 
-        // 标记只出现一次的剧情为已出现
         if (STORIES[storyKey].appearsOnlyOnce) {
             STORIES[storyKey].hasAppeared = true;
             STORIES[storyKey].canAppear = false;
         }
-
-        console.log(`选择剧情: ${STORIES[storyKey].name}，剩余可用: ${availableStories.length}，总触发: ${storyCount}`);
-
         return STORIES[storyKey];
     }
 
-    // 打乱数组顺序
     function shuffleArray(array) {
         for (let i = array.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -1758,71 +1744,38 @@
         return array;
     }
 
-    // 清除所有现有效果（被新剧情覆盖）
     function clearAllEffects() {
-        console.log("清除所有现有效果");
-
-        // 清除夜幕降临效果
         if (activeEffects.nightFall) {
             gameBoardElement.classList.remove('night-fall');
             activeEffects.nightFall = false;
-            if (effectTimers.nightFall) {
-                clearTimeout(effectTimers.nightFall);
-                effectTimers.nightFall = null;
-            }
-            // 移除提示文字
+            if (effectTimers.nightFall) { clearTimeout(effectTimers.nightFall); effectTimers.nightFall = null; }
             const warning = document.querySelector('.night-warning');
-            if (warning && warning.parentNode) {
-                warning.remove();
-            }
+            if (warning && warning.parentNode) warning.remove();
         }
-
-        // 清除长生者效果
         if (activeEffects.immortal) {
             activeEffects.immortal = false;
             dropSpeed = originalDropSpeed;
             updateDropSpeed();
-            if (effectTimers.immortal) {
-                clearTimeout(effectTimers.immortal);
-                effectTimers.immortal = null;
-            }
+            if (effectTimers.immortal) { clearTimeout(effectTimers.immortal); effectTimers.immortal = null; }
         }
-
-        // 清除炒肝效果
         if (activeEffects.friedLiver) {
             activeEffects.friedLiver = false;
-            if (effectTimers.friedLiver) {
-                clearTimeout(effectTimers.friedLiver);
-                effectTimers.friedLiver = null;
-            }
-            // 移除冻结覆盖层
+            if (effectTimers.friedLiver) { clearTimeout(effectTimers.friedLiver); effectTimers.friedLiver = null; }
             const freezeOverlay = document.querySelector('.freeze-overlay');
-            if (freezeOverlay && freezeOverlay.parentNode) {
-                freezeOverlay.remove();
-            }
+            if (freezeOverlay && freezeOverlay.parentNode) freezeOverlay.remove();
         }
-
-        // 清除流血天气效果
         if (activeEffects.bloodyWeather) {
             activeEffects.bloodyWeather = false;
             activeEffects.bloodyWeatherCount = 0;
             gameBoardElement.classList.remove('blood-weather');
         }
-
-        // 清除冤魂效果
         if (activeEffects.yuanGhost) {
             activeEffects.yuanGhost = false;
-            if (effectTimers.yuanGhost) {
-                clearTimeout(effectTimers.yuanGhost);
-                effectTimers.yuanGhost = null;
-            }
+            if (effectTimers.yuanGhost) { clearTimeout(effectTimers.yuanGhost); effectTimers.yuanGhost = null; }
         }
-
-        // 重新绘制游戏板
         drawBoard();
     }
 
-    // 初始化游戏板
     function createBoard() {
         board = Array.from({ length: BOARD_HEIGHT }, () =>
             Array.from({ length: BOARD_WIDTH }, () => EMPTY_CELL)
@@ -1853,7 +1806,6 @@
         updateItemDisplays();
     }
 
-    // 获取随机方块
     function getRandomPiece() {
         const tetrominoNames = Object.keys(TETROMINOES);
         const randomName = tetrominoNames[Math.floor(Math.random() * tetrominoNames.length)];
@@ -1866,15 +1818,21 @@
         };
     }
 
-    // 保存当前方块状态（用于史努比撤回）
     function saveCurrentState() {
-        // 深拷贝当前游戏板
         previousBoard = JSON.parse(JSON.stringify(board));
-        // 保存当前方块
         previousPiece = currentPiece ? JSON.parse(JSON.stringify(currentPiece)) : null;
     }
 
-    // 绘制游戏板
+    function getGhostRow() {
+        if (!currentPiece) return null;
+        let ghostRow = currentPiece.row;
+        while (!checkCollision({ ...currentPiece, row: ghostRow + 1 })) {
+            ghostRow++;
+            if (ghostRow > BOARD_HEIGHT + 4) break;
+        }
+        return ghostRow;
+    }
+
     function drawBoard() {
         const cells = document.querySelectorAll('#game-board .cell');
 
@@ -1885,62 +1843,62 @@
             cell.style.borderColor = '';
         });
 
-        // 应用流血天气效果
-        if (activeEffects.bloodyWeather) {
-            gameBoardElement.classList.add('blood-weather');
-        } else {
-            gameBoardElement.classList.remove('blood-weather');
-        }
+        if (activeEffects.bloodyWeather) gameBoardElement.classList.add('blood-weather');
+        else gameBoardElement.classList.remove('blood-weather');
 
-        // 应用冤魂效果（黑色方块）
-        if (activeEffects.yuanGhost) {
-            gameBoardElement.classList.add('yuan-ghost');
-        } else {
-            gameBoardElement.classList.remove('yuan-ghost');
-        }
+        if (activeEffects.yuanGhost) gameBoardElement.classList.add('yuan-ghost');
+        else gameBoardElement.classList.remove('yuan-ghost');
 
         for (let row = 0; row < BOARD_HEIGHT; row++) {
             for (let col = 0; col < BOARD_WIDTH; col++) {
                 if (board[row][col] !== EMPTY_CELL) {
                     const cellIndex = row * BOARD_WIDTH + col;
                     cells[cellIndex].classList.add('filled', board[row][col]);
-
-                    // 如果处于冤魂状态，所有方块显示为黑色
                     if (activeEffects.yuanGhost) {
-                        cells[cellIndex].style.backgroundColor = '#000000';
-                        cells[cellIndex].style.borderColor = '#444444';
-                    }
-                    // 如果处于流血天气状态，所有方块显示为红色
-                    else if (activeEffects.bloodyWeather) {
-                        cells[cellIndex].style.backgroundColor = '#ff2a2a';
-                        cells[cellIndex].style.borderColor = '#ff7a7a';
+                        cells[cellIndex].style.backgroundColor = '#4a3f3a';
+                        cells[cellIndex].style.borderColor = '#6a5a52';
+                    } else if (activeEffects.bloodyWeather) {
+                        cells[cellIndex].style.backgroundColor = '#e88a8a';
+                        cells[cellIndex].style.borderColor = '#f4b8b8';
                     }
                 }
             }
         }
 
         if (currentPiece) {
+            const ghostRow = getGhostRow();
+            if (ghostRow !== null && ghostRow !== currentPiece.row) {
+                for (let row = 0; row < currentPiece.shape.length; row++) {
+                    for (let col = 0; col < currentPiece.shape[row].length; col++) {
+                        if (currentPiece.shape[row][col]) {
+                            const boardRow = ghostRow + row;
+                            const boardCol = currentPiece.col + col;
+                            if (boardRow >= 0 && boardRow < BOARD_HEIGHT && boardCol >= 0 && boardCol < BOARD_WIDTH) {
+                                const cellIndex = boardRow * BOARD_WIDTH + boardCol;
+                                if (!cells[cellIndex].classList.contains('filled')) {
+                                    cells[cellIndex].classList.add('ghost');
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
             for (let row = 0; row < currentPiece.shape.length; row++) {
                 for (let col = 0; col < currentPiece.shape[row].length; col++) {
                     if (currentPiece.shape[row][col]) {
                         const boardRow = currentPiece.row + row;
                         const boardCol = currentPiece.col + col;
-
-                        if (boardRow >= 0 && boardRow < BOARD_HEIGHT &&
-                            boardCol >= 0 && boardCol < BOARD_WIDTH) {
+                        if (boardRow >= 0 && boardRow < BOARD_HEIGHT && boardCol >= 0 && boardCol < BOARD_WIDTH) {
                             const cellIndex = boardRow * BOARD_WIDTH + boardCol;
-
-                            // 如果处于冤魂状态，当前方块也显示为黑色
                             if (activeEffects.yuanGhost) {
                                 cells[cellIndex].classList.add('filled');
-                                cells[cellIndex].style.backgroundColor = '#000000';
-                                cells[cellIndex].style.borderColor = '#444444';
-                            }
-                            // 如果处于流血天气状态，当前方块也显示为红色
-                            else if (activeEffects.bloodyWeather) {
+                                cells[cellIndex].style.backgroundColor = '#4a3f3a';
+                                cells[cellIndex].style.borderColor = '#6a5a52';
+                            } else if (activeEffects.bloodyWeather) {
                                 cells[cellIndex].classList.add('filled');
-                                cells[cellIndex].style.backgroundColor = '#ff2a2a';
-                                cells[cellIndex].style.borderColor = '#ff7a7a';
+                                cells[cellIndex].style.backgroundColor = '#e88a8a';
+                                cells[cellIndex].style.borderColor = '#f4b8b8';
                             } else {
                                 cells[cellIndex].classList.add('filled', currentPiece.className);
                             }
@@ -1951,10 +1909,8 @@
         }
     }
 
-    // 绘制下一个方块预览
     function drawNextPiece() {
         const cells = document.querySelectorAll('#next-piece-board .cell');
-
         cells.forEach(cell => {
             cell.className = 'cell';
             cell.textContent = '';
@@ -1965,20 +1921,17 @@
         if (nextPiece) {
             const offsetX = Math.floor((4 - nextPiece.shape[0].length) / 2);
             const offsetY = Math.floor((4 - nextPiece.shape.length) / 2);
-
             for (let row = 0; row < nextPiece.shape.length; row++) {
                 for (let col = 0; col < nextPiece.shape[row].length; col++) {
                     if (nextPiece.shape[row][col]) {
                         const previewRow = row + offsetY;
                         const previewCol = col + offsetX;
                         const cellIndex = previewRow * 4 + previewCol;
-
                         if (cellIndex >= 0 && cellIndex < cells.length) {
-                            // 如果处于流血天气状态，预览方块也显示为红色
                             if (activeEffects.bloodyWeather && activeEffects.bloodyWeatherCount > 0) {
                                 cells[cellIndex].classList.add('filled');
-                                cells[cellIndex].style.backgroundColor = '#ff2a2a';
-                                cells[cellIndex].style.borderColor = '#ff7a7a';
+                                cells[cellIndex].style.backgroundColor = '#e88a8a';
+                                cells[cellIndex].style.borderColor = '#f4b8b8';
                             } else {
                                 cells[cellIndex].classList.add('filled', nextPiece.className);
                             }
@@ -1989,21 +1942,15 @@
         }
     }
 
-    // 更新道具显示和状态
     function updateItemDisplays() {
         mojingCountElement.textContent = items.mojing;
         haitangCountElement.textContent = items.haitang;
         qingjunceCountElement.textContent = items.qingjunce;
         sodawaterCountElement.textContent = items.sodawater;
-
-        // 更新恢复进度条
         updateRecoveryBars();
-
-        // 更新道具项状态（是否可用）
         updateItemStates();
     }
 
-    // 更新恢复进度条
     function updateRecoveryBars() {
         mojingRecoveryElement.style.width = `${itemRecoveryProgress.mojing}%`;
         haitangRecoveryElement.style.width = `${itemRecoveryProgress.haitang}%`;
@@ -2011,193 +1958,91 @@
         sodawaterRecoveryElement.style.width = `${itemRecoveryProgress.sodawater}%`;
     }
 
-    // 更新道具项状态（是否可用）
     function updateItemStates() {
-        // 清君侧
-        if (items.qingjunce > 0) {
-            qingjunceItemElement.classList.remove('disabled');
-            qingjunceItemElement.classList.add('recovered');
-        } else {
-            qingjunceItemElement.classList.add('disabled');
-            qingjunceItemElement.classList.remove('recovered');
-        }
+        if (items.qingjunce > 0) { qingjunceItemElement.classList.remove('disabled'); qingjunceItemElement.classList.add('recovered'); }
+        else { qingjunceItemElement.classList.add('disabled'); qingjunceItemElement.classList.remove('recovered'); }
 
-        // 苏打水
-        if (items.sodawater > 0) {
-            sodawaterItemElement.classList.remove('disabled');
-            sodawaterItemElement.classList.add('recovered');
-        } else {
-            sodawaterItemElement.classList.add('disabled');
-            sodawaterItemElement.classList.remove('recovered');
-        }
+        if (items.sodawater > 0) { sodawaterItemElement.classList.remove('disabled'); sodawaterItemElement.classList.add('recovered'); }
+        else { sodawaterItemElement.classList.add('disabled'); sodawaterItemElement.classList.remove('recovered'); }
 
-        // 海棠
-        if (items.haitang > 0) {
-            haitangItemElement.classList.remove('disabled');
-            haitangItemElement.classList.add('recovered');
-        } else {
-            haitangItemElement.classList.add('disabled');
-            haitangItemElement.classList.remove('recovered');
-        }
+        if (items.haitang > 0) { haitangItemElement.classList.remove('disabled'); haitangItemElement.classList.add('recovered'); }
+        else { haitangItemElement.classList.add('disabled'); haitangItemElement.classList.remove('recovered'); }
 
-        // 墨镜
-        if (items.mojing > 0) {
-            mojingItemElement.classList.remove('disabled');
-            mojingItemElement.classList.add('recovered');
-        } else {
-            mojingItemElement.classList.add('disabled');
-            mojingItemElement.classList.remove('recovered');
-        }
+        if (items.mojing > 0) { mojingItemElement.classList.remove('disabled'); mojingItemElement.classList.add('recovered'); }
+        else { mojingItemElement.classList.add('disabled'); mojingItemElement.classList.remove('recovered'); }
     }
 
-    // 开始道具恢复计时器（暂停时会自动暂停）
     function startItemRecovery(itemType) {
-        // 如果已经有计时器在运行，先清除
-        if (itemRecoveryTimers[itemType]) {
-            clearInterval(itemRecoveryTimers[itemType]);
-        }
-
-        // 重置恢复进度（如果已经有道具，则从100%开始）
-        if (items[itemType] > 0) {
-            itemRecoveryProgress[itemType] = 100;
-        } else {
-            itemRecoveryProgress[itemType] = 0;
-        }
-
-        // 立即更新一次进度条
+        if (itemRecoveryTimers[itemType]) clearInterval(itemRecoveryTimers[itemType]);
+        if (items[itemType] > 0) { itemRecoveryProgress[itemType] = 100; updateRecoveryBars(); return; }
+        itemRecoveryProgress[itemType] = 0;
         updateRecoveryBars();
 
-        // 如果道具数已经大于0（表示已经有可用道具），不启动恢复计时器
-        if (items[itemType] > 0) {
-            return;
-        }
-
-        // 计算恢复间隔（每100毫秒更新一次）
         const recoveryTime = ITEM_RECOVERY_TIMES[itemType];
         const interval = 100;
-        const steps = recoveryTime / interval;
-        const increment = 100 / steps;
-
-        let accumulatedProgress = itemRecoveryProgress[itemType];
+        let accumulatedProgress = 0;
         let lastUpdateTime = Date.now();
 
-        // 开始恢复计时器
         itemRecoveryTimers[itemType] = setInterval(() => {
             if (isPaused || !gameStarted) return;
-
             const currentTime = Date.now();
             const elapsed = currentTime - lastUpdateTime;
             lastUpdateTime = currentTime;
-
-            // 根据实际经过的时间计算进度
-            const progressIncrement = (elapsed / recoveryTime) * 100;
-            accumulatedProgress += progressIncrement;
-
-            // 确保不超过100%
-            if (accumulatedProgress > 100) {
-                accumulatedProgress = 100;
-            }
-
+            accumulatedProgress += (elapsed / recoveryTime) * 100;
+            if (accumulatedProgress > 100) accumulatedProgress = 100;
             itemRecoveryProgress[itemType] = accumulatedProgress;
-
-            // 更新进度条
             updateRecoveryBars();
 
-            // 恢复完成
             if (accumulatedProgress >= 100) {
                 clearInterval(itemRecoveryTimers[itemType]);
                 itemRecoveryTimers[itemType] = null;
-                // 保持100%
                 itemRecoveryProgress[itemType] = 100;
                 items[itemType]++;
                 updateItemDisplays();
-
-                // 显示获得提示
                 let itemName = '';
                 if (itemType === 'mojing') itemName = '墨镜';
                 else if (itemType === 'haitang') itemName = '海棠';
                 else if (itemType === 'qingjunce') itemName = '清君侧';
                 else if (itemType === 'sodawater') itemName = '苏打水';
-
                 showItemAddedMessage(itemName);
             }
         }, interval);
     }
 
-    // 暂停所有道具恢复计时器
-    function pauseAllItemRecovery() {
-        for (const itemType in itemRecoveryTimers) {
-            if (itemRecoveryTimers[itemType]) {
-                // 不清除计时器，但在恢复函数中检查暂停状态
-                console.log(`暂停 ${itemType} 恢复`);
-            }
-        }
-    }
+    function pauseAllItemRecovery() {}
+    function resumeAllItemRecovery() {}
 
-    // 恢复所有道具恢复计时器
-    function resumeAllItemRecovery() {
-        for (const itemType in itemRecoveryTimers) {
-            if (itemRecoveryTimers[itemType]) {
-                // 恢复函数已经在检查暂停状态
-                console.log(`恢复 ${itemType} 恢复`);
-            }
-        }
-    }
-
-    // 使用道具（会触发恢复计时器）
     function useItem(itemType) {
         if (items[itemType] <= 0) {
-            // 道具不可用，给用户反馈
             const itemElement = document.getElementById(`${itemType}-item`);
             itemElement.style.transform = 'scale(0.95)';
-            setTimeout(() => {
-                itemElement.style.transform = '';
-            }, 300);
+            setTimeout(() => { itemElement.style.transform = ''; }, 300);
             return false;
         }
-
         items[itemType]--;
         updateItemDisplays();
-
-        // 道具使用后，立即将恢复进度重置为0
         itemRecoveryProgress[itemType] = 0;
         updateRecoveryBars();
-
-        // 开始恢复计时器（从0开始恢复）
         startItemRecovery(itemType);
-
         return true;
     }
 
-    // 显示道具获得提示
     function showItemAddedMessage(itemName) {
         const message = document.createElement('div');
         message.className = 'item-added';
         message.textContent = `获得道具：${itemName}`;
         document.body.appendChild(message);
-
-        // 3秒后移除提示
-        setTimeout(() => {
-            if (message.parentNode) {
-                message.remove();
-            }
-        }, 3000);
+        setTimeout(() => { if (message.parentNode) message.remove(); }, 3000);
     }
 
-    // 检查碰撞
     function checkCollision(piece, rowOffset = 0, colOffset = 0) {
         for (let row = 0; row < piece.shape.length; row++) {
             for (let col = 0; col < piece.shape[row].length; col++) {
                 if (piece.shape[row][col]) {
                     const newRow = piece.row + row + rowOffset;
                     const newCol = piece.col + col + colOffset;
-
-                    if (
-                        newRow >= BOARD_HEIGHT ||
-                        newCol < 0 ||
-                        newCol >= BOARD_WIDTH ||
-                        (newRow >= 0 && board[newRow][newCol] !== EMPTY_CELL)
-                    ) {
+                    if (newRow >= BOARD_HEIGHT || newCol < 0 || newCol >= BOARD_WIDTH ||
+                        (newRow >= 0 && board[newRow][newCol] !== EMPTY_CELL)) {
                         return true;
                     }
                 }
@@ -2206,11 +2051,8 @@
         return false;
     }
 
-    // 移动方块（考虑炒肝冻结效果）
     function movePiece(rowOffset, colOffset) {
         if (!currentPiece || gameOver || isPaused || !gameStarted) return false;
-
-        // 炒肝效果：玩家不能操作，但游戏正常进行
         if (activeEffects.friedLiver) return false;
 
         if (!checkCollision(currentPiece, rowOffset, colOffset)) {
@@ -2219,86 +2061,51 @@
             drawBoard();
             return true;
         }
-
-        if (rowOffset > 0 && colOffset === 0) {
-            lockPiece();
-            return false;
-        }
-
+        if (rowOffset > 0 && colOffset === 0) { lockPiece(); return false; }
         return false;
     }
 
-    // 旋转方块（考虑炒肝冻结效果）
     function rotatePiece() {
         if (!currentPiece || gameOver || isPaused || !gameStarted) return;
-
-        // 炒肝效果：玩家不能操作，但游戏正常进行
         if (activeEffects.friedLiver) return;
 
         const originalShape = currentPiece.shape;
         const originalCol = currentPiece.col;
         const originalRow = currentPiece.row;
-
         const rotatedShape = [];
         const rows = originalShape.length;
         const cols = originalShape[0].length;
 
         for (let col = 0; col < cols; col++) {
             const newRow = [];
-            for (let row = rows - 1; row >= 0; row--) {
-                newRow.push(originalShape[row][col]);
-            }
+            for (let row = rows - 1; row >= 0; row--) newRow.push(originalShape[row][col]);
             rotatedShape.push(newRow);
         }
-
         currentPiece.shape = rotatedShape;
 
-        const kicks = [
-            [0, 0],
-            [0, -1],
-            [0, 1],
-            [-1, 0],
-            [1, 0]
-        ];
-
+        const kicks = [[0, 0], [0, -1], [0, 1], [-1, 0], [1, 0]];
         let canRotate = false;
-
         for (const [rowOffset, colOffset] of kicks) {
             currentPiece.row = originalRow + rowOffset;
             currentPiece.col = originalCol + colOffset;
-
-            if (!checkCollision(currentPiece)) {
-                canRotate = true;
-                break;
-            }
+            if (!checkCollision(currentPiece)) { canRotate = true; break; }
         }
-
         if (!canRotate) {
             currentPiece.shape = originalShape;
             currentPiece.row = originalRow;
             currentPiece.col = originalCol;
         }
-
         drawBoard();
     }
 
-    // 直接落下方块（考虑炒肝冻结效果）
     function dropPiece() {
         if (!currentPiece || gameOver || isPaused || !gameStarted) return;
-
-        // 炒肝效果：玩家不能操作，但游戏正常进行
         if (activeEffects.friedLiver) return;
-
-        while (movePiece(1, 0)) {
-            // 持续向下移动直到碰撞
-        }
+        while (movePiece(1, 0)) {}
     }
 
-    // 固定方块到游戏板
     function lockPiece() {
         if (!currentPiece) return;
-
-        // 在固定方块前保存状态（用于史努比撤回）
         saveCurrentState();
 
         for (let row = 0; row < currentPiece.shape.length; row++) {
@@ -2306,11 +2113,9 @@
                 if (currentPiece.shape[row][col]) {
                     const boardRow = currentPiece.row + row;
                     const boardCol = currentPiece.col + col;
-
                     if (boardRow >= 0) {
-                        // 如果处于流血天气状态，固定为红色方块
                         if (activeEffects.bloodyWeather && activeEffects.bloodyWeatherCount > 0) {
-                            board[boardRow][boardCol] = 'z'; // 使用z类作为红色方块标识
+                            board[boardRow][boardCol] = 'z';
                         } else {
                             board[boardRow][boardCol] = currentPiece.className;
                         }
@@ -2319,41 +2124,33 @@
             }
         }
 
-        // 减少流血天气计数器
         if (activeEffects.bloodyWeather && activeEffects.bloodyWeatherCount > 0) {
             activeEffects.bloodyWeatherCount--;
             if (activeEffects.bloodyWeatherCount <= 0) {
                 activeEffects.bloodyWeather = false;
                 gameStatusElement.textContent = "流血天气结束";
                 setTimeout(() => {
-                    if (!gameOver && !isPaused && gameStarted) {
-                        gameStatusElement.textContent = "游戏中";
-                    }
+                    if (!gameOver && !isPaused && gameStarted) gameStatusElement.textContent = "游戏中";
                 }, 2000);
             }
         }
 
         clearLines();
-
-        // 获取下一个方块
         currentPiece = nextPiece;
 
-        // 如果处于流血天气状态，生成红色方块
         if (activeEffects.bloodyWeather && activeEffects.bloodyWeatherCount > 0) {
             nextPiece = {
                 name: 'Z',
                 shape: TETROMINOES.Z.shape,
-                className: 'z', // 红色方块
+                className: 'z',
                 row: 0,
                 col: Math.floor(BOARD_WIDTH / 2) - Math.floor(TETROMINOES.Z.shape[0].length / 2)
             };
         } else {
             nextPiece = getRandomPiece();
         }
-
         drawNextPiece();
 
-        // 检查游戏是否结束
         if (checkCollision(currentPiece)) {
             gameOver = true;
             gameStatusElement.textContent = "游戏结束!";
@@ -2364,16 +2161,16 @@
             pauseBackgroundMusic();
             stopOperaMusic();
         }
-
         drawBoard();
     }
 
-    // 清除完整的行
     function clearLines() {
         let linesCleared = 0;
+        const clearedRows = [];
 
         for (let row = BOARD_HEIGHT - 1; row >= 0; row--) {
             if (board[row].every(cell => cell !== EMPTY_CELL)) {
+                clearedRows.push(row);
                 board.splice(row, 1);
                 board.unshift(Array.from({ length: BOARD_WIDTH }, () => EMPTY_CELL));
                 linesCleared++;
@@ -2382,145 +2179,97 @@
         }
 
         if (linesCleared > 0) {
-            // 更新分数
+            const cells = document.querySelectorAll('#game-board .cell');
+            clearedRows.forEach(r => {
+                for (let c = 0; c < BOARD_WIDTH; c++) {
+                    const idx = r * BOARD_WIDTH + c;
+                    if (cells[idx]) cells[idx].classList.add('line-flash');
+                }
+            });
+
             score += linesCleared * 100;
             scoreElement.textContent = score;
+            scoreElement.classList.remove('pop');
+            void scoreElement.offsetWidth;
+            scoreElement.classList.add('pop');
 
             gameStatusElement.textContent = `消除了 ${linesCleared} 行!`;
-
-            // 每次消除都会触发随机剧情
-            setTimeout(() => {
-                triggerRandomStory();
-            }, 500);
+            setTimeout(() => { triggerRandomStory(); }, 500);
         } else {
-            if (!gameOver && !isPaused && gameStarted) {
-                gameStatusElement.textContent = "游戏中";
-            }
+            if (!gameOver && !isPaused && gameStarted) gameStatusElement.textContent = "游戏中";
         }
     }
 
-    // 触发随机剧情
-    // 触发随机剧情
     function triggerRandomStory() {
         if (gameOver || isPaused) return;
-
-        console.log("触发随机剧情...");
-
-        // 暂停游戏
         clearInterval(dropInterval);
         isPaused = true;
-
-        // 获取下一个随机剧情（保证不重复）
         const story = getNextRandomStory();
-
-        console.log("获取到剧情:", story.name);
-
-        // 显示剧情弹窗
         showStoryModal(story);
     }
 
-    // 显示剧情弹窗
     function showStoryModal(story) {
-        console.log("显示剧情弹窗，剧情名称:", story.name);
-
         eventTitleElement.textContent = story.name;
-        // 隐藏类型标签
-        if (eventTypeElement) {
-            eventTypeElement.style.display = 'none';
-        }
+        if (eventTypeElement) eventTypeElement.style.display = 'none';
         eventDescriptionElement.textContent = story.effect;
         eventEffectDescElement.textContent = story.description;
 
-        // 如果是黄铜箱子，添加特殊样式
-        if (story.name.includes("黄铜箱子")) {
-            const eventContent = eventModal.querySelector('.event-content');
-            eventContent.classList.add('brass-box-special');
-        }
+        const eventContent = eventModal.querySelector('.event-content');
+        eventContent.classList.remove('brass-box-special');
+        if (story.name.includes("黄铜箱子")) eventContent.classList.add('brass-box-special');
 
-        // 清空之前的动作按钮
         eventActionsElement.innerHTML = '';
 
-        // 根据剧情类型添加不同的动作按钮
         if (story.name.includes("食君之禄")) {
-            console.log("创建食君之禄按钮");
-            // 食君之禄：需要消耗海棠
             const consumeButton = document.createElement('button');
             consumeButton.className = 'event-button consume';
             consumeButton.textContent = `支付1朵【海棠】🌸`;
             consumeButton.onclick = () => {
-                console.log("点击支付海棠按钮");
                 if (items.haitang > 0) {
                     items.haitang--;
                     updateItemDisplays();
-                    // 开始海棠恢复计时器
                     startItemRecovery('haitang');
-                    // 清除所有现有效果
                     clearAllEffects();
                     resumeGame();
                 } else {
-                    // 没有海棠，触发冤魂效果
-                    console.log("没有海棠，触发怨气效果");
                     handleYuanGhost();
                 }
             };
-
             const cancelButton = document.createElement('button');
             cancelButton.className = 'event-button cancel';
             cancelButton.textContent = '拒绝支付';
-            cancelButton.onclick = () => {
-                console.log("点击拒绝支付按钮");
-                // 拒绝消耗海棠，触发冤魂效果
-                handleYuanGhost();
-            };
-
+            cancelButton.onclick = () => { handleYuanGhost(); };
             eventActionsElement.appendChild(consumeButton);
             eventActionsElement.appendChild(cancelButton);
 
         } else if (story.name.includes("夜幕降临")) {
-            console.log("创建夜幕降临按钮");
-            // 夜幕降临：需要消耗墨镜
             const consumeButton = document.createElement('button');
             consumeButton.className = 'event-button consume';
             consumeButton.textContent = `使用1副【墨镜】🕶️`;
             consumeButton.onclick = () => {
-                console.log("点击使用墨镜按钮");
                 if (items.mojing > 0) {
                     items.mojing--;
                     updateItemDisplays();
-                    // 开始墨镜恢复计时器
                     startItemRecovery('mojing');
-                    // 清除所有现有效果
                     clearAllEffects();
                     resumeGame();
                 } else {
-                    // 没有墨镜，触发黑夜效果
-                    console.log("没有墨镜，触发黑夜效果");
                     handleNightFallWithoutMojing();
                 }
             };
-
             const cancelButton = document.createElement('button');
             cancelButton.className = 'event-button cancel';
             cancelButton.textContent = '拒绝使用';
-            cancelButton.onclick = () => {
-                console.log("点击拒绝使用按钮");
-                // 拒绝消耗墨镜，触发黑夜效果
-                handleNightFallWithoutMojing();
-            };
-
+            cancelButton.onclick = () => { handleNightFallWithoutMojing(); };
             eventActionsElement.appendChild(consumeButton);
             eventActionsElement.appendChild(cancelButton);
 
         } else if (story.name.includes("机票")) {
-            console.log("创建机票输入框");
-            // 机票：需要输入正确文本
             const inputContainer = document.createElement('div');
             inputContainer.className = 'input-container';
-
             const inputText = document.createElement('div');
             inputText.className = 'input-text';
             inputText.textContent = '卑微的_____ ';
-
             const textInput = document.createElement('input');
             textInput.type = 'text';
             textInput.className = 'text-input';
@@ -2531,26 +2280,16 @@
             confirmButton.textContent = '确认';
 
             confirmButton.onclick = () => {
-                console.log("点击确认按钮，输入值:", textInput.value);
                 if (textInput.value.trim() === '爱情') {
-                    console.log("输入正确");
-                    // 机票剧情不需要清除效果，直接恢复游戏
-                    // 不要调用 clearAllEffects(); ← 移除这行
                     resumeGame();
-                    // 可以添加一些反馈
                     gameStatusElement.textContent = "登机成功！";
                     setTimeout(() => {
-                        if (!gameOver && !isPaused && gameStarted) {
-                            gameStatusElement.textContent = "游戏中";
-                        }
+                        if (!gameOver && !isPaused && gameStarted) gameStatusElement.textContent = "游戏中";
                     }, 2000);
                 } else {
-                    console.log("输入错误");
-                    // 输入错误，保持弹窗显示，给出提示
                     alert('❌ 输入错误！提示：友情/爱情/亲情');
                     textInput.value = '';
                     textInput.focus();
-                    // 不关闭弹窗，让用户继续尝试
                 }
             };
 
@@ -2559,164 +2298,107 @@
             eventActionsElement.appendChild(inputContainer);
             eventActionsElement.appendChild(confirmButton);
 
-            // 添加回车键支持
             textInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    confirmButton.click();
-                }
+                if (e.key === 'Enter') confirmButton.click();
             });
-
-            // 自动聚焦到输入框
-            setTimeout(() => {
-                textInput.focus();
-            }, 100);
+            setTimeout(() => textInput.focus(), 100);
 
         } else {
-            console.log("创建默认确认按钮");
-            // 其他剧情：直接确认继续
             const confirmButton = document.createElement('button');
             confirmButton.className = 'event-button';
             confirmButton.textContent = '确认继续';
             confirmButton.onclick = () => {
-                console.log("点击确认继续按钮");
-                // 清除所有现有效果
                 clearAllEffects();
                 resumeGame();
-                // 触发剧情效果
                 story.effectFunc();
             };
-
             eventActionsElement.appendChild(confirmButton);
         }
 
-        console.log("显示弹窗");
         eventModal.classList.add('active');
     }
 
-    // 恢复游戏
     function resumeGame() {
         eventModal.classList.remove('active');
-        // 移除黄铜箱子的特殊样式
         const eventContent = eventModal.querySelector('.event-content');
         eventContent.classList.remove('brass-box-special');
 
         isPaused = false;
         if (!gameOver && gameStarted) {
-            dropInterval = setInterval(() => {
-                movePiece(1, 0);
-            }, dropSpeed);
+            dropInterval = setInterval(() => { movePiece(1, 0); }, dropSpeed);
             gameStatusElement.textContent = "游戏中";
             updateMusicForPause();
         }
     }
 
-    // 处理食君之禄剧情
-    function handleShijunzhilu() {
-        // 这个函数不会被直接调用，因为食君之禄有特殊的弹窗处理
-        console.log("食君之禄剧情处理");
-    }
+    function handleShijunzhilu() { console.log("食君之禄剧情处理"); }
 
-    // 处理冤魂效果（没有海棠的情况）
-    // 处理冤魂效果（没有海棠的情况）
     function handleYuanGhost() {
-        // 清除所有现有效果
         clearAllEffects();
-
-        // 触发冤魂效果
         activeEffects.yuanGhost = true;
-
-        // 显示冤字弹窗
         eventModal.classList.remove('active');
 
-        // 创建冤字弹窗
         const yuanModal = document.createElement('div');
         yuanModal.className = 'event-modal active';
         yuanModal.innerHTML = `
-        <div class="event-content">
-            <div class="yuan-character" style="color: white !important; text-shadow: 0 0 20px rgba(255, 255, 255, 0.7) !important;">冤</div>
-            <div class="event-description" style="color: #ff9ec9;">黑眼镜把发票贴成一个冤字</div>
-            <button class="confirm-button" id="confirm-yuan-button">确认</button>
-        </div>
-    `;
-
+            <div class="event-content">
+                <div class="yuan-character">冤</div>
+                <div class="event-description" style="color: var(--text-soft);">黑眼镜把发票贴成一个冤字</div>
+                <button class="confirm-button" id="confirm-yuan-button">确认</button>
+            </div>
+        `;
         document.body.appendChild(yuanModal);
-
-        // 更新游戏板显示（黑色方块）
         drawBoard();
 
-        // 设置定时器，20秒后自动清除效果
         effectTimers.yuanGhost = setTimeout(() => {
             activeEffects.yuanGhost = false;
             drawBoard();
             gameStatusElement.textContent = "冤魂散去";
             setTimeout(() => {
-                if (!gameOver && !isPaused && gameStarted) {
-                    gameStatusElement.textContent = "游戏中";
-                }
+                if (!gameOver && !isPaused && gameStarted) gameStatusElement.textContent = "游戏中";
             }, 2000);
         }, 20000);
 
-        // 确认按钮事件
         document.getElementById('confirm-yuan-button').onclick = () => {
             yuanModal.remove();
             resumeGame();
         };
     }
 
-    // 处理夜幕降临剧情（有墨镜消耗）
-    function handleNightFall() {
-        // 这个函数不会被直接调用，因为夜幕降临有特殊的弹窗处理
-        console.log("夜幕降临剧情处理");
-    }
+    function handleNightFall() { console.log("夜幕降临剧情处理"); }
 
-    // 处理夜幕降临（没有墨镜的情况）
     function handleNightFallWithoutMojing() {
-        // 清除所有现有效果
         clearAllEffects();
-
         eventModal.classList.remove('active');
-
-        // 触发夜幕降临效果（覆盖之前的效果）
         activeEffects.nightFall = true;
         gameBoardElement.classList.add('night-fall');
 
-        // 添加提示文字
         const warning = document.createElement('div');
         warning.className = 'night-warning';
         warning.textContent = "夜幕降临，5秒后恢复";
         gameBoardElement.appendChild(warning);
 
-        // 游戏正常进行，只是玩家看不到
         resumeGame();
 
-        // 5秒后恢复
         effectTimers.nightFall = setTimeout(() => {
             activeEffects.nightFall = false;
             gameBoardElement.classList.remove('night-fall');
-            if (warning.parentNode) {
-                warning.remove();
-            }
+            if (warning.parentNode) warning.remove();
             gameStatusElement.textContent = "夜幕散去";
             setTimeout(() => {
-                if (!gameOver && !isPaused && gameStarted) {
-                    gameStatusElement.textContent = "游戏中";
-                }
+                if (!gameOver && !isPaused && gameStarted) gameStatusElement.textContent = "游戏中";
             }, 2000);
         }, 5000);
     }
 
-    // 长生者效果
     function activateImmortal() {
-        // 清除之前的效果
         clearAllEffects();
-
         activeEffects.immortal = true;
         originalDropSpeed = dropSpeed;
-        dropSpeed *= 2; // 速度减半
+        dropSpeed *= 2;
         updateDropSpeed();
         gameStatusElement.textContent = "方块下落速度变慢";
 
-        // 长生者效果持续20秒
         effectTimers.immortal = setTimeout(() => {
             if (activeEffects.immortal) {
                 activeEffects.immortal = false;
@@ -2724,169 +2406,116 @@
                 updateDropSpeed();
                 gameStatusElement.textContent = "变慢效果结束";
                 setTimeout(() => {
-                    if (!gameOver && !isPaused && gameStarted) {
-                        gameStatusElement.textContent = "游戏中";
-                    }
+                    if (!gameOver && !isPaused && gameStarted) gameStatusElement.textContent = "游戏中";
                 }, 1000);
             }
         }, 10000);
     }
 
-    // 炒肝效果 - 玩家不能操作，但游戏正常进行
-    // 炒肝效果 - 玩家不能操作，但游戏正常进行
     function activateFriedLiver() {
-        // 清除之前的效果
         clearAllEffects();
-
-        // 炒肝效果在确认后触发
         setTimeout(() => {
             if (activeEffects.friedLiver) return;
-
             activeEffects.friedLiver = true;
             gameStatusElement.textContent = "操作被冻结3秒";
 
-            // 创建冻结效果覆盖层
             const freezeOverlay = document.createElement('div');
             freezeOverlay.className = 'freeze-overlay';
             const freezeText = document.createElement('div');
             freezeText.className = 'freeze-text';
-            freezeText.textContent = "🌸 吃炒肝中";  // 修改这里的文字
-            freezeText.style.animation = 'none';  // 移除动画效果
-            freezeText.style.fontSize = '1rem';  // 调整字体大小
-            freezeText.style.color = '#ff9ec9';    // 粉色文字
-            freezeText.style.textShadow = '0 2px 4px rgba(0, 0, 0, 0.5)';
+            freezeText.textContent = "🌸 吃炒肝中";
             freezeOverlay.appendChild(freezeText);
             gameBoardElement.appendChild(freezeOverlay);
 
-            // 3秒后解除冻结
             effectTimers.friedLiver = setTimeout(() => {
                 activeEffects.friedLiver = false;
-                if (freezeOverlay.parentNode) {
-                    freezeOverlay.remove();
-                }
+                if (freezeOverlay.parentNode) freezeOverlay.remove();
                 gameStatusElement.textContent = "炒肝吃完啦";
                 setTimeout(() => {
-                    if (!gameOver && !isPaused && gameStarted) {
-                        gameStatusElement.textContent = "游戏中";
-                    }
+                    if (!gameOver && !isPaused && gameStarted) gameStatusElement.textContent = "游戏中";
                 }, 2000);
             }, 3000);
         }, 100);
     }
 
-    // 流血天气效果
     function activateBloodyWeather() {
-        // 清除之前的效果
         clearAllEffects();
-
         activeEffects.bloodyWeather = true;
-        activeEffects.bloodyWeatherCount = 5; // 接下来的5个方块
+        activeEffects.bloodyWeatherCount = 5;
         gameStatusElement.textContent = "接下来5个方块变为红色";
         drawBoard();
         drawNextPiece();
     }
 
-    // 戏曲效果
     function activateOpera() {
         gameStatusElement.textContent = "播放BGM《霸王别姬》";
         playOperaMusic();
         setTimeout(() => {
-            if (!gameOver && !isPaused && gameStarted) {
-                gameStatusElement.textContent = "游戏中";
-            }
+            if (!gameOver && !isPaused && gameStarted) gameStatusElement.textContent = "游戏中";
         }, 3000);
     }
 
-    // 史努比效果 - 撤回这一步方块
     function activateSnoopy() {
         if (previousBoard && previousPiece) {
-            // 清除之前的效果
             clearAllEffects();
-
-            // 恢复之前的游戏板状态
             board = JSON.parse(JSON.stringify(previousBoard));
             currentPiece = JSON.parse(JSON.stringify(previousPiece));
-
             drawBoard();
             gameStatusElement.textContent = "撤回了一步";
             setTimeout(() => {
-                if (!gameOver && !isPaused && gameStarted) {
-                    gameStatusElement.textContent = "游戏中";
-                }
+                if (!gameOver && !isPaused && gameStarted) gameStatusElement.textContent = "游戏中";
             }, 2000);
         } else {
             gameStatusElement.textContent = "史努比出现，但没有可撤回的步骤";
             setTimeout(() => {
-                if (!gameOver && !isPaused && gameStarted) {
-                    gameStatusElement.textContent = "游戏中";
-                }
+                if (!gameOver && !isPaused && gameStarted) gameStatusElement.textContent = "游戏中";
             }, 2000);
         }
     }
 
-    // 黄铜箱子效果 - 分数变成9999
     function activateBrassBox() {
-        // 清除之前的效果
         clearAllEffects();
-
         score = 9999;
         scoreElement.textContent = score;
+        scoreElement.classList.remove('pop');
+        void scoreElement.offsetWidth;
+        scoreElement.classList.add('pop');
         gameStatusElement.textContent = "分数变为9999";
         setTimeout(() => {
-            if (!gameOver && !isPaused && gameStarted) {
-                gameStatusElement.textContent = "游戏中";
-            }
+            if (!gameOver && !isPaused && gameStarted) gameStatusElement.textContent = "游戏中";
         }, 2000);
     }
 
-    // 机票效果 - 需要输入正确文本（已在showStoryModal中处理）
-    function activateTicket() {
-        // 效果在showStoryModal中处理，这里只需记录
-        console.log("机票剧情激活");
-    }
+    function activateTicket() { console.log("机票剧情激活"); }
 
-    // 易拉罐风车效果 - 随机消除3块已经存在的方块
     function activateCanWindmill() {
-        // 清除之前的效果
         clearAllEffects();
-
-        // 收集所有已填充的方块位置
         const filledCells = [];
         for (let row = 0; row < BOARD_HEIGHT; row++) {
             for (let col = 0; col < BOARD_WIDTH; col++) {
-                if (board[row][col] !== EMPTY_CELL) {
-                    filledCells.push({ row, col });
-                }
+                if (board[row][col] !== EMPTY_CELL) filledCells.push({ row, col });
             }
         }
 
         if (filledCells.length === 0) {
             gameStatusElement.textContent = "易拉罐风车转动，但没有方块可消除";
             setTimeout(() => {
-                if (!gameOver && !isPaused && gameStarted) {
-                    gameStatusElement.textContent = "游戏中";
-                }
+                if (!gameOver && !isPaused && gameStarted) gameStatusElement.textContent = "游戏中";
             }, 2000);
             return;
         }
 
-        // 随机选择3个方块（如果总数不足9个，则选择所有）
         const cellsToRemove = Math.min(9, filledCells.length);
         const removedPositions = [];
-
         for (let i = 0; i < cellsToRemove; i++) {
             const randomIndex = Math.floor(Math.random() * filledCells.length);
             const cell = filledCells[randomIndex];
             removedPositions.push({ ...cell });
             filledCells.splice(randomIndex, 1);
-
-            // 标记为需要移除
             board[cell.row][cell.col] = EMPTY_CELL;
         }
 
-        // 处理方块下落
         for (const pos of removedPositions) {
-            // 从被移除的位置开始，上方的方块下落
             for (let row = pos.row - 1; row >= 0; row--) {
                 if (board[row][pos.col] !== EMPTY_CELL) {
                     board[row + 1][pos.col] = board[row][pos.col];
@@ -2898,15 +2527,11 @@
         drawBoard();
         gameStatusElement.textContent = `消除了${cellsToRemove}个方块`;
         setTimeout(() => {
-            if (!gameOver && !isPaused && gameStarted) {
-                gameStatusElement.textContent = "游戏中";
-            }
+            if (!gameOver && !isPaused && gameStarted) gameStatusElement.textContent = "游戏中";
         }, 2000);
     }
 
-    // 道具效果函数
     function clearAllBlocks() {
-        // 清除所有方块
         for (let row = 0; row < BOARD_HEIGHT; row++) {
             for (let col = 0; col < BOARD_WIDTH; col++) {
                 board[row][col] = EMPTY_CELL;
@@ -2915,76 +2540,48 @@
         drawBoard();
         gameStatusElement.textContent = "所有方块已清除";
         setTimeout(() => {
-            if (!gameOver && !isPaused && gameStarted) {
-                gameStatusElement.textContent = "游戏中";
-            }
+            if (!gameOver && !isPaused && gameStarted) gameStatusElement.textContent = "游戏中";
         }, 2000);
     }
 
     function randomizeNextPiece() {
-        // 随机改变下一个方块的形状
         nextPiece = getRandomPiece();
         drawNextPiece();
         gameStatusElement.textContent = "下一个方块已改变";
         setTimeout(() => {
-            if (!gameOver && !isPaused && gameStarted) {
-                gameStatusElement.textContent = "游戏中";
-            }
+            if (!gameOver && !isPaused && gameStarted) gameStatusElement.textContent = "游戏中";
         }, 2000);
     }
 
-    // 更新下落速度
     function updateDropSpeed() {
         if (dropInterval) {
             clearInterval(dropInterval);
-            dropInterval = setInterval(() => {
-                movePiece(1, 0);
-            }, dropSpeed);
+            dropInterval = setInterval(() => { movePiece(1, 0); }, dropSpeed);
         }
     }
 
-    // 开始/重新开始游戏
-    // 开始/重新开始游戏
     function startOrRestartGame() {
-        console.log("点击开始/重新开始按钮，当前状态 - gameStarted:", gameStarted, "gameOver:", gameOver);
-
         if (gameStarted && !gameOver) {
-            // 重新开始游戏：直接开始，不显示规则
-            console.log("重新开始游戏");
             resetGame();
             startGame();
         } else {
-            // 第一次开始游戏：先显示规则
-            console.log("第一次开始游戏，显示规则");
             resetGame();
             showRulesModal();
         }
     }
 
-    // 显示规则弹窗
     function showRulesModal() {
-        console.log("显示游戏规则弹窗");
         rulesModal.classList.add('active');
-
-        // 禁用其他按钮
         startRestartButton.disabled = true;
         pauseResumeButton.disabled = true;
     }
 
-    // 隐藏规则弹窗并开始游戏
     function hideRulesModalAndStartGame() {
-        console.log("关闭规则弹窗，开始游戏");
         rulesModal.classList.remove('active');
-
-        // 启用其他按钮
         startRestartButton.disabled = false;
-
-        // 开始游戏
         startGame();
     }
 
-    // 开始游戏
-    // 开始游戏
     function startGame() {
         gameStarted = true;
         gameOver = false;
@@ -2993,18 +2590,9 @@
         startRestartButton.textContent = "重新开始";
         pauseResumeButton.disabled = false;
 
-        // 初始化剧情系统
         initStorySystem();
+        items = { mojing: 0, haitang: 0, qingjunce: 0, sodawater: 0 };
 
-        // 初始化道具（初始值为0，会自动恢复）
-        items = {
-            mojing: 0,
-            haitang: 0,
-            qingjunce: 0,
-            sodawater: 0
-        };
-
-        // 清除所有恢复计时器
         for (const itemType in itemRecoveryTimers) {
             if (itemRecoveryTimers[itemType]) {
                 clearInterval(itemRecoveryTimers[itemType]);
@@ -3013,95 +2601,56 @@
             itemRecoveryProgress[itemType] = 0;
         }
 
-        // 开始所有道具的恢复计时器
         startItemRecovery('mojing');
         startItemRecovery('haitang');
         startItemRecovery('qingjunce');
         startItemRecovery('sodawater');
 
         updateItemDisplays();
-
-        // 清除所有效果
         clearAllEffects();
-
         gameBoardElement.classList.remove('night-fall', 'blood-weather', 'yuan-ghost');
 
-        // 确保有当前方块和下一个方块
-        if (!currentPiece) {
-            currentPiece = getRandomPiece();
-        }
+        if (!currentPiece) currentPiece = getRandomPiece();
+        if (!nextPiece) { nextPiece = getRandomPiece(); drawNextPiece(); }
 
-        if (!nextPiece) {
-            nextPiece = getRandomPiece();
-            drawNextPiece();
-        }
-
-        // 重置下落速度
         dropSpeed = 1000;
         originalDropSpeed = 1000;
 
-        // 清除之前的定时器
-        if (dropInterval) {
-            clearInterval(dropInterval);
-        }
+        if (dropInterval) clearInterval(dropInterval);
+        dropInterval = setInterval(() => { movePiece(1, 0); }, dropSpeed);
 
-        // 开始新的定时器
-        dropInterval = setInterval(() => {
-            movePiece(1, 0);
-        }, dropSpeed);
-
-        // 开始播放背景音乐（从规则弹窗确认后播放）
         playBackgroundMusic();
-
         drawBoard();
-
-        console.log("游戏开始完成");
     }
 
-    // 规则弹窗确认按钮事件
     rulesConfirmButton.addEventListener('click', hideRulesModalAndStartGame);
-
-    // 也可以在规则弹窗区域点击其他地方关闭（可选）
     rulesModal.addEventListener('click', function (e) {
-        if (e.target === rulesModal) {
-            hideRulesModalAndStartGame();
-        }
+        if (e.target === rulesModal) hideRulesModalAndStartGame();
     });
 
-    // 暂停/继续游戏
     function togglePauseResume() {
         if (gameOver || !gameStarted) return;
-
         isPaused = !isPaused;
 
         if (isPaused) {
             clearInterval(dropInterval);
             gameStatusElement.textContent = "已暂停";
             pauseResumeButton.textContent = "继续";
+            pauseOverlay.classList.add('active');
             pauseAllItemRecovery();
         } else {
             gameStatusElement.textContent = "游戏中";
             pauseResumeButton.textContent = "暂停";
-
-            dropInterval = setInterval(() => {
-                movePiece(1, 0);
-            }, dropSpeed);
+            pauseOverlay.classList.remove('active');
+            dropInterval = setInterval(() => { movePiece(1, 0); }, dropSpeed);
             resumeAllItemRecovery();
         }
-
         updateMusicForPause();
     }
 
-    // 重置游戏状态
-    // 重置游戏状态
     function resetGame() {
-        // 清除定时器
-        if (dropInterval) {
-            clearInterval(dropInterval);
-            dropInterval = null;
-        }
+        if (dropInterval) { clearInterval(dropInterval); dropInterval = null; }
 
-        // 清除道具恢复计时器
         for (const itemType in itemRecoveryTimers) {
             if (itemRecoveryTimers[itemType]) {
                 clearInterval(itemRecoveryTimers[itemType]);
@@ -3110,47 +2659,34 @@
             itemRecoveryProgress[itemType] = 0;
         }
 
-        // 清除效果计时器
         for (const timer in effectTimers) {
-            if (effectTimers[timer]) {
-                clearTimeout(effectTimers[timer]);
-                effectTimers[timer] = null;
-            }
+            if (effectTimers[timer]) { clearTimeout(effectTimers[timer]); effectTimers[timer] = null; }
         }
 
-        // 重置游戏变量
         score = 0;
         gameOver = false;
         isPaused = false;
         gameStarted = false;
         dropSpeed = 1000;
 
-        // 清除所有效果
         clearAllEffects();
-
-        // 重置剧情状态
         previousBoard = null;
         previousPiece = null;
 
-        // 隐藏规则弹窗（如果显示的话）
         rulesModal.classList.remove('active');
-
-        // 确保开始按钮可用
         startRestartButton.disabled = false;
 
-        // 停止音乐
         pauseBackgroundMusic();
         stopOperaMusic();
         isOperaPlaying = false;
 
-        // 更新UI
         scoreElement.textContent = score;
         gameStatusElement.textContent = "准备开始";
         startRestartButton.textContent = "开始游戏";
         pauseResumeButton.textContent = "暂停";
         pauseResumeButton.disabled = true;
+        pauseOverlay.classList.remove('active');
 
-        // 重置游戏板
         createBoard();
         currentPiece = getRandomPiece();
         nextPiece = getRandomPiece();
@@ -3158,166 +2694,77 @@
         drawBoard();
     }
 
-    // 键盘控制
     function handleKeyDown(event) {
         if (!gameStarted && event.key !== 'Enter') return;
 
         switch (event.key) {
-            case 'ArrowLeft':
-                event.preventDefault();
-                movePiece(0, -1);
-                break;
-            case 'ArrowRight':
-                event.preventDefault();
-                movePiece(0, 1);
-                break;
-            case 'ArrowDown':
-                event.preventDefault();
-                movePiece(1, 0);
-                break;
-            case 'ArrowUp':
-                event.preventDefault();
-                rotatePiece();
-                break;
-            case ' ':
-                event.preventDefault();
-                dropPiece();
-                break;
+            case 'ArrowLeft': event.preventDefault(); movePiece(0, -1); break;
+            case 'ArrowRight': event.preventDefault(); movePiece(0, 1); break;
+            case 'ArrowDown': event.preventDefault(); movePiece(1, 0); break;
+            case 'ArrowUp': event.preventDefault(); rotatePiece(); break;
+            case ' ': event.preventDefault(); dropPiece(); break;
             case 'p':
-            case 'P':
-                event.preventDefault();
-                togglePauseResume();
-                break;
+            case 'P': event.preventDefault(); togglePauseResume(); break;
             case 'r':
-            case 'R':
-                event.preventDefault();
-                resetGame();
-                startGame();
-                break;
-            case 'Enter':
-                event.preventDefault();
-                startOrRestartGame();
-                break;
+            case 'R': event.preventDefault(); resetGame(); startGame(); break;
+            case 'Enter': event.preventDefault(); startOrRestartGame(); break;
         }
     }
 
-    // 设置触摸控制和道具点击
     function setupTouchControls() {
-        // 旋转按钮
         const rotateBtn = document.querySelector('.touch-btn.rotate');
         if (rotateBtn) {
-            rotateBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                rotatePiece();
-            });
-
-            rotateBtn.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                rotatePiece();
-            });
+            rotateBtn.addEventListener('click', (e) => { e.preventDefault(); rotatePiece(); });
+            rotateBtn.addEventListener('touchstart', (e) => { e.preventDefault(); rotatePiece(); });
         }
-
-        // 移动按钮
         const leftBtn = document.querySelector('.touch-btn.left');
         if (leftBtn) {
-            leftBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                movePiece(0, -1);
-            });
-
-            leftBtn.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                movePiece(0, -1);
-            });
+            leftBtn.addEventListener('click', (e) => { e.preventDefault(); movePiece(0, -1); });
+            leftBtn.addEventListener('touchstart', (e) => { e.preventDefault(); movePiece(0, -1); });
         }
-
         const rightBtn = document.querySelector('.touch-btn.right');
         if (rightBtn) {
-            rightBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                movePiece(0, 1);
-            });
-
-            rightBtn.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                movePiece(0, 1);
-            });
+            rightBtn.addEventListener('click', (e) => { e.preventDefault(); movePiece(0, 1); });
+            rightBtn.addEventListener('touchstart', (e) => { e.preventDefault(); movePiece(0, 1); });
         }
-
         const downBtn = document.querySelector('.touch-btn.down');
         if (downBtn) {
-            downBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                movePiece(1, 0);
-            });
-
-            downBtn.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                movePiece(1, 0);
-            });
+            downBtn.addEventListener('click', (e) => { e.preventDefault(); movePiece(1, 0); });
+            downBtn.addEventListener('touchstart', (e) => { e.preventDefault(); movePiece(1, 0); });
         }
-
         const dropBtn = document.querySelector('.touch-btn.drop');
         if (dropBtn) {
-            dropBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                dropPiece();
-            });
-
-            dropBtn.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                dropPiece();
-            });
+            dropBtn.addEventListener('click', (e) => { e.preventDefault(); dropPiece(); });
+            dropBtn.addEventListener('touchstart', (e) => { e.preventDefault(); dropPiece(); });
         }
 
-        // 道具点击事件
         qingjunceItemElement.addEventListener('click', () => {
-            if (useItem('qingjunce')) {
-                ITEMS.QINGJUNCE.effectFunc();
-            }
+            if (useItem('qingjunce')) ITEMS.QINGJUNCE.effectFunc();
         });
-
         sodawaterItemElement.addEventListener('click', () => {
-            if (useItem('sodawater')) {
-                ITEMS.SODAWATER.effectFunc();
-            }
+            if (useItem('sodawater')) ITEMS.SODAWATER.effectFunc();
         });
 
-        // 防止触摸滚动
         document.querySelectorAll('.touch-btn').forEach(btn => {
-            btn.addEventListener('touchmove', (e) => {
-                e.preventDefault();
-            });
+            btn.addEventListener('touchmove', (e) => { e.preventDefault(); });
         });
-
-        // 道具项也防止触摸滚动
         document.querySelectorAll('.item').forEach(item => {
-            item.addEventListener('touchmove', (e) => {
-                e.preventDefault();
-            });
+            item.addEventListener('touchmove', (e) => { e.preventDefault(); });
         });
     }
 
-    // 初始化游戏
     function init() {
         createBoard();
         resetGame();
-
-        // 添加事件监听器
         document.addEventListener('keydown', handleKeyDown);
         startRestartButton.addEventListener('click', startOrRestartGame);
         pauseResumeButton.addEventListener('click', togglePauseResume);
-
-        // 设置触摸控制
         setupTouchControls();
-
-        // 初始绘制
         drawBoard();
         drawNextPiece();
     }
 
-    // 页面加载完成后初始化游戏
     window.addEventListener('DOMContentLoaded', init);
 </script>
-
+</body>
 </html>
