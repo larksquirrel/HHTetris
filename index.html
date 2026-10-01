@@ -1,1809 +1,3323 @@
-<!DOCTYPE html>
-<html lang="zh">
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <title>花夜前行 · Travel Map | 黑瞎子 × 解雨臣</title>
-  <style>
-    @font-face {
-      font-family: "My Font";
-      src: url("./font1.ttf") format("truetype");
-      font-weight: 400;
-      font-display: swap;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>黑黑花花的俄罗斯方块</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
 
-    :root {
-      --bg-main: #06060c;
-      --bg-grad-1: #1c0f22;
-      --bg-grad-2: #0a0a12;
-      --bg-grad-3: #030307;
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #0f0b1e 0%, #1a0f2e 100%);
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 5px;
+            overflow-x: hidden;
+        }
 
-      --panel-bg-1: rgba(48, 30, 55, 0.72);
-      --panel-bg-2: rgba(22, 18, 32, 0.88);
-      --card-bg: rgba(255, 255, 255, 0.07);
-      --card-bg-hover: rgba(255, 77, 148, 0.14);
+        .header {
+            text-align: center;
+            margin: 5px 0 10px;
+            width: 340px;
+        }
 
-      --card-border: rgba(255, 168, 203, 0.55);
-      --card-border-hover: rgba(255, 200, 222, 0.95);
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 3px;
+            background: linear-gradient(to right, #ff2a8f, #ff7eb3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 2px 10px rgba(255, 42, 143, 0.3);
+        }
 
-      --text-main: #f5f5fa;
-      --text-sub: #e2e2f0;
-      --text-dim: #a8a8be;
-      --text-label: #ffa8cb;
+        .subtitle {
+            color: #ff9ec9;
+            font-size: 0.8rem;
+            opacity: 0.9;
+        }
 
-      --primary: #ff4d94;
-      --primary-light: #ff77b0;
-      --primary-soft: #ff9ecb;
-      --primary-deep: #d13a7c;
-      --yellow: #ffd54a;
-      --blue: #4db8ff;
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 340px;
+            height: 550px;
+            margin-left: 5px; /* 添加左边距 */
+        }
 
-      --title-grad: linear-gradient(135deg, #ff4d94 0%, #ff9ecb 50%, #ffd54a 100%);
+        .main-game {
+            display: grid;
+            grid-template-columns: 210px 100px;
+            grid-template-rows: 320px 100px 70px; /* 改为三行：第一行游戏棋盘和分数道具，第二行操作键，第三行左边按钮 */
+            gap: 10px;
+            width: 320px;
+            height: 500px; /* 调整总高度 */
+            margin-bottom: 10px;
+        }
 
-      --r-sm: 10px;
-      --r-md: 14px;
-      --r-lg: 20px;
-    }
+        /* 左上：游戏棋盘区域 */
+        .game-board-container {
+            grid-column: 1;
+            grid-row: 1 / span 2; /* 跨两行，包含游戏棋盘和左边按钮的位置 */
+            position: relative;
+            background: linear-gradient(145deg, rgba(20, 10, 30, 0.9), rgba(30, 15, 40, 0.9));
+            border-radius: 12px;
+            padding: 8px;
+            box-shadow: 0 8px 20px rgba(255, 42, 143, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 122, 179, 0.2);
+            width: 210px;
+            height: 440px; /* 保持原高度，但位置变了 */
+            box-sizing: border-box;
+        }
 
-    body.light-mode {
-      --bg-main: #fdfaf5;
-      --bg-grad-1: #fffdf8;
-      --bg-grad-2: #fbf5ea;
-      --bg-grad-3: #f5ecd9;
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            grid-template-rows: repeat(20, 1fr);
+            width: 194px;
+            height: 388px;
+            background-color: rgba(10, 5, 20, 0.9);
+            border: 2px solid rgba(255, 122, 179, 0.3);
+            border-radius: 6px;
+            overflow: hidden;
+            transition: background-color 0.5s, filter 0.5s;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+        }
 
-      --panel-bg-1: rgba(255, 255, 255, 0.92);
-      --panel-bg-2: rgba(255, 252, 246, 0.96);
-      --card-bg: rgba(255, 255, 255, 0.9);
-      --card-bg-hover: rgba(255, 249, 242, 1);
-      --card-border: rgba(220, 195, 170, 0.55);
-      --card-border-hover: rgba(255, 150, 190, 0.7);
+        /* 夜幕降临效果 - 全黑 */
+        .night-fall {
+            background-color: #000 !important;
+            filter: brightness(0.1);
+        }
 
-      --text-main: #4a2a1a;
-      --text-sub: #6a4a3a;
-      --text-dim: #9a7a6a;
-      --text-label: #a05a3a;
-    }
+        /* 冤魂效果 - 黑色方块 */
+        .yuan-ghost .cell.filled.i,
+        .yuan-ghost .cell.filled.j,
+        .yuan-ghost .cell.filled.l,
+        .yuan-ghost .cell.filled.o,
+        .yuan-ghost .cell.filled.s,
+        .yuan-ghost .cell.filled.t,
+        .yuan-ghost .cell.filled.z {
+            background-color: #000000 !important;
+            border-color: #444444 !important;
+        }
 
-    html, body {
-      margin: 0; padding: 0; height: 100%;
-      overflow: hidden;
-      font-family: "My Font", -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
-      background: radial-gradient(ellipse at 30% 20%, var(--bg-grad-1) 0%, var(--bg-grad-2) 60%, var(--bg-grad-3) 100%);
-      color: var(--text-main);
-      transition: background 0.6s ease, color 0.6s ease;
-    }
-    #globeViz { width: 100vw; height: 100vh; position: relative; z-index: 1; }
+        /* 流血天气效果 - 红色方块 */
+        .blood-weather .cell.filled.i,
+        .blood-weather .cell.filled.j,
+        .blood-weather .cell.filled.l,
+        .blood-weather .cell.filled.o,
+        .blood-weather .cell.filled.s,
+        .blood-weather .cell.filled.t,
+        .blood-weather .cell.filled.z {
+            background-color: #ff2a2a !important;
+            border-color: #ff7a7a !important;
+        }
 
-    #loader {
-      position: fixed; inset: 0; z-index: 999;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      gap: 22px;
-      background: radial-gradient(ellipse at 50% 40%, #1c0f22 0%, #06060c 100%);
-      transition: opacity 0.6s ease;
-    }
-    body.light-mode #loader {
-      background: radial-gradient(ellipse at 50% 40%, #fffdf8 0%, #f5ecd9 100%);
-    }
-    #loader.hidden { opacity: 0; pointer-events: none; }
-    #loader-ring {
-      width: 46px; height: 46px;
-      border: 3px solid rgba(255, 77, 148, 0.18);
-      border-top-color: var(--primary);
-      border-radius: 50%;
-      animation: spin 0.9s linear infinite;
-      box-shadow: 0 0 24px rgba(255, 77, 148, 0.35);
-    }
-    body.light-mode #loader-ring {
-      box-shadow: 0 4px 16px rgba(255, 77, 148, 0.2);
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    #loader-text {
-      font-size: 12px; letter-spacing: 5px;
-      color: var(--primary-soft);
-      text-shadow: 0 0 14px rgba(255, 77, 148, 0.6);
-    }
-    body.light-mode #loader-text {
-      color: var(--primary-deep);
-      text-shadow: none;
-    }
+        /* 右上：信息区域 */
+        .right-section {
+            grid-column: 2;
+            grid-row: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 130px;
+            height: 340px;
+        }
 
-    #top-bar {
-      position: fixed;
-      top: 24px; left: 50%;
-      transform: translateX(-50%);
-      z-index: 20;
-      display: flex; align-items: center; gap: 20px;
-      animation: fadeInDown 0.8s ease;
-      pointer-events: none;
-    }
-    #top-line-left, #top-line-right {
-      width: 80px; height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(255, 77, 148, 0.6));
-    }
-    #top-line-right {
-      background: linear-gradient(90deg, rgba(255, 77, 148, 0.6), transparent);
-    }
-    body.light-mode #top-line-left {
-      background: linear-gradient(90deg, transparent, rgba(209, 58, 124, 0.35));
-    }
-    body.light-mode #top-line-right {
-      background: linear-gradient(90deg, rgba(209, 58, 124, 0.35), transparent);
-    }
-    #top-text-wrap { text-align: center; }
-    #top-title {
-      font-size: 28px; font-weight: 800; letter-spacing: 4px;
-      background: var(--title-grad);
-      -webkit-background-clip: text; background-clip: text;
-      -webkit-text-fill-color: transparent;
-      filter: drop-shadow(0 0 20px rgba(255, 77, 148, 0.55));
-      animation: titleGlow 3s ease-in-out infinite;
-    }
-    @keyframes titleGlow {
-      0%,100% { filter: drop-shadow(0 0 20px rgba(255,77,148,0.55)); }
-      50%     { filter: drop-shadow(0 0 32px rgba(255,77,148,0.85)) drop-shadow(0 0 48px rgba(255,213,74,0.4)); }
-    }
-    body.light-mode #top-title {
-      background: linear-gradient(135deg, #d13a7c 0%, #ff4d94 55%, #d18f00 100%);
-      -webkit-background-clip: text; background-clip: text;
-      filter: none;
-      animation: none;
-    }
-    #top-subtitle {
-      margin-top: 8px;
-      font-size: 12px; letter-spacing: 3px;
-      color: var(--yellow);
-      text-shadow: 0 0 14px rgba(255, 213, 74, 0.5);
-    }
-    body.light-mode #top-subtitle {
-      color: #a05a3a;
-      text-shadow: none;
-      opacity: 0.85;
-    }
-    @keyframes fadeInDown {
-      from { opacity: 0; transform: translate(-50%, -12px); }
-      to   { opacity: 1; transform: translate(-50%, 0); }
-    }
 
-    #sidebar {
-      position: fixed; top: 0; left: 0;
-      width: 280px; height: 100vh;
-      background: linear-gradient(160deg, #160c1c 0%, #0a0810 100%);
-      backdrop-filter: blur(24px) saturate(1.4);
-      color: var(--text-main);
-      box-sizing: border-box;
-      display: flex; flex-direction: column;
-      z-index: 10;
-      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), background 0.6s;
-      border-right: 1px solid rgba(255, 77, 148, 0.16);
-      box-shadow: 4px 0 60px rgba(255, 77, 148, 0.12);
-      padding-top: 90px;
-    }
-    body.light-mode #sidebar {
-      background: linear-gradient(160deg, #ffffff 0%, #fbf5ea 100%);
-      border-right: 1px solid rgba(220, 195, 170, 0.5);
-      box-shadow: 4px 0 40px rgba(200, 160, 130, 0.1);
-    }
-    #sidebar::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0; height: 200px;
-      background: radial-gradient(ellipse at 50% 0%, rgba(255, 77, 148, 0.18), transparent 70%);
-      pointer-events: none;
-    }
-    body.light-mode #sidebar::before {
-      background: radial-gradient(ellipse at 50% 0%, rgba(255, 200, 220, 0.35), transparent 70%);
-    }
-    #sidebar.collapsed { transform: translateX(-100%); }
+        /* 修改合并的分数和下一个方块面板 */
+        .combined-panel {
+            background: linear-gradient(145deg, rgba(20, 10, 30, 0.9), rgba(30, 15, 40, 0.9));
+            border-radius: 12px;
+            padding: 10px;
+            box-shadow: 0 4px 15px rgba(255, 42, 143, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 122, 179, 0.2);
+            height: 90px; /* 降低高度，因为是并排 */
+        }
 
-    #sidebar-header {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0 18px 16px;
-      font-size: 15px; font-weight: 700; letter-spacing: 2px;
-      color: var(--primary);
-      border-bottom: 1px solid rgba(255, 77, 148, 0.15);
-      flex-shrink: 0;
-      text-shadow: 0 0 12px rgba(255, 77, 148, 0.4);
-    }
-    body.light-mode #sidebar-header {
-      color: #a05a3a;
-      border-bottom-color: rgba(220, 195, 170, 0.5);
-      text-shadow: none;
-    }
-    #collapse-btn {
-      background: transparent; border: none;
-      color: var(--primary);
-      font-size: 15px; cursor: pointer;
-      padding: 4px 8px; border-radius: var(--r-sm);
-      transition: all 0.2s;
-    }
-    body.light-mode #collapse-btn { color: #a05a3a; }
-    #collapse-btn:hover {
-      background: rgba(255, 77, 148, 0.15);
-      transform: translateX(-2px);
-    }
+        /* 水平布局 */
+        .combined-content.horizontal {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            height: 100%;
+        }
 
-    #sidebar-body {
-      padding: 16px 12px 18px;
-      display: flex; flex-direction: column; gap: 12px;
-      overflow: hidden; flex: 1; min-height: 0;
-      background: transparent;
-    }
+        /* 分数区域调整 */
+        .score-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            height: 100%;
+        }
 
-    .panel-section {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      padding: 12px 12px 14px;
-      border-radius: var(--r-md);
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      backdrop-filter: blur(12px);
-      transition: all 0.3s ease;
-    }
-    body.light-mode .panel-section {
-      background: #ffffff;
-      border: 1px solid rgba(220, 195, 170, 0.45);
-      box-shadow: 0 2px 10px rgba(200, 160, 130, 0.08);
-    }
-    .panel-section:hover {
-      background: var(--card-bg-hover);
-      border-color: var(--card-border-hover);
-      box-shadow: 0 0 24px rgba(255, 77, 148, 0.18);
-    }
-    body.light-mode .panel-section:hover {
-      background: #fffdf9;
-      border-color: rgba(255, 150, 190, 0.6);
-      box-shadow: 0 4px 16px rgba(255, 150, 190, 0.18);
-    }
-    .panel-section-grow {
-      flex: 1;
-      min-height: 0;
-    }
-    .panel-label {
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 2.5px;
-      color: var(--text-label);
-      text-shadow: 0 0 8px rgba(255, 77, 148, 0.45);
-      padding-left: 4px;
-    }
-    body.light-mode .panel-label {
-      color: #a05a3a;
-      text-shadow: none;
-      opacity: 0.9;
-    }
+            .score-section .info-title {
+                margin-bottom: 8px;
+                color: #ff7eb3;
+                font-size: 2rem;
+                font-weight: 600;
+                text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+            }
 
-    #role-tabs { display: flex; gap: 8px; }
-    .role-tab {
-      position: relative;
-      flex: 1;
-      padding: 10px 0;
-      border-radius: var(--r-sm);
-      border: 1px solid rgba(255, 77, 148, 0.3);
-      background: rgba(255, 77, 148, 0.05);
-      color: #ffa8cb;
-      font-size: 13px; font-weight: 600;
-      cursor: pointer;
-      transition: all 0.25s;
-      letter-spacing: 0.5px;
-      overflow: hidden;
-    }
-    body.light-mode .role-tab {
-      background: #fff5f8;
-      color: #c02a6a;
-      border-color: rgba(255, 150, 190, 0.6);
-    }
-    .role-tab::before {
-      content: attr(data-key);
-      position: absolute; top: 3px; right: 8px;
-      font-size: 9px;
-      color: rgba(255, 255, 255, 0.3);
-      font-weight: 400;
-    }
-    body.light-mode .role-tab::before {
-      color: rgba(160, 90, 58, 0.4);
-    }
-    .role-tab:hover {
-      background: rgba(255, 77, 148, 0.18);
-      color: #fff;
-      border-color: rgba(255, 77, 148, 0.7);
-      transform: translateY(-1px);
-      box-shadow: 0 0 20px rgba(255, 77, 148, 0.4);
-    }
-    body.light-mode .role-tab:hover {
-      color: #fff;
-      background: var(--primary);
-      border-color: var(--primary);
-      box-shadow: 0 4px 14px rgba(255, 77, 148, 0.3);
-    }
-    .role-tab.active {
-      background: linear-gradient(135deg, var(--primary), var(--primary-light));
-      color: #fff;
-      border-color: var(--primary);
-      box-shadow: 0 0 24px rgba(255,77,148,0.6), inset 0 1px 0 rgba(255,255,255,0.3);
-    }
-    body.light-mode .role-tab.active {
-      box-shadow: 0 4px 16px rgba(255, 77, 148, 0.35);
-    }
-    .ripple {
-      position: absolute;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.6);
-      transform: scale(0);
-      animation: rippleAnim 0.6s ease-out;
-      pointer-events: none;
-    }
-    @keyframes rippleAnim {
-      to { transform: scale(4); opacity: 0; }
-    }
+        .score-display {
+            font-size: 1rem; /* 可以适当调整大小 */
+            text-align: center;
+            font-weight: bold;
+            color: #ff4d9e;
+            text-shadow: 0 2px 8px rgba(255, 77, 158, 0.5);
+            margin: 0;
+        }
 
-    #country-input {
-      width: 100%; box-sizing: border-box;
-      padding: 11px 14px;
-      font-size: 14px; border-radius: var(--r-sm);
-      border: 1px solid rgba(255, 77, 148, 0.22);
-      background: rgba(0, 0, 0, 0.35);
-      color: var(--text-main);
-      outline: none;
-      transition: all 0.25s;
-    }
-    body.light-mode #country-input {
-      background: #fffdf9;
-      color: var(--text-main);
-      border-color: rgba(220, 195, 170, 0.6);
-    }
-    #country-input::placeholder { color: var(--text-dim); }
-    #country-input:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(255,77,148,0.15), 0 0 24px rgba(255,77,148,0.35);
-    }
-    body.light-mode #country-input:focus {
-      background: #fff;
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(255,77,148,0.15), 0 2px 10px rgba(255,77,148,0.12);
-    }
+        /* 下一个方块区域调整 */
+        .next-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            height: 100%;
+        }
 
-    #country-select {
-      width: 100%; box-sizing: border-box;
-      font-size: 14px; border-radius: var(--r-sm);
-      border: 1px solid rgba(255, 77, 148, 0.15);
-      background: rgba(0, 0, 0, 0.3);
-      color: var(--text-main);
-      outline: none; padding: 6px;
-      flex: 1; min-height: 0;
-      overflow-y: auto;
-      transition: background 0.6s, color 0.6s;
-    }
-    body.light-mode #country-select {
-      background: #fffdf9;
-      border-color: rgba(220, 195, 170, 0.5);
-    }
-    #country-select option {
-      padding: 9px 10px;
-      border-radius: 6px;
-      background: #1a1420;
-      color: var(--text-sub);
-    }
-    body.light-mode #country-select option {
-      background: #ffffff;
-      color: var(--text-main);
-    }
-    #country-select option:checked {
-      background: var(--primary-deep);
-      color: #fff;
-    }
+            .next-section .info-title {
+                margin-bottom: 8px;
+                color: #ff7eb3;
+                font-size: 1rem;
+                font-weight: 600;
+                text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+            }
 
-    .scroll-pink::-webkit-scrollbar { width: 8px; }
-    .scroll-pink::-webkit-scrollbar-track {
-      background: rgba(255, 77, 148, 0.06);
-      border-radius: 4px;
-    }
-    .scroll-pink::-webkit-scrollbar-thumb {
-      background: linear-gradient(180deg, var(--primary), var(--primary-light));
-      border-radius: 4px;
-      border: 1px solid rgba(255, 77, 148, 0.25);
-      box-shadow: 0 0 10px rgba(255, 77, 148, 0.5);
-    }
-    .scroll-pink::-webkit-scrollbar-thumb:hover {
-      background: linear-gradient(180deg, var(--primary-light), var(--primary-soft));
-    }
-    body.light-mode .scroll-pink::-webkit-scrollbar-thumb {
-      box-shadow: none;
-      border-color: rgba(255, 77, 148, 0.2);
-    }
-    body.light-mode .scroll-pink::-webkit-scrollbar-track {
-      background: rgba(255, 77, 148, 0.08);
-    }
+        .next-piece-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
-    #toggle-btn {
-      position: fixed; top: 24px; left: 0;
-      width: 44px; height: 52px;
-      border-radius: 0 var(--r-md) var(--r-md) 0;
-      border: 1px solid rgba(255, 77, 148, 0.4);
-      border-left: none;
-      background: linear-gradient(160deg, var(--panel-bg-1), var(--panel-bg-2));
-      backdrop-filter: blur(20px);
-      color: var(--primary);
-      font-size: 18px;
-      cursor: pointer;
-      z-index: 11; display: none;
-      transition: all 0.2s;
-    }
-    body.light-mode #toggle-btn {
-      border-color: rgba(220, 195, 170, 0.6);
-      color: var(--primary-deep);
-    }
-    #toggle-btn:hover {
-      color: #fff;
-      background: linear-gradient(135deg, var(--primary), var(--primary-light));
-      box-shadow: 0 0 24px rgba(255, 77, 148, 0.6);
-    }
-    #toggle-btn.show { display: block; }
+        .next-piece-board {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(4, 1fr);
+            width: 70px; /* 调整为适合并排的大小 */
+            height: 70px;
+            background-color: rgba(10, 5, 20, 0.9);
+            border-radius: 6px;
+            border: 1px solid rgba(255, 122, 179, 0.3);
+        }
 
-    #top-right {
-      position: fixed; top: 24px; right: 24px;
-      z-index: 20;
-      display: flex; gap: 12px; align-items: flex-start;
-    }
-    #theme-btn, #dev-btn {
-      width: 40px; height: 40px;
-      border-radius: var(--r-sm);
-      border: 1px solid rgba(255, 77, 148, 0.4);
-      background: linear-gradient(160deg, var(--panel-bg-1), var(--panel-bg-2));
-      backdrop-filter: blur(20px);
-      color: var(--primary);
-      font-size: 17px;
-      cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      transition: all 0.25s;
-    }
-    body.light-mode #theme-btn, body.light-mode #dev-btn {
-      background: #ffffff;
-      border-color: rgba(220, 195, 170, 0.6);
-      color: var(--primary-deep);
-      box-shadow: 0 2px 10px rgba(200, 160, 130, 0.1);
-    }
-    #theme-btn { font-style: normal; }
-    #dev-btn { font-style: italic; font-family: Georgia, serif; }
-    #theme-btn:hover, #dev-btn:hover {
-      color: #fff;
-      transform: translateY(-2px);
-      background: linear-gradient(135deg, var(--primary), var(--primary-light));
-      box-shadow: 0 8px 32px rgba(255, 77, 148, 0.7);
-    }
-    body.light-mode #theme-btn:hover, body.light-mode #dev-btn:hover {
-      box-shadow: 0 6px 20px rgba(255, 77, 148, 0.35);
-    }
 
-    #export-btn {
-      height: 40px;
-      padding: 0 14px;
-      border-radius: var(--r-sm);
-      border: 1px solid rgba(77, 184, 255, 0.4);
-      background: linear-gradient(160deg, rgba(25, 40, 60, 0.7), rgba(10, 20, 35, 0.85));
-      backdrop-filter: blur(20px);
-      color: var(--blue);
-      font-size: 13px;
-      font-weight: 600;
-      letter-spacing: 0.5px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      transition: all 0.25s;
-    }
-    body.light-mode #export-btn {
-      background: #ffffff;
-      color: #1a7ac8;
-      border-color: rgba(77, 184, 255, 0.5);
-      box-shadow: 0 2px 10px rgba(100, 170, 220, 0.12);
-    }
-    #export-btn:hover {
-      color: #0a0a12;
-      background: linear-gradient(135deg, var(--blue), #7dd0ff);
-      transform: translateY(-2px);
-      box-shadow: 0 8px 32px rgba(77, 184, 255, 0.6);
-    }
-    body.light-mode #export-btn:hover {
-      color: #fff;
-      box-shadow: 0 6px 20px rgba(77, 184, 255, 0.35);
-    }
-    #fav-count {
-      font-size: 12px;
-      color: var(--yellow);
-      font-weight: 700;
-      font-variant-numeric: tabular-nums;
-    }
-    body.light-mode #fav-count { color: #d18f00; }
+        /* 分数区域 */
+        .score-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 70px;
+        }
 
-    #bottom-right {
-      position: fixed; right: 24px; bottom: 24px;
-      z-index: 10;
-      display: flex; flex-direction: column; align-items: flex-end; gap: 12px;
-    }
-    #legend {
-      background: linear-gradient(160deg, var(--panel-bg-1), var(--panel-bg-2));
-      backdrop-filter: blur(20px);
-      border: 1px solid var(--card-border);
-      border-radius: var(--r-md);
-      padding: 12px 16px;
-      font-size: 13px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 32px rgba(255, 77, 148, 0.12);
-      min-width: 130px;
-      transition: background 0.6s, color 0.6s, border-color 0.6s;
-    }
-    body.light-mode #legend {
-      background: #ffffff;
-      border-color: rgba(220, 195, 170, 0.5);
-      box-shadow: 0 4px 16px rgba(200, 160, 130, 0.12);
-    }
-    #legend .legend-title {
-      color: var(--yellow); font-weight: 700; font-size: 10px;
-      letter-spacing: 2.5px; margin-bottom: 8px;
-      text-shadow: 0 0 10px rgba(255, 213, 74, 0.5);
-    }
-    body.light-mode #legend .legend-title {
-      color: #a05a3a;
-      text-shadow: none;
-    }
-    #legend .legend-row {
-      display: flex; align-items: center; gap: 10px;
-      padding: 4px 0;
-      color: var(--text-sub);
-    }
-    #legend .legend-dot {
-      width: 10px; height: 10px; border-radius: 50%;
-      flex-shrink: 0;
-      box-shadow: 0 0 10px currentColor;
-    }
-    body.light-mode #legend .legend-dot {
-      box-shadow: none;
-    }
-    #rotate-btn {
-      width: 46px; height: 46px;
-      border-radius: var(--r-md);
-      border: 1px solid rgba(255, 77, 148, 0.35);
-      background: linear-gradient(160deg, var(--panel-bg-1), var(--panel-bg-2));
-      backdrop-filter: blur(20px);
-      color: var(--primary); font-size: 18px;
-      cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      transition: all 0.25s;
-    }
-    body.light-mode #rotate-btn {
-      background: #ffffff;
-      color: var(--primary-deep);
-      border-color: rgba(220, 195, 170, 0.6);
-      box-shadow: 0 2px 10px rgba(200, 160, 130, 0.1);
-    }
-    #rotate-btn:hover {
-      color: #fff;
-      transform: translateY(-2px);
-      background: linear-gradient(135deg, var(--primary), var(--primary-light));
-      box-shadow: 0 0 28px rgba(255, 77, 148, 0.6);
-    }
-    #rotate-btn.paused { color: var(--yellow); }
-    body.light-mode #rotate-btn.paused { color: #d18f00; }
+            .score-section .info-title {
+                margin-bottom: 5px;
+                color: #ff7eb3;
+                font-size: 0.85rem;
+                font-weight: 600;
+                text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+            }
 
-    #overlay {
-      position: fixed; inset: 0;
-      background: rgba(5, 5, 12, 0.6);
-      backdrop-filter: blur(6px);
-      opacity: 0; visibility: hidden;
-      transition: opacity 0.3s, visibility 0.3s;
-      z-index: 99;
-    }
-    body.light-mode #overlay {
-      background: rgba(80, 60, 50, 0.18);
-    }
-    #overlay.show { opacity: 1; visibility: visible; }
+        .score-display {
+            font-size: 1rem;
+            text-align: center;
+            font-weight: bold;
+            color: #ff4d9e;
+            text-shadow: 0 2px 8px rgba(255, 77, 158, 0.5);
+            margin: 0;
+        }
 
-    #info-card {
-      position: fixed; top: 50%; left: 50%;
-      transform: translate(-50%, calc(-50% + 30px)) scale(0.94);
-      width: 600px; max-width: 88vw; max-height: 78vh;
-      display: none; flex-direction: column;
-      background: linear-gradient(160deg, var(--panel-bg-1), var(--panel-bg-2));
-      backdrop-filter: blur(32px) saturate(1.4);
-      color: var(--text-main);
-      border-radius: var(--r-lg);
-      font-size: 15px; line-height: 1.8;
-      z-index: 100; opacity: 0;
-      transition: opacity 0.4s cubic-bezier(0.2, 0.8, 0.2, 1),
-                  transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1),
-                  background 0.6s;
-      border: 1px solid rgba(255, 77, 148, 0.4);
-      box-shadow: 0 24px 80px rgba(0,0,0,0.85), 0 0 70px rgba(255,77,148,0.35);
-      overflow: hidden;
-    }
-    body.light-mode #info-card {
-      background: #ffffff;
-      border-color: rgba(220, 195, 170, 0.6);
-      box-shadow: 0 24px 60px rgba(120, 90, 70, 0.15);
-    }
-    #info-card::before {
-      content: '';
-      position: absolute; top: 0; left: 0; right: 0; height: 160px;
-      background: radial-gradient(ellipse at 50% 0%, rgba(255, 77, 148, 0.25), transparent 70%);
-      pointer-events: none;
-    }
-    body.light-mode #info-card::before {
-      background: radial-gradient(ellipse at 50% 0%, rgba(255, 200, 220, 0.35), transparent 70%);
-    }
-    #info-card.show {
-      display: flex;
-      opacity: 1;
-      transform: translate(-50%, -50%) scale(1);
-    }
+        /* 下一个方块区域 */
+        .next-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 90px;
+        }
 
-    #close-btn {
-      position: absolute; top: 18px; right: 20px;
-      width: 32px; height: 32px;
-      border-radius: var(--r-sm);
-      background: rgba(255, 77, 148, 0.1);
-      border: 1px solid rgba(255, 77, 148, 0.3);
-      color: var(--primary-soft); font-size: 15px;
-      cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      transition: all 0.2s;
-      z-index: 2;
-    }
-    body.light-mode #close-btn {
-      color: var(--primary-deep);
-      background: #fff5f8;
-      border-color: rgba(255, 150, 190, 0.5);
-    }
-    #close-btn:hover {
-      background: var(--primary); color: #fff;
-      transform: rotate(90deg) scale(1.1);
-      box-shadow: 0 0 20px rgba(255, 77, 148, 0.7);
-    }
-    #fav-btn {
-      position: absolute; top: 18px; right: 62px;
-      width: 32px; height: 32px;
-      border-radius: var(--r-sm);
-      background: rgba(255, 77, 148, 0.1);
-      border: 1px solid rgba(255, 77, 148, 0.3);
-      color: var(--primary-soft); font-size: 16px;
-      cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      transition: all 0.2s;
-      z-index: 2;
-    }
-    body.light-mode #fav-btn {
-      color: var(--primary-deep);
-      background: #fff5f8;
-      border-color: rgba(255, 150, 190, 0.5);
-    }
-    #fav-btn:hover {
-      background: rgba(255, 213, 74, 0.2);
-      color: var(--yellow);
-      transform: scale(1.1);
-    }
-    #fav-btn.faved {
-      color: var(--yellow);
-      border-color: rgba(255, 213, 74, 0.8);
-      background: rgba(255, 213, 74, 0.15);
-      box-shadow: 0 0 20px rgba(255, 213, 74, 0.5);
-    }
-    body.light-mode #fav-btn.faved {
-      color: #d18f00;
-      border-color: rgba(209, 143, 0, 0.6);
-      background: rgba(255, 213, 74, 0.2);
-      box-shadow: none;
-    }
+            .next-section .info-title {
+                margin-bottom: 5px;
+                color: #ff7eb3;
+                font-size: 0.85rem;
+                font-weight: 600;
+                text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+            }
 
-    #info-content {
-      display: flex; flex-direction: column;
-      flex: 1; min-height: 0;
-      padding: 32px 36px 26px;
-      overflow: hidden;
-      position: relative;
-      z-index: 1;
-    }
+        .next-piece-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
-    #info-role-tag, #info-title, #info-body-wrap, #text-switcher {
-      opacity: 0; transform: translateY(8px);
-      transition: opacity 0.4s ease, transform 0.4s ease;
-    }
-    #info-card.show #info-role-tag { opacity: 1; transform: none; transition-delay: 0.10s; }
-    #info-card.show #info-title    { opacity: 1; transform: none; transition-delay: 0.18s; }
-    #info-card.show #info-body-wrap{ opacity: 1; transform: none; transition-delay: 0.26s; }
-    #info-card.show #text-switcher { opacity: 1; transform: none; transition-delay: 0.34s; }
+        .next-piece-board {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(4, 1fr);
+            width: 50px;
+            height: 50px;
+            background-color: rgba(10, 5, 20, 0.9);
+            border-radius: 6px;
+            border: 1px solid rgba(255, 122, 179, 0.3);
+        }
 
-    #info-role-tag {
-      display: inline-flex; align-items: center; gap: 8px;
-      padding: 5px 14px; border-radius: 999px;
-      font-size: 12px; font-weight: 600; letter-spacing: 1.5px;
-      color: #fff;
-      align-self: flex-start;
-      margin-bottom: 10px;
-      border: 1px solid;
-    }
-    #info-role-tag .dot {
-      width: 8px; height: 8px; border-radius: 50%;
-      box-shadow: 0 0 10px currentColor;
-    }
-    body.light-mode #info-role-tag .dot { box-shadow: none; }
-    #info-role-tag.role-黑瞎子 {
-      color: #ffd54a;
-      border-color: rgba(255, 213, 74, 0.6);
-      background: rgba(255, 213, 74, 0.12);
-    }
-    body.light-mode #info-role-tag.role-黑瞎子 {
-      color: #a06a00;
-      background: rgba(255, 213, 74, 0.18);
-      border-color: rgba(209, 143, 0, 0.5);
-    }
-    #info-role-tag.role-解雨臣 {
-      color: #ff4d94;
-      border-color: rgba(255, 77, 148, 0.5);
-      background: rgba(255, 77, 148, 0.12);
-    }
-    body.light-mode #info-role-tag.role-解雨臣 {
-      color: #c02a6a;
-      background: rgba(255, 77, 148, 0.12);
-      border-color: rgba(255, 77, 148, 0.4);
-    }
-    #info-role-tag.role-黑花 {
-      color: #4db8ff;
-      border-color: rgba(77, 184, 255, 0.6);
-      background: rgba(77, 184, 255, 0.12);
-    }
-    body.light-mode #info-role-tag.role-黑花 {
-      color: #1a7ac8;
-      background: rgba(77, 184, 255, 0.15);
-      border-color: rgba(77, 184, 255, 0.5);
-    }
+        /* 道具栏 */
+        .items-panel {
+            flex: 1;
+            background: linear-gradient(145deg, rgba(20, 10, 30, 0.9), rgba(30, 15, 40, 0.9));
+            border-radius: 12px;
+            padding: 8px; /* 改为8px */
+            box-shadow: 0 4px 15px rgba(255, 42, 143, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 122, 179, 0.2);
+            height: 200px; /* 改为200px */
+            overflow-y: auto;
+        }
 
-    #info-title {
-      font-size: 26px; font-weight: 700; letter-spacing: 1.5px;
-      margin-bottom: 16px;
-      background: linear-gradient(135deg, #ffffff, #ffccdf);
-      -webkit-background-clip: text; background-clip: text;
-      -webkit-text-fill-color: transparent;
-      line-height: 1.35;
-    }
-    body.light-mode #info-title {
-      background: linear-gradient(135deg, #d13a7c, #ff4d94);
-      -webkit-background-clip: text; background-clip: text;
-    }
-    #info-body-wrap {
-      flex: 1; min-height: 0;
-      overflow-y: auto;
-      padding: 20px 22px;
-      border-radius: var(--r-md);
-      background: rgba(0, 0, 0, 0.32);
-      border: 1px solid rgba(255, 77, 148, 0.15);
-      box-shadow: inset 0 0 40px rgba(255, 77, 148, 0.06);
-    }
-    body.light-mode #info-body-wrap {
-      background: #fffdf9;
-      border-color: rgba(220, 195, 170, 0.5);
-      box-shadow: none;
-    }
-    #text-body {
-      white-space: pre-wrap;
-      color: var(--text-sub);
-      font-size: 15px; line-height: 1.9;
-      letter-spacing: 0.3px;
-    }
-    body.light-mode #text-body { color: #4a3a32; }
-    #text-source {
-      margin-top: 12px;
-      font-size: 11px;
-      color: var(--text-dim);
-      opacity: 0.7;
-      letter-spacing: 0.3px;
-      font-style: normal;
-      border: none;
-      padding: 0;
-    }
-    body.light-mode #text-source {
-      color: var(--text-dim);
-      opacity: 0.75;
-    }
-    #text-source:empty { display: none; }
+            /* 道具栏标题 */
+            .items-panel .info-title {
+                margin-bottom: 8px; /* 改为8px */
+                color: #ff7eb3;
+                font-size: 0.85rem; /* 改为0.85rem */
+                font-weight: 600;
+                text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+                text-align: center;
+            }
 
-    #text-switcher {
-      display: flex; align-items: center; justify-content: flex-end;
-      gap: 14px; margin-top: 18px; padding-top: 16px;
-      border-top: 1px solid rgba(255, 77, 148, 0.15);
-      flex-shrink: 0;
-    }
-    body.light-mode #text-switcher {
-      border-top-color: rgba(220, 195, 170, 0.5);
-    }
-    #text-switcher.hidden { display: none; }
-    #text-label {
-      font-size: 13px; font-weight: 600;
-      color: var(--yellow); letter-spacing: 1px;
-      min-width: 90px; text-align: center;
-      font-variant-numeric: tabular-nums;
-    }
-    body.light-mode #text-label { color: #d18f00; }
-    #switch-prev, #switch-next {
-      width: 38px; height: 38px;
-      border-radius: var(--r-sm);
-      border: 1px solid rgba(255, 77, 148, 0.4);
-      background: rgba(255, 77, 148, 0.1);
-      color: var(--primary); font-size: 15px;
-      display: flex; align-items: center; justify-content: center;
-      transition: all 0.2s;
-      cursor: pointer;
-    }
-    body.light-mode #switch-prev, body.light-mode #switch-next {
-      color: var(--primary-deep);
-      background: #fff5f8;
-      border-color: rgba(255, 150, 190, 0.6);
-    }
-    #switch-prev:hover:not(:disabled),
-    #switch-next:hover:not(:disabled) {
-      background: var(--primary); color: #fff;
-      transform: translateY(-2px);
-      box-shadow: 0 0 20px rgba(255, 77, 148, 0.6);
-    }
-    body.light-mode #switch-prev:hover:not(:disabled),
-    body.light-mode #switch-next:hover:not(:disabled) {
-      box-shadow: 0 4px 14px rgba(255, 77, 148, 0.3);
-    }
-    #switch-prev:disabled, #switch-next:disabled { opacity: 0.2; cursor: default; }
+        /* 道具样式 */
+        .item {
+            position: relative;
+            overflow: hidden;
+            border-radius: 8px;
+            border-left: 3px solid;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(145deg, rgba(30, 15, 40, 0.9), rgba(20, 10, 30, 0.9));
+            margin-bottom: 6px; /* 改为6px */
+            height: 42px; /* 改为42px */
+        }
 
-    #hover-tip {
-      position: fixed; pointer-events: none;
-      background: linear-gradient(135deg, var(--primary), var(--primary-light));
-      color: #fff; padding: 6px 14px; border-radius: var(--r-sm);
-      font-size: 13px; font-weight: 600;
-      opacity: 0; transform: translateY(-4px);
-      transition: opacity 0.2s, transform 0.2s;
-      z-index: 200; white-space: nowrap;
-      box-shadow: 0 4px 16px rgba(255, 77, 148, 0.5), 0 0 24px rgba(255, 77, 148, 0.4);
-    }
-    body.light-mode #hover-tip {
-      box-shadow: 0 4px 14px rgba(255, 77, 148, 0.3);
-    }
-    #hover-tip.show { opacity: 1; transform: translateY(0); }
+            .item:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+            }
 
-    #dev-panel {
-      position: fixed; top: 50%; left: 50%;
-      transform: translate(-50%, calc(-50% + 20px)) scale(0.96);
-      width: 520px; max-width: 88vw; max-height: 72vh;
-      display: none; flex-direction: column;
-      background: linear-gradient(160deg, var(--panel-bg-1), var(--panel-bg-2));
-      backdrop-filter: blur(32px);
-      color: var(--text-main);
-      border-radius: var(--r-lg);
-      font-size: 15px; line-height: 1.85;
-      z-index: 200; opacity: 0;
-      transition: opacity 0.3s, transform 0.3s, background 0.6s;
-      border: 1px solid rgba(255, 77, 148, 0.4);
-      box-shadow: 0 24px 80px rgba(0,0,0,0.85), 0 0 70px rgba(255,77,148,0.35);
-      overflow: hidden;
-    }
-    body.light-mode #dev-panel {
-      background: #ffffff;
-      border-color: rgba(220, 195, 170, 0.6);
-      box-shadow: 0 24px 60px rgba(120, 90, 70, 0.15);
-    }
-    #dev-panel.show {
-      display: flex; opacity: 1;
-      transform: translate(-50%, -50%) scale(1);
-    }
-    #dev-close {
-      position: absolute; top: 18px; right: 20px;
-      width: 32px; height: 32px;
-      border-radius: var(--r-sm);
-      background: rgba(255, 77, 148, 0.1);
-      border: 1px solid rgba(255, 77, 148, 0.3);
-      color: var(--primary-soft);
-      cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      z-index: 2;
-    }
-    body.light-mode #dev-close {
-      color: var(--primary-deep);
-      background: #fff5f8;
-      border-color: rgba(255, 150, 190, 0.5);
-    }
-    #dev-close:hover {
-      background: var(--primary); color: #fff;
-      box-shadow: 0 0 20px rgba(255, 77, 148, 0.7);
-    }
-    #dev-content { padding: 32px 36px 30px; overflow-y: auto; }
-    #dev-title {
-      font-size: 24px; font-weight: 700; letter-spacing: 2px;
-      margin-bottom: 20px;
-      background: linear-gradient(135deg, var(--primary), var(--primary-soft));
-      -webkit-background-clip: text; background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-    body.light-mode #dev-title {
-      background: linear-gradient(135deg, #d13a7c, #ff4d94);
-      -webkit-background-clip: text; background-clip: text;
-    }
-    #dev-body { color: var(--text-sub); }
-    body.light-mode #dev-body { color: #4a3a32; }
-    #dev-body p { margin: 0 0 14px; }
-    #dev-body strong { color: var(--yellow); }
-    body.light-mode #dev-body strong { color: #a06a00; }
-    #dev-body a { color: var(--blue); text-decoration: none; border-bottom: 1px dashed rgba(77, 184, 255, 0.5); }
-    #dev-body a:hover { color: var(--primary); border-bottom-color: var(--primary); }
-    body.light-mode #dev-body a:hover { color: var(--primary-deep); }
-    #dev-body hr { border: none; border-top: 1px dashed rgba(255, 77, 148, 0.25); margin: 18px 0; }
-    body.light-mode #dev-body hr { border-top-color: rgba(220, 195, 170, 0.5); }
+            .item:active {
+                transform: translateY(0);
+            }
 
-    #hint-bar {
-      position: fixed; bottom: 18px; left: 50%;
-      transform: translateX(-50%);
-      font-size: 11px; color: rgba(255, 255, 255, 0.3);
-      letter-spacing: 2px;
-      z-index: 5; pointer-events: none;
-    }
-    body.light-mode #hint-bar { color: rgba(120, 90, 70, 0.45); }
+            .item.disabled {
+                opacity: 0.5;
+                filter: grayscale(0.7);
+                cursor: not-allowed;
+                pointer-events: none;
+            }
 
-    @media (max-width: 900px) {
-      #hint-bar { display: none; }
-      #legend { transform: scale(0.9); transform-origin: bottom right; }
-      #top-line-left, #top-line-right { width: 40px; }
-    }
-  </style>
+            /* 道具恢复完成的状态 */
+            .item.recovered {
+                border-left-width: 4px;
+                box-shadow: 0 5px 15px rgba(255, 255, 255, 0.2);
+            }
+
+                .item.recovered .item-name {
+                    color: #ffffff;
+                    text-shadow: 0 0 10px currentColor;
+                    font-weight: bold;
+                }
+
+                .item.recovered .item-count {
+                    color: #ffffff;
+                    text-shadow: 0 0 10px #ffffff;
+                    font-weight: bold;
+                    animation: count-glow 1.5s infinite alternate;
+                }
+
+        @keyframes count-glow {
+            from {
+                transform: scale(1);
+                text-shadow: 0 0 5px #ffffff;
+            }
+
+            to {
+                transform: scale(1.1);
+                text-shadow: 0 0 15px #ffffff;
+            }
+        }
+
+        /* 道具颜色调整 */
+        .item.mojing {
+            border-left-color: #ffffff; /* 墨镜 - 黑色 */
+        }
+
+        .item.haitang {
+            border-left-color: #ff4081; /* 海棠 - 粉色 */
+        }
+
+        .item.sodawater {
+            border-left-color: #2196f3; /* 苏打水 - 蓝色 */
+        }
+
+        .item.qingjunce {
+            border-left-color: #ffc107; /* 清君侧 - 黄色 */
+        }
+
+        /* 道具内容 */
+        .item-content {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 6px 8px; /* 改为6px 8px */
+            height: 100%;
+        }
+
+        /* 道具名称 */
+        .item-name {
+            font-weight: 600; /* 改为600 */
+            font-size: 0.8rem; /* 改为0.8rem */
+            color: #fff;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
+            max-width: 70px; /* 新增限制宽度 */
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* 道具数量 */
+        .item-count {
+            font-size: 0.9rem; /* 改为0.9rem */
+            font-weight: 700; /* 改为700 */
+            min-width: 20px; /* 改为20px */
+            text-align: center;
+            color: #ff7eb3;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
+        }
+
+        .item-recovery {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 0%;
+            z-index: 1;
+            transition: width 0.3s ease;
+            opacity: 0.5;
+        }
+
+        .item.mojing .item-recovery {
+            background: linear-gradient(90deg, #000000 0%, #333333 100%);
+        }
+
+        .item.haitang .item-recovery {
+            background: linear-gradient(90deg, #ff2a8f 0%, #ff7eb3 100%);
+        }
+
+        .item.sodawater .item-recovery {
+            background: linear-gradient(90deg, #2196f3 0%, #64b5f6 100%);
+        }
+
+        .item.qingjunce .item-recovery {
+            background: linear-gradient(90deg, #ffc107 0%, #ffd54f 100%);
+        }
+
+        /* 左下：按钮区域 */
+        .left-buttons {
+            grid-column: 1;
+            grid-row: 2;
+            display: flex;
+            gap: 10px;
+            width: 210px;
+            height: 70px;
+            padding: 10px 0;
+            box-sizing: border-box;
+        }
+
+        .game-button {
+            flex: 1;
+            height: 30px;
+            padding: 0 10px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            border-radius: 25px;
+            border: none;
+            background: linear-gradient(to bottom, #ff2a8f, #ff4d9e);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(255, 42, 143, 0.3);
+            min-width: 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+            .game-button::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+                transition: left 0.5s;
+            }
+
+            .game-button:hover::after {
+                left: 100%;
+            }
+
+            .game-button:hover, .game-button:active {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 15px rgba(255, 42, 143, 0.4);
+            }
+
+            .game-button:active {
+                transform: translateY(1px);
+            }
+
+            .game-button.pause {
+                background: linear-gradient(to bottom, #ff7eb3, #ff9ec9);
+            }
+
+        /* 右下：触摸操作区域 */
+        .controls-container {
+            grid-column: 2;
+            grid-row: 2;
+            width: 130px;
+            height: 130px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 15px;
+        }
+
+        .touch-controls {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            gap: 8px;
+            width: 120px;
+            height: 120px;
+        }
+
+        .touch-btn {
+            background: linear-gradient(145deg, rgba(40, 20, 50, 0.9), rgba(30, 15, 40, 0.9));
+            border: 2px solid rgba(255, 122, 179, 0.4);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: #ff7eb3;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+        }
+
+            .touch-btn:active {
+                background: linear-gradient(145deg, rgba(50, 25, 60, 0.9), rgba(40, 20, 50, 0.9));
+                transform: scale(0.95);
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+            }
+
+            /* 触摸按钮位置 */
+            .touch-btn.rotate {
+                grid-column: 2;
+                grid-row: 1;
+            }
+
+            .touch-btn.left {
+                grid-column: 1;
+                grid-row: 2;
+            }
+
+            .touch-btn.down {
+                grid-column: 2;
+                grid-row: 2;
+            }
+
+            .touch-btn.right {
+                grid-column: 3;
+                grid-row: 2;
+            }
+
+            .touch-btn.drop {
+                grid-column: 2;
+                grid-row: 3;
+            }
+
+        .cell {
+            width: 100%;
+            height: 100%;
+            border: 1px solid rgba(255, 122, 179, 0.1);
+            transition: background-color 0.3s;
+        }
+
+            .cell:hover {
+                transform: scale(1.05);
+            }
+
+        .filled {
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 2px;
+            box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.3);
+        }
+
+        /* 方块颜色 - 经典俄罗斯方块颜色 */
+        .i {
+            background-color: #00bcd4;
+        }
+        /* I型 - 青色 */
+        .j {
+            background-color: #2196f3;
+        }
+        /* J型 - 蓝色 */
+        .l {
+            background-color: #ff9800;
+        }
+        /* L型 - 橙色 */
+        .o {
+            background-color: #ffeb3b;
+        }
+        /* O型 - 黄色 */
+        .s {
+            background-color: #4caf50;
+        }
+        /* S型 - 绿色 */
+        .t {
+            background-color: #9c27b0;
+        }
+        /* T型 - 紫色 */
+        .z {
+            background-color: #f44336;
+        }
+        /* Z型 - 红色 */
+
+        .game-status {
+            grid-column: 1 / span 2;
+            text-align: center;
+            font-size: 1rem;
+            font-weight: bold;
+            height: 30px;
+            color: #ff7eb3;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+            margin-top: 5px;
+        }
+
+        /* 事件弹窗样式 */
+        .event-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(15, 8, 25, 0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+
+            .event-modal.active {
+                opacity: 1;
+                visibility: visible;
+            }
+
+        .event-content {
+            background: linear-gradient(145deg, rgba(25, 12, 35, 0.95), rgba(35, 17, 45, 0.95));
+            border-radius: 16px;
+            padding: 20px;
+            max-width: 300px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(255, 42, 143, 0.2);
+            border: 2px solid rgba(255, 122, 179, 0.3);
+            transform: translateY(-20px);
+            transition: transform 0.3s;
+        }
+
+        .event-modal.active .event-content {
+            transform: translateY(0);
+        }
+
+        .event-title {
+            font-size: 1rem;
+            margin-bottom: 15px;
+            color: #ff7eb3;
+            text-shadow: 0 2px 10px rgba(255, 126, 179, 0.5);
+        }
+
+        .event-type {
+            display: inline-block;
+            padding: 6px 18px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+            .event-type.item {
+                background: linear-gradient(to right, #ff4d9e, #ff2a8f);
+                color: white;
+                box-shadow: 0 3px 8px rgba(255, 77, 158, 0.3);
+            }
+
+            .event-type.story {
+                background: linear-gradient(to right, #ff7eb3, #ff4d9e);
+                color: white;
+                box-shadow: 0 3px 8px rgba(255, 126, 179, 0.3);
+            }
+
+        .event-description {
+            font-size: 0.85rem;
+            line-height: 1.5;
+            margin-bottom: 20px;
+            color: #ff9ec9;
+        }
+
+        .event-effect {
+            background: rgba(255, 122, 179, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid #ff7eb3;
+            font-size: 0.85rem;
+        }
+
+        .event-effect-title {
+            font-weight: bold;
+            color: #ff7eb3;
+            margin-bottom: 8px;
+            font-size: 0.85rem;
+        }
+
+        .event-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+            font-size: 0.85rem;
+        }
+
+        .event-button {
+            background: linear-gradient(to bottom, #ff2a8f, #ff4d9e);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 12px 24px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(255, 42, 143, 0.3);
+        }
+
+            .event-button:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 16px rgba(255, 42, 143, 0.4);
+            }
+
+            .event-button.consume {
+                background: linear-gradient(to bottom, #ff4d9e, #ff2a8f);
+            }
+
+            .event-button.cancel {
+                background: linear-gradient(to bottom, #666666, #444444);
+            }
+
+        .event-type {
+            display: none !important;
+        }
+
+        .yuan-character {
+            font-size: 6rem;
+            color: #000000;
+            text-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+            font-family: 'SimHei', 'Microsoft YaHei', sans-serif;
+            margin: 20px 0;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
+
+            50% {
+                transform: scale(1.1);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
+        }
+
+        .confirm-button {
+            background: linear-gradient(to bottom, #ff2a8f, #ff4d9e);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 12px 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(255, 42, 143, 0.3);
+        }
+
+            .confirm-button:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 20px rgba(255, 42, 143, 0.4);
+            }
+
+        .input-container {
+            margin: 20px 0;
+        }
+
+        .input-text {
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+            color: #ff9ec9;
+        }
+
+        .text-input {
+            width: 100%;
+            padding: 12px;
+            font-size: 0.85rem;
+            border: 2px solid #ff2a8f;
+            border-radius: 8px;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            text-align: center;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+            .text-input:focus {
+                outline: none;
+                border-color: #ff7eb3;
+                box-shadow: 0 0 15px rgba(255, 126, 179, 0.5);
+                background-color: rgba(255, 255, 255, 0.15);
+            }
+
+        /* 规则弹窗样式 */
+        .rules-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(15, 8, 25, 0.95);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+
+            .rules-modal.active {
+                opacity: 1;
+                visibility: visible;
+            }
+
+        .rules-content {
+            background: linear-gradient(145deg, rgba(25, 12, 35, 0.95), rgba(35, 17, 45, 0.95));
+            border-radius: 16px;
+            padding: 20px;
+            max-width: 320px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(255, 42, 143, 0.2);
+            border: 2px solid rgba(255, 122, 179, 0.3);
+            transform: translateY(-20px);
+            transition: transform 0.3s;
+        }
+
+        .rules-modal.active .rules-content {
+            transform: translateY(0);
+        }
+
+        .rules-title {
+            font-size: 1rem;
+            margin-bottom: 20px;
+            color: #ff7eb3;
+            text-shadow: 0 2px 10px rgba(255, 126, 179, 0.5);
+        }
+
+        .rules-text {
+            text-align: left;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            color: #ff9ec9;
+            margin-bottom: 25px;
+        }
+
+            .rules-text p {
+                margin-bottom: 15px;
+            }
+
+        .rule-item {
+            padding: 12px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 4px solid;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+            .rule-item:hover {
+                transform: translateX(10px);
+            }
+
+            /* 墨镜 - 黑色主题 */
+            .rule-item.mojing-rule {
+                background: linear-gradient(145deg, rgba(0, 0, 0, 0.15), rgba(50, 50, 50, 0.1));
+                border-left-color: #ffffff;
+                color: #ffffff;
+            }
+
+                .rule-item.mojing-rule strong {
+                    color: #ffffff;
+                    text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+                }
+
+            /* 海棠 - 粉色主题 */
+            .rule-item.haitang-rule {
+                background: linear-gradient(145deg, rgba(255, 42, 143, 0.15), rgba(255, 126, 179, 0.1));
+                border-left-color: #ff2a8f;
+                color: #ff9ec9;
+            }
+
+                .rule-item.haitang-rule strong {
+                    color: #ff7eb3;
+                    text-shadow: 0 0 5px rgba(255, 126, 179, 0.5);
+                }
+
+            /* 苏打水 - 蓝色主题 */
+            .rule-item.sodawater-rule {
+                background: linear-gradient(145deg, rgba(33, 150, 243, 0.15), rgba(100, 181, 246, 0.1));
+                border-left-color: #2196f3;
+                color: #90caf9;
+            }
+
+                .rule-item.sodawater-rule strong {
+                    color: #64b5f6;
+                    text-shadow: 0 0 5px rgba(100, 181, 246, 0.5);
+                }
+
+            /* 清君侧 - 黄色主题 */
+            .rule-item.qingjunce-rule {
+                background: linear-gradient(145deg, rgba(255, 193, 7, 0.15), rgba(255, 213, 79, 0.1));
+                border-left-color: #ffc107;
+                color: #ffd54f;
+            }
+
+                .rule-item.qingjunce-rule strong {
+                    color: #ffd54f;
+                    text-shadow: 0 0 5px rgba(255, 213, 79, 0.5);
+                }
+
+            .rule-item strong {
+                color: #ffffff;
+                font-size: 0.84rem;
+                display: block;
+                margin-bottom: 8px;
+                text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+            }
+
+        .rules-confirm-button {
+            background: linear-gradient(to bottom, #ff2a8f, #ff4d9e);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 10px 30px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(255, 42, 143, 0.3);
+            margin-top: 10px;
+            min-width: 150px;
+        }
+
+            .rules-confirm-button:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 8px 20px rgba(255, 42, 143, 0.4);
+            }
+
+            .rules-confirm-button:active {
+                transform: translateY(1px);
+            }
+
+        .footer {
+            margin-top: 15px;
+            margin-bottom: 10px;
+            color: #ff9ec9;
+            font-size: 0.7rem;
+            text-align: center;
+            opacity: 0.7;
+        }
+
+        .freeze-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(139, 69, 19, 0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            border-radius: 4px;
+            pointer-events: none;
+        }
+
+        .freeze-text {
+            font-size: 1rem;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+            animation: pulse 1s infinite;
+            background-color: rgba(139, 69, 19, 0.7);
+            padding: 8px 16px;
+            border-radius: 10px;
+        }
+
+        .night-warning {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1rem;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.7);
+            z-index: 101;
+            text-align: center;
+            width: 100%;
+        }
+
+        .item-added {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(to right, #ff4d9e, #ff2a8f);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: bold;
+            z-index: 999;
+            animation: slideIn 0.5s, fadeOut 0.5s 2s forwards;
+            box-shadow: 0 5px 15px rgba(255, 77, 158, 0.4);
+            font-size: 0.85rem;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+            }
+        }
+
+        .brass-box-special {
+            position: relative;
+            border: 2px solid #ffd700 !important;
+            background: linear-gradient(145deg, rgba(50, 35, 10, 0.9), rgba(70, 50, 20, 0.9)) !important;
+            animation: glow 1.5s infinite alternate;
+        }
+
+        @keyframes glow {
+            from {
+                box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+            }
+
+            to {
+                box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
+            }
+        }
+
+        /* 移除所有响应式设计，保持固定布局 */
+
+
+        /* 底部信息样式 */
+        .footer-info {
+            position: fixed;
+            bottom: 10px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            padding: 8px 15px;
+            background: rgba(20, 10, 30, 0.8);
+            border-top: 1px solid rgba(255, 122, 179, 0.3);
+            backdrop-filter: blur(5px);
+            z-index: 100;
+            font-size: 0.7rem;
+            color: #ff9ec9;
+            text-align: center;
+        }
+
+        /* 适应小屏幕 */
+        @media (max-width: 350px) {
+            .footer-info {
+                flex-direction: column;
+                gap: 5px;
+                font-size: 0.65rem;
+            }
+        }
+
+        /* 或者用更简单的样式 */
+        .footer-info.simple {
+            position: fixed;
+            bottom: 5px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 0.6rem;
+            color: #ff7eb3;
+            opacity: 0.7;
+            padding: 5px;
+            z-index: 100;
+        }
+
+            .footer-info.simple div {
+                display: inline-block;
+                margin: 0 8px;
+            }
+    </style>
 </head>
 <body>
-  <div id="loader">
-    <div id="loader-ring"></div>
-    <div id="loader-text">花 夜 前 行 · 加 载 中</div>
-  </div>
-
-  <div id="globeViz"></div>
-
-  <div id="top-bar">
-    <div id="top-line-left"></div>
-    <div id="top-text-wrap">
-      <div id="top-title">花夜前行 · Travel Map</div>
-      <div id="top-subtitle">黑瞎子 × 解雨臣</div>
+    <div class="header">
+        <h1>黑黑花花俄罗斯方块</h1>
+        <div class="subtitle">🕶️ 黑眼镜 · 🎮  · 解雨臣 🌸</div>
     </div>
-    <div id="top-line-right"></div>
-  </div>
 
-  <div id="top-right">
-    <button id="theme-btn" title="切换昼夜模式">☾</button>
-    <button id="export-btn" title="导出收藏">⇩<span id="fav-count"></span></button>
-    <button id="dev-btn" title="开发者信息">i</button>
-  </div>
+    <!-- 游戏规则弹窗 -->
+    <div class="rules-modal" id="rules-modal">
+        <div class="rules-content">
+            <h2 class="rules-title">游戏规则</h2>
+            <div class="rules-text">
+                <p style="text-align: center; font-weight: bold; margin: 20px 0;">🎉 欢迎来到黑黑花花的俄罗斯方块！🎉</p>
+                <p>本游戏在传统的俄罗斯方块上增加了4种【道具】和10种【剧情】</p>
+                <p>在消除一行方块后会触发随机【剧情】，需完成相应要求后才能继续游戏</p>
+                <p>在游戏过程中可使用右侧【道具】，介绍如下：</p>
 
-  <div id="sidebar">
-    <div id="sidebar-header">
-      <span>筛选</span>
-      <button id="collapse-btn" title="收起">◀</button>
-    </div>
-    <div id="sidebar-body">
-      <div class="panel-section">
-        <div class="panel-label">角色</div>
-        <div id="role-tabs">
-          <button class="role-tab" data-role="黑花" data-key="1">黑花</button>
-          <button class="role-tab" data-role="黑瞎子" data-key="2">黑瞎子</button>
-          <button class="role-tab" data-role="解雨臣" data-key="3">解雨臣</button>
+                <div class="rule-item mojing-rule">
+                    <strong>🕶️ 【墨镜】</strong>
+                    <p>用于适应剧情【夜幕降临】</p>
+                </div>
+
+                <div class="rule-item haitang-rule">
+                    <strong>🌸 【海棠】</strong>
+                    <p>用于支付剧情【食君之禄】</p>
+                </div>
+
+                <div class="rule-item sodawater-rule">
+                    <strong>🥤 【苏打水】</strong>
+                    <p>随机改变下一方块的形状。</p>
+                </div>
+
+                <div class="rule-item qingjunce-rule">
+                    <strong>⚔️ 【清君侧】</strong>
+                    <p>清除现有全部方块。</p>
+                </div>
+
+            </div>
+            <button class="rules-confirm-button" id="rules-confirm-button">开始游戏</button>
         </div>
-      </div>
-
-      <div class="panel-section">
-        <div class="panel-label">搜索</div>
-        <input id="country-input" type="text" placeholder="输入国家名筛选…" />
-      </div>
-
-      <div class="panel-section panel-section-grow">
-        <div class="panel-label">国家列表</div>
-        <select id="country-select" size="20" class="scroll-pink"></select>
-      </div>
     </div>
-  </div>
 
-  <button id="toggle-btn" title="展开">▶</button>
-  <div id="hover-tip"></div>
 
-  <div id="bottom-right">
-    <div id="legend">
-      <div class="legend-title">Legend</div>
-      <div class="legend-row"><span class="legend-dot" style="background:#ffd54a;color:#ffd54a"></span>黑瞎子</div>
-      <div class="legend-row"><span class="legend-dot" style="background:#ff4d94;color:#ff4d94"></span>解雨臣</div>
-      <div class="legend-row"><span class="legend-dot" style="background:#4db8ff;color:#4db8ff"></span>黑花</div>
-    </div>
-    <button id="rotate-btn" title="暂停 / 继续旋转">⏸</button>
-  </div>
+    <div class="game-container">
+        <div class="main-game">
+            <!-- 左边：游戏棋盘区域 -->
+            <div class="left-section">
+                <div class="game-board-container">
+                    <div class="game-board" id="game-board"></div>
+                    <div class="game-status" id="game-status">准备开始</div>
+                </div>
 
-  <div id="overlay"></div>
+                <!-- 左边的两个按钮 -->
+                <div class="left-buttons">
+                    <button class="game-button" id="start-restart-button">开始游戏</button>
+                    <button class="game-button pause" id="pause-resume-button" disabled>暂停</button>
+                </div>
+            </div>
 
-  <div id="info-card">
-    <button id="close-btn" title="关闭">✕</button>
-    <button id="fav-btn" title="收藏">☆</button>
-    <div id="info-content">
-      <div id="info-role-tag">
-        <span class="dot"></span>
-        <span id="info-role-text"></span>
-      </div>
-      <div id="info-title"></div>
-      <div id="info-body-wrap" class="scroll-pink">
-        <div id="text-body"></div>
-        <div id="text-source"></div>
-      </div>
-      <div id="text-switcher">
-        <button id="switch-prev" title="上一段">◀</button>
-        <span id="text-label"></span>
-        <button id="switch-next" title="下一段">▶</button>
-      </div>
-    </div>
-  </div>
+            <!-- 右边：信息区域 -->
+            <div class="right-section">
+                <!-- 分数和下一个方块并排 -->
+                <div class="info-panel combined-panel">
+                    <div class="combined-content horizontal">
+                        <!-- 左侧：分数 -->
+                        <div class="score-section">
+                            <div class="info-title">分数</div>
+                            <div class="score-display" id="score">0</div>
+                        </div>
 
-  <div id="dev-panel">
-    <button id="dev-close" title="关闭">✕</button>
-    <div id="dev-content" class="scroll-pink">
-      <div id="dev-title">关于此项目</div>
-      <div id="dev-body">
-        <p><strong>花夜前行 · Travel Map 测试版</strong></p>
-        <p>这是一个用于汇总「黑瞎子 × 解雨臣」原著及问答涉及地点的交互地图。</p>
-        <p><strong>如何使用</strong></p>
-        <p>· 点击地图上的<strong>国家领土</strong>，可查看该国家层级的原文片段。</p>
-        <p>· 点击地图上的<strong>红色花形点</strong>，可查看具体城市或地点的原文片段。</p>
-        <p>· 点击<strong>东南亚任意国家</strong>（越南、泰国、缅甸、柬埔寨、老挝、马来西亚、印尼、菲律宾、文莱、东帝汶），会作为整体「东南亚」显示。</p>
-        <p>· 左侧列表中的「东南亚」条目可一次性高亮所有东南亚国家。</p>
-        <p><strong>筛选与操作</strong></p>
-        <p>· 左侧<strong>角色</strong>按钮：按「黑花 / 黑瞎子 / 解雨臣」筛选地点与高亮国家。</p>
-        <p>· 左侧<strong>搜索</strong>与<strong>国家列表</strong>：快速定位国家或地区。</p>
-        <p>· 右下角按钮：暂停 / 继续地球自转。</p>
-        <p>· 右上角按钮：切换昼夜模式、导出收藏、查看本说明。</p>
-        <p><strong>收藏与导出</strong></p>
-        <p>· 在文本弹窗中点击右上角 ☆ 可收藏当前段落。</p>
-        <p>· 点击顶部 ⇩ 按钮，可将收藏导出为 txt 文本。</p>
-        <p><strong>快捷键</strong></p>
-        <p>· <strong>1 / 2 / 3</strong>：切换黑花 / 黑瞎子 / 解雨臣筛选。</p>
-        <p>· <strong>← / →</strong>：在弹窗中切换上一段 / 下一段文本。</p>
-        <p>· <strong>Esc</strong>：关闭弹窗或清除筛选。</p>
-        <hr>
-        <p><strong>版本说明</strong></p>
-        <p>· 本版本为 <strong>测试版</strong>，收录截至日期为 <strong>2026.9.27</strong>。</p>
-        <p>· 由于国内地点分散，且存在部分虚构地点尚待考据，国内地点收录并不完全；国外地点收录相对较为全面。</p>
-        <p>· 后续版本会继续补充与修订。</p>
-        <hr>
-        <p><strong>免责声明</strong></p>
-        <p>· 底图数据来源为公开数据库，如存在领土划分争议等数据问题，不代表本人立场。</p>
-        <p>· 本页面仅供「黑花」同好交流参考，所有原文版权归南派三叔及出版方所有。</p>
-        <hr>
-        <p style="opacity:0.6;font-size:13px;">—— 云雀Lark · 2026</p>
-      </div>
-    </div>
-  </div>
+                        <!-- 右侧：下一个方块 -->
+                        <div class="next-section">
+                            <div class="info-title">下一个</div>
+                            <div class="next-piece-container">
+                                <div class="next-piece-board" id="next-piece-board"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-  <div id="hint-bar">黑花 | 2026 花夜前行 · 旅行地图 | 云雀Lark</div>
+                <!-- 道具栏应该放在这里，在分数和下一个的下面 -->
+                <div class="info-panel items-panel">
+                    <div class="info-title">道具栏</div>
 
-  <script src="//cdn.jsdelivr.net/npm/globe.gl"></script>
-  <script src="./data.js"></script>
-  <script>
-const COUNTRY_ZH = {
-  "China":       "中国",
-  "Russia":      "俄罗斯",
-  "Japan":       "日本",
-  "Iceland":     "冰岛",
-  "Mongolia":    "蒙古",
-  "Germany":     "德国",
-  "Switzerland": "瑞士",
-  "Nepal":       "尼泊尔",
-  "India":       "印度",
-  "Myanmar":     "缅甸",
-  "Cyprus":      "塞浦路斯",
-  "United States of America": "美国",
-  "Somalia":     "索马里",
-  "France":      "法国",
-  "Tajikistan":  "塔吉克斯坦",
-  "Afghanistan": "阿富汗",
-  "United Arab Emirates": "阿联酋",
-  "Southeast Asia": "东南亚",
+                    <div class="item mojing" id="mojing-item">
+                        <div class="item-recovery" id="mojing-recovery"></div>
+                        <div class="item-content">
+                            <span class="item-name">🕶️ 墨镜</span>
+                            <span class="item-count" id="mojing-count">0</span>
+                        </div>
+                    </div>
 
-  // 东南亚各国
-  "Vietnam":     "越南",
-  "Thailand":    "泰国",
-  "Cambodia":    "柬埔寨",
-  "Laos":        "老挝",
-  "Malaysia":    "马来西亚",
-  "Indonesia":   "印度尼西亚",
-  "Philippines": "菲律宾",
-  "Brunei":      "文莱",
-  "Timor-Leste": "东帝汶"
-};
+                    <div class="item haitang" id="haitang-item">
+                        <div class="item-recovery" id="haitang-recovery"></div>
+                        <div class="item-content">
+                            <span class="item-name">🌸 海棠</span>
+                            <span class="item-count" id="haitang-count">0</span>
+                        </div>
+                    </div>
 
-    setTimeout(() => {
-      const el = document.getElementById('loader');
-      if (el) el.classList.add('hidden');
-      setTimeout(() => { if (el) el.style.display = 'none'; }, 600);
-    }, 2000);
+                    <div class="item sodawater" id="sodawater-item">
+                        <div class="item-recovery" id="sodawater-recovery"></div>
+                        <div class="item-content">
+                            <span class="item-name">🥤 苏打水</span>
+                            <span class="item-count" id="sodawater-count">0</span>
+                        </div>
+                    </div>
 
-    const world = new Globe(document.getElementById('globeViz'), { animateIn: true })
-      .globeImageUrl('//unpkg.com/three-globe/example/img/earth-night.jpg')
-      .backgroundColor('rgba(0,0,0,0)');
+                    <div class="item qingjunce" id="qingjunce-item">
+                        <div class="item-recovery" id="qingjunce-recovery"></div>
+                        <div class="item-content">
+                            <span class="item-name">⚔️ 清君侧</span>
+                            <span class="item-count" id="qingjunce-count">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div> <!-- 这是right-section的结束 -->
+            <!-- 触摸控制（保持原来的位置） -->
+            <div class="controls-container">
+                <div class="touch-controls">
+                    <div class="touch-btn rotate">↻</div>
+                    <div class="touch-btn left">←</div>
+                    <div class="touch-btn down">↓</div>
+                    <div class="touch-btn right">→</div>
+                    <div class="touch-btn drop">⇊</div>
+                </div>
+            </div>
+        </div>
 
-    world.controls().autoRotate = true;
-    world.controls().autoRotateSpeed = 0.5;
-    world.controls().minDistance = 200;
-    world.controls().maxDistance = 700;
+        <!-- 音频元素 -->
+        <audio id="background-music" loop preload="auto">
+            <source src="backgroundmusic.mp3" type="audio/mpeg">
+        </audio>
+        <audio id="opera-music" preload="auto">
+            <source src="xiqu.mp3" type="audio/mpeg">
+        </audio>
 
-    const rotateBtn = document.getElementById('rotate-btn');
+        <!-- 事件弹窗 -->
+        <div class="event-modal" id="event-modal">
+            <div class="event-content">
+                <h2 class="event-title" id="event-title">事件标题</h2>
+                <div class="event-type" id="event-type"></div>
+                <div class="event-description" id="event-description"></div>
+                <div class="event-effect">
+                    <div class="event-effect-title"></div>
+                    <div id="event-effect-desc"></div>
+                </div>
+                <div class="event-actions" id="event-actions">
+                    <!-- 按钮会动态添加 -->
+                </div>
+            </div>
+        </div>
 
-    window.addEventListener('resize', () => {
-      const w = window.innerWidth;
-      const h = window.innerHeight;
-      if (typeof world.width === 'function') {
-        world.width(w);
-        world.height(h);
-      } else {
-        const camera = world.camera();
-        camera.aspect = w / h;
-        camera.updateProjectionMatrix();
-        world.renderer().setSize(w, h);
-      }
-    });
+        <div class="footer-info">
+            <div class="copyright">©2026 黑黑花花系列</div>
+            <div class="version">1.0.0版本</div>
+            <div class="developer">云雀Lark</div>
+        </div>
 
-    let isLightMode = false;
-    const themeBtn = document.getElementById('theme-btn');
-    themeBtn.addEventListener('click', () => {
-      isLightMode = !isLightMode;
-      document.body.classList.toggle('light-mode', isLightMode);
-      if (isLightMode) {
-        world.globeImageUrl('//unpkg.com/three-globe/example/img/earth-day.jpg');
-        themeBtn.textContent = '☀';
-      } else {
-        world.globeImageUrl('//unpkg.com/three-globe/example/img/earth-night.jpg');
-        themeBtn.textContent = '☾';
-      }
-    });
+</body>
 
-    let selectedName = null;
-    let activeRole   = null;
 
-    const FAV_KEY = 'travel-map-favorites-v2';
-    let favorites = JSON.parse(localStorage.getItem(FAV_KEY) || '[]');
-    if (favorites.length && typeof favorites[0] === 'string') {
-      const migrated = [];
-      favorites.forEach(key => {
-        const [name, idxStr] = key.split('::');
-        const idx = parseInt(idxStr, 10);
-        let role = null, item = null;
-        if (countryTexts[name] && countryTexts[name][idx]) {
-          item = countryTexts[name][idx];
-          role = countryRoles[name];
-        } else {
-          for (const country in countryCities) {
-            const city = countryCities[country].find(c => c.name === name);
-            if (city && city.texts && city.texts[idx]) {
-              item = city.texts[idx];
-              role = city.role;
-              break;
-            }
-          }
-        }
-        if (item) {
-          migrated.push({
-            name, idx,
-            title: item.title || '',
-            source: item.source || '',
-            content: item.content || '',
-            role: role || '',
-            savedAt: Date.now()
-          });
-        }
-      });
-      favorites = migrated;
-      saveFavorites();
-    }
+<script>
+    // 游戏常量
+    const BOARD_WIDTH = 10;
+    const BOARD_HEIGHT = 20;
+    const EMPTY_CELL = 'empty';
 
-    function saveFavorites() {
-      localStorage.setItem(FAV_KEY, JSON.stringify(favorites));
-    }
-    function isFaved(name, idx) {
-      return favorites.some(f => f.name === name && f.idx === idx);
-    }
-
-    function updateExportBtn() {
-      const cnt = document.getElementById('fav-count');
-      if (favorites.length === 0) {
-        cnt.textContent = '';
-        cnt.style.display = 'none';
-      } else {
-        cnt.textContent = `(${favorites.length})`;
-        cnt.style.display = '';
-      }
-    }
-
-    function toggleFav(name, idx, role) {
-      const pos = favorites.findIndex(f => f.name === name && f.idx === idx);
-      if (pos >= 0) {
-        favorites.splice(pos, 1);
-      } else {
-        let item = null;
-        if (countryTexts[name] && countryTexts[name][idx]) {
-          item = countryTexts[name][idx];
-        } else {
-          for (const country in countryCities) {
-            const city = countryCities[country].find(c => c.name === name);
-            if (city && city.texts && city.texts[idx]) { item = city.texts[idx]; break; }
-          }
-        }
-        if (!item) return;
-        favorites.push({
-          name, idx,
-          title: item.title || '',
-          source: item.source || '',
-          content: item.content || '',
-          role: role || '',
-          savedAt: Date.now()
-        });
-      }
-      saveFavorites();
-      updateExportBtn();
-    }
-
-    const NORMAL_CAP   = 'rgba(60, 120, 200, 0.28)';
-    const NORMAL_SIDE  = 'rgba(60, 120, 200, 0.08)';
-    const NORMAL_LINE  = '#4db8ff';
-    const HILIGHT_CAP  = 'rgba(77, 184, 255, 0.9)';
-    const HILIGHT_SIDE = 'rgba(77, 184, 255, 0.4)';
-    const HILIGHT_LINE = '#a8dcff';
-    const HOVER_LINE   = '#4db8ff';
-
-    const ROLE_STYLE = {
-      "黑瞎子": { cap: 'rgba(255, 213, 74, 0.75)', side: 'rgba(255, 213, 74, 0.3)', line: '#fff0a8', point: '#ff0000' },
-      "解雨臣": { cap: 'rgba(255, 77, 148, 0.7)',  side: 'rgba(255, 77, 148, 0.3)', line: '#ff8eb8', point: '#ff0000' },
-      "黑花":   { cap: 'rgba(77, 184, 255, 0.7)',  side: 'rgba(77, 184, 255, 0.3)', line: '#a8dcff', point: '#ff0000' }
+    // 道具恢复时间（毫秒）
+    const ITEM_RECOVERY_TIMES = {
+        mojing: 6000,      // 墨镜：6秒
+        haitang: 8000,     // 海棠：8秒
+        sodawater: 12000,  // 苏打水：12秒
+        qingjunce: 20000   // 清君侧：20秒
     };
 
-    const PROVINCE_LINE_COLOR = 'rgba(255, 77, 148, 0.9)';
-    const PROVINCE_LINE_WIDTH = 0.5;
-    const PROVINCE_LINE_ALT   = 0.02;
+    // 方块形状定义
+    const TETROMINOES = {
+        I: {
+            shape: [
+                [0, 0, 0, 0],
+                [1, 1, 1, 1],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0]
+            ],
+            className: 'i'
+        },
+        J: {
+            shape: [
+                [1, 0, 0],
+                [1, 1, 1],
+                [0, 0, 0]
+            ],
+            className: 'j'
+        },
+        L: {
+            shape: [
+                [0, 0, 1],
+                [1, 1, 1],
+                [0, 0, 0]
+            ],
+            className: 'l'
+        },
+        O: {
+            shape: [
+                [1, 1],
+                [1, 1]
+            ],
+            className: 'o'
+        },
+        S: {
+            shape: [
+                [0, 1, 1],
+                [1, 1, 0],
+                [0, 0, 0]
+            ],
+            className: 's'
+        },
+        T: {
+            shape: [
+                [0, 1, 0],
+                [1, 1, 1],
+                [0, 0, 0]
+            ],
+            className: 't'
+        },
+        Z: {
+            shape: [
+                [1, 1, 0],
+                [0, 1, 1],
+                [0, 0, 0]
+            ],
+            className: 'z'
+        }
+    };
 
-    function roleMatches(role) {
-      if (!activeRole || !role) return false;
-      if (role === activeRole) return true;
-      if ((activeRole === '黑瞎子' || activeRole === '解雨臣') && role === '黑花') return true;
-      return false;
+    // 剧情定义（黄铜箱子只出现一次）
+    const STORIES = {
+        SHIJUNZHILU: {
+            name: "🍚 食君之禄",
+            type: "剧情",
+            description: "食君之禄，为君分忧。",
+            effect: "👻 需消耗【海棠】🌸x1支付报酬，否则将出现黑色怨气。",
+            effectFunc: handleShijunzhilu,
+            canAppear: true
+        },
+        NIGHTFALL: {
+            name: "🌙 夜幕降临",
+            type: "剧情",
+            description: "太阳没有出来之前，我是无敌的。",
+            effect: "👀 需消耗【墨镜】🕶️x1适应黑暗，否则将被剥夺视线5秒。",
+            effectFunc: handleNightFall,
+            canAppear: true
+        },
+        IMMORTAL: {
+            name: "🧬 长生者",
+            type: "剧情",
+            description: "这个人汉姓姓齐，家族显赫，他没有受过什么正规的教育，在德国有一个音乐和解剖学的学位。",
+            effect: "⏳ 方块下落时间放缓为0.5倍，持续10秒。",
+            effectFunc: activateImmortal,
+            canAppear: true
+        },
+        FRIED_LIVER: {
+            name: "🍲 炒肝",
+            type: "剧情",
+            description: "-今天晚上我想吃炒肝。 -我们能天亮之后去吃吗？天亮之后如果你能到这来，我就带你去吃炒肝。",
+            effect: "⏸️ 小小花开始吃炒肝，停止操作3秒。",
+            effectFunc: activateFriedLiver,
+            canAppear: true
+        },
+        BLOODY_WEATHER: {
+            name: "🌧️ 流血的天气",
+            type: "剧情",
+            description: "今晚要下雨，流血的天气。",
+            effect: "🔴 现有及接下来的5个方块全部变为红色",
+            effectFunc: activateBloodyWeather,
+            canAppear: true
+        },
+        OPERA: {
+            name: "🎭 戏曲",
+            type: "剧情",
+            description: "如果我声带坏了，我就不能唱戏了，很多女孩子会伤心的。",
+            effect: "🎵 解语花路过，更换了BGM。",
+            effectFunc: activateOpera,
+            canAppear: true
+        },
+        SNOOPY: {
+            name: "🐶 史努比",
+            type: "剧情",
+            description: "九点五十分，上床看了会儿史努比的漫画。",
+            effect: "↩️ 解雨臣打开漫画，撤回这一步方块。",
+            effectFunc: activateSnoopy,
+            canAppear: true
+        },
+        BRASS_BOX: {
+            name: "📦 黄铜箱子",
+            type: "剧情",
+            description: "-很久以前的那个黄铜箱子。 -你也有那么想找回来的东西？",
+            effect: "💞 找到宿命结局，分数直接变为9999。",
+            effectFunc: activateBrassBox,
+            canAppear: true,
+            appearsOnlyOnce: true,  // 只出现一次
+            hasAppeared: false      // 是否已经出现过
+        },
+        TICKET: {
+            name: "✈️ 机票",
+            type: "剧情",
+            description: "类似于回去的机票都买不起的那种卑微。",
+            effect: "💓 输入正确答案后方可继续游戏",
+            effectFunc: activateTicket,
+            canAppear: true
+        },
+        CAN_WINDMILL: {
+            name: "🎡 易拉罐风车",
+            type: "剧情",
+            description: "苏打水易拉罐diy风车手作。",
+            effect: "💨 黑眼镜示范玩法，随机吹走了现有的9格方块。",
+            effectFunc: activateCanWindmill,
+            canAppear: true
+        }
+    };
+
+    // 道具定义
+    const ITEMS = {
+        QINGJUNCE: {
+            name: "清君侧",
+            description: "清除游戏区域内的所有方块",
+            effectFunc: clearAllBlocks
+        },
+        SODAWATER: {
+            name: "苏打水",
+            description: "随机改变下一个方块的形状",
+            effectFunc: randomizeNextPiece
+        }
+    };
+
+    // 游戏变量
+    let board = [];
+    let currentPiece = null;
+    let nextPiece = null;
+    let score = 0;
+    let gameOver = false;
+    let isPaused = false;
+    let gameStarted = false;
+    let dropInterval = null;
+    let dropSpeed = 1000;
+    let originalDropSpeed = 1000;
+
+    // 剧情管理系统变量
+    let availableStories = []; // 当前可用的剧情列表
+    let usedStories = [];      // 本轮已使用的剧情
+    let storyRound = 1;        // 当前是第几轮
+    let storyCount = 0;        // 已触发的剧情数量（用于控制黄铜箱子在第3个以后出现）
+
+    // 上一个方块状态（用于史努比撤回）
+    let previousBoard = null;
+    let previousPiece = null;
+
+    // 道具和状态变量
+    let items = {
+        mojing: 0,      // 墨镜
+        haitang: 0,     // 海棠
+        qingjunce: 0,   // 清君侧
+        sodawater: 0    // 苏打水
+    };
+
+    // 道具恢复计时器
+    let itemRecoveryTimers = {
+        mojing: null,
+        haitang: null,
+        qingjunce: null,
+        sodawater: null
+    };
+
+    // 道具恢复进度
+    let itemRecoveryProgress = {
+        mojing: 0,
+        haitang: 0,
+        qingjunce: 0,
+        sodawater: 0
+    };
+
+    // 状态效果（后一个剧情覆盖前一个）
+    let activeEffects = {
+        nightFall: false,           // 夜幕降临
+        immortal: false,            // 长生者
+        bloodyWeather: false,       // 流血的天气
+        bloodyWeatherCount: 0,      // 流血天气剩余方块数
+        friedLiver: false,          // 炒肝（冻结操作）
+        friedLiverTimer: null,      // 炒肝计时器
+        yuanGhost: false            // 冤魂效果（黑色方块）
+    };
+
+    // 效果计时器（用于清除效果）
+    let effectTimers = {
+        nightFall: null,
+        immortal: null,
+        friedLiver: null,
+        yuanGhost: null
+    };
+
+    // 音乐变量
+    let backgroundMusic = document.getElementById('background-music');
+    let operaMusic = document.getElementById('opera-music');
+    let isOperaPlaying = false;
+    let operaTimeout = null;
+
+    // DOM元素
+    const rulesModal = document.getElementById('rules-modal');
+    const rulesConfirmButton = document.getElementById('rules-confirm-button');
+    const gameBoardElement = document.getElementById('game-board');
+    const nextPieceBoardElement = document.getElementById('next-piece-board');
+    const scoreElement = document.getElementById('score');
+    const gameStatusElement = document.getElementById('game-status');
+    const startRestartButton = document.getElementById('start-restart-button');
+    const pauseResumeButton = document.getElementById('pause-resume-button');
+
+    // 道具数量显示元素和道具项
+    const mojingCountElement = document.getElementById('mojing-count');
+    const haitangCountElement = document.getElementById('haitang-count');
+    const qingjunceCountElement = document.getElementById('qingjunce-count');
+    const sodawaterCountElement = document.getElementById('sodawater-count');
+
+    const mojingItemElement = document.getElementById('mojing-item');
+    const haitangItemElement = document.getElementById('haitang-item');
+    const qingjunceItemElement = document.getElementById('qingjunce-item');
+    const sodawaterItemElement = document.getElementById('sodawater-item');
+
+    // 道具恢复进度条元素
+    const mojingRecoveryElement = document.getElementById('mojing-recovery');
+    const haitangRecoveryElement = document.getElementById('haitang-recovery');
+    const qingjunceRecoveryElement = document.getElementById('qingjunce-recovery');
+    const sodawaterRecoveryElement = document.getElementById('sodawater-recovery');
+
+    // 事件弹窗元素
+    const eventModal = document.getElementById('event-modal');
+    const eventTitleElement = document.getElementById('event-title');
+    const eventTypeElement = document.getElementById('event-type');
+    const eventDescriptionElement = document.getElementById('event-description');
+    const eventEffectDescElement = document.getElementById('event-effect-desc');
+    const eventActionsElement = document.getElementById('event-actions');
+
+    // 道具选择弹窗元素
+    const itemSelectModal = document.getElementById('item-select-modal');
+    const itemOptionsElement = document.getElementById('item-options');
+    const cancelItemButton = document.getElementById('cancel-item-button');
+
+    // 触摸控制按钮
+    const rotateBtn = document.getElementById('rotate-btn');
+    const leftBtn = document.getElementById('left-btn');
+    const rightBtn = document.getElementById('right-btn');
+    const downBtn = document.getElementById('down-btn');
+    const dropBtn = document.getElementById('drop-btn');
+
+    // 音乐控制函数
+    function playBackgroundMusic() {
+        if (backgroundMusic) {
+            backgroundMusic.currentTime = 0;
+            backgroundMusic.play().catch(e => console.log("背景音乐播放失败:", e));
+        }
     }
 
-    function isSoutheastAsia(name) {
-      return typeof SOUTHEAST_ASIA_COUNTRIES !== 'undefined' && SOUTHEAST_ASIA_COUNTRIES.includes(name);
+    function pauseBackgroundMusic() {
+        if (backgroundMusic && !backgroundMusic.paused) {
+            backgroundMusic.pause();
+        }
     }
 
-    let hoveredName = null;
-    let selectedCityName = null;
-    let hoveredCityName = null;
-
-    function polygonCapFor(d) {
-      const name = d.properties.NAME;
-      if (activeRole) return roleMatches(countryRoles[name]) ? ROLE_STYLE[activeRole].cap : NORMAL_CAP;
-      if (selectedName === "__SOUTHEAST_ASIA__") {
-        return isSoutheastAsia(name) ? HILIGHT_CAP : NORMAL_CAP;
-      }
-      return name === selectedName ? HILIGHT_CAP : NORMAL_CAP;
-    }
-    function polygonSideFor(d) {
-      const name = d.properties.NAME;
-      if (activeRole) return roleMatches(countryRoles[name]) ? ROLE_STYLE[activeRole].side : NORMAL_SIDE;
-      if (selectedName === "__SOUTHEAST_ASIA__") {
-        return isSoutheastAsia(name) ? HILIGHT_SIDE : NORMAL_SIDE;
-      }
-      return name === selectedName ? HILIGHT_SIDE : NORMAL_SIDE;
-    }
-    function polygonLineFor(d) {
-      const name = d.properties.NAME;
-      if (name === hoveredName) return HOVER_LINE;
-      if (activeRole) return roleMatches(countryRoles[name]) ? ROLE_STYLE[activeRole].line : NORMAL_LINE;
-      if (selectedName === "__SOUTHEAST_ASIA__") {
-        return isSoutheastAsia(name) ? HILIGHT_LINE : NORMAL_LINE;
-      }
-      return name === selectedName ? HILIGHT_LINE : NORMAL_LINE;
-    }
-    function repaint() {
-      world
-        .polygonCapColor(polygonCapFor)
-        .polygonSideColor(polygonSideFor)
-        .polygonStrokeColor(polygonLineFor);
-    }
-
-    const select = document.getElementById('country-select');
-    function refreshCities() {
-      let cities = [];
-      if (activeRole) {
-        Object.keys(countryCities).forEach(country => {
-          countryCities[country].forEach(city => {
-            if (roleMatches(city.role)) cities.push({ ...city, _color: ROLE_STYLE[activeRole].point });
-          });
-        });
-      } else if (selectedName && selectedName !== "__SOUTHEAST_ASIA__" && countryCities[selectedName]) {
-        cities = countryCities[selectedName].map(c => ({ ...c, _color: '#ff0000' }));
-      }
-
-      world
-        .pointsData(cities)
-        .pointLat(d => d.lat)
-        .pointLng(d => d.lng)
-        .pointColor(() => 'rgba(0,0,0,0)')
-        .pointAltitude(0.025)
-        .pointRadius(1.0)
-        .pointResolution(16)
-        .onPointClick(city => {
-          selectedCityName = city.name;
-          let belongTo = null;
-          for (const country in countryCities) {
-            if (countryCities[country].some(c => c.name === city.name)) {
-              belongTo = country; break;
+    function stopOperaMusic() {
+        if (operaMusic && !operaMusic.paused) {
+            operaMusic.pause();
+            operaMusic.currentTime = 0;
+            isOperaPlaying = false;
+            if (operaTimeout) {
+                clearTimeout(operaTimeout);
+                operaTimeout = null;
             }
-          }
-          if (!belongTo) { showCard(city.name, city.texts, city.role, null); return; }
-          selectedName = belongTo;
-          activeRole = null;
-          document.querySelectorAll('.role-tab').forEach(b => b.classList.remove('active'));
+        }
+    }
 
-          input.value = '';
-          fillSelect('');
+    function playOperaMusic() {
+        if (isOperaPlaying) return;
 
-          let opt = Array.from(select.options).find(o => o.value === belongTo);
-          if (!opt) {
-            opt = document.createElement('option');
-            opt.value = belongTo;
-            opt.textContent = COUNTRY_ZH[belongTo] ? `${COUNTRY_ZH[belongTo]} / ${belongTo}` : belongTo;
-            select.appendChild(opt);
-          }
-          select.value = belongTo;
+        isOperaPlaying = true;
+        if (backgroundMusic && !backgroundMusic.paused) {
+            backgroundMusic.pause();
+        }
 
-          world.pointOfView({ lat: city.lat, lng: city.lng, altitude: 1.6 }, 1000);
-          repaint();
-          refreshCities();
-          showCard(city.name, city.texts, city.role, belongTo);
-        })
-        .onPointHover(city => {
-          const name = city ? city.name : null;
-          if (name === hoveredCityName) return;
-          hoveredCityName = name;
-          const allPoints = world.pointsData();
-          world.labelsData(allPoints.filter(c => c.name === hoveredCityName));
-          document.body.style.cursor = city ? 'pointer' : 'default';
-        })
-        .htmlElementsData(cities)
-        .htmlLat(d => d.lat)
-        .htmlLng(d => d.lng)
-        .htmlAltitude(0.02)
-        .htmlElement(d => {
-          const el = document.createElement('div');
-          el.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><g fill="#ff0000"><circle cx="12" cy="6" r="3.5"/><circle cx="17.7" cy="10.2" r="3.5"/><circle cx="15.5" cy="16.8" r="3.5"/><circle cx="8.5" cy="16.8" r="3.5"/><circle cx="6.3" cy="10.2" r="3.5"/></g><circle cx="12" cy="12" r="2.5" fill="#fff"/></svg>`;
-          el.style.cssText = 'pointer-events:none;transform:translateY(-50%);filter:drop-shadow(0 2px 4px rgba(0,0,0,0.5));';
-          return el;
+        if (operaMusic) {
+            operaMusic.currentTime = 0;
+            operaMusic.play().catch(e => console.log("戏曲音乐播放失败:", e));
+
+            // 监听戏曲音乐结束事件
+            operaMusic.onended = function () {
+                isOperaPlaying = false;
+                if (gameStarted && !isPaused && !gameOver) {
+                    playBackgroundMusic();
+                }
+            };
+
+            // 安全起见，设置一个超时恢复背景音乐
+            if (operaTimeout) clearTimeout(operaTimeout);
+            operaTimeout = setTimeout(() => {
+                if (isOperaPlaying) {
+                    stopOperaMusic();
+                    if (gameStarted && !isPaused && !gameOver) {
+                        playBackgroundMusic();
+                    }
+                }
+            }, 30000); // 30秒后自动恢复
+        }
+    }
+
+    // 游戏暂停/恢复时控制音乐
+    function updateMusicForPause() {
+        if (isPaused) {
+            if (backgroundMusic && !backgroundMusic.paused) {
+                backgroundMusic.pause();
+            }
+            if (operaMusic && !operaMusic.paused) {
+                operaMusic.pause();
+            }
+        } else {
+            if (gameStarted && !gameOver) {
+                if (isOperaPlaying) {
+                    if (operaMusic) operaMusic.play().catch(e => console.log(e));
+                } else {
+                    if (backgroundMusic) backgroundMusic.play().catch(e => console.log(e));
+                }
+            }
+        }
+    }
+
+    // 初始化剧情系统
+    function initStorySystem() {
+        // 重置剧情系统
+        availableStories = [];
+        usedStories = [];
+        storyRound = 1;
+        storyCount = 0;
+
+        // 重置所有剧情的出现状态（除了黄铜箱子）
+        for (const key in STORIES) {
+            if (key !== 'BRASS_BOX') {
+                STORIES[key].canAppear = true;
+            } else {
+                STORIES[key].canAppear = false; // 初始不可出现
+                STORIES[key].hasAppeared = false;
+            }
+        }
+
+        console.log(`剧情系统初始化，第${storyRound}轮`);
+    }
+
+    // 获取下一个随机剧情（保证不重复）
+    function getNextRandomStory() {
+        storyCount++;
+
+        // 如果黄铜箱子还没出现过，并且已经触发了3个以上的剧情，可以出现黄铜箱子
+        if (storyCount > 3 && !STORIES.BRASS_BOX.hasAppeared) {
+            STORIES.BRASS_BOX.canAppear = true;
+        }
+
+        // 构建可用剧情列表
+        availableStories = [];
+        for (const key in STORIES) {
+            if (STORIES[key].canAppear && !usedStories.includes(key)) {
+                // 检查只出现一次的剧情是否已经出现过
+                if (STORIES[key].appearsOnlyOnce && STORIES[key].hasAppeared) {
+                    continue;
+                }
+                availableStories.push(key);
+            }
+        }
+
+        // 如果可用剧情列表为空，重置并进入下一轮
+        if (availableStories.length === 0) {
+            // 重置已使用列表
+            usedStories = [];
+            storyRound++;
+
+            // 重建可用列表（排除已经永久出现过的）
+            for (const key in STORIES) {
+                if (STORIES[key].canAppear) {
+                    // 检查只出现一次的剧情是否已经出现过
+                    if (STORIES[key].appearsOnlyOnce && STORIES[key].hasAppeared) {
+                        continue;
+                    }
+                    availableStories.push(key);
+                }
+            }
+
+            // 打乱顺序（确保每轮顺序不同）
+            shuffleArray(availableStories);
+
+            console.log(`进入第${storyRound}轮剧情，打乱顺序`);
+        }
+
+        // 从可用剧情中随机选择一个
+        const randomIndex = Math.floor(Math.random() * availableStories.length);
+        const storyKey = availableStories[randomIndex];
+
+        // 从可用列表中移除，添加到已使用列表
+        availableStories.splice(randomIndex, 1);
+        usedStories.push(storyKey);
+
+        // 标记只出现一次的剧情为已出现
+        if (STORIES[storyKey].appearsOnlyOnce) {
+            STORIES[storyKey].hasAppeared = true;
+            STORIES[storyKey].canAppear = false;
+        }
+
+        console.log(`选择剧情: ${STORIES[storyKey].name}，剩余可用: ${availableStories.length}，总触发: ${storyCount}`);
+
+        return STORIES[storyKey];
+    }
+
+    // 打乱数组顺序
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+    }
+
+    // 清除所有现有效果（被新剧情覆盖）
+    function clearAllEffects() {
+        console.log("清除所有现有效果");
+
+        // 清除夜幕降临效果
+        if (activeEffects.nightFall) {
+            gameBoardElement.classList.remove('night-fall');
+            activeEffects.nightFall = false;
+            if (effectTimers.nightFall) {
+                clearTimeout(effectTimers.nightFall);
+                effectTimers.nightFall = null;
+            }
+            // 移除提示文字
+            const warning = document.querySelector('.night-warning');
+            if (warning && warning.parentNode) {
+                warning.remove();
+            }
+        }
+
+        // 清除长生者效果
+        if (activeEffects.immortal) {
+            activeEffects.immortal = false;
+            dropSpeed = originalDropSpeed;
+            updateDropSpeed();
+            if (effectTimers.immortal) {
+                clearTimeout(effectTimers.immortal);
+                effectTimers.immortal = null;
+            }
+        }
+
+        // 清除炒肝效果
+        if (activeEffects.friedLiver) {
+            activeEffects.friedLiver = false;
+            if (effectTimers.friedLiver) {
+                clearTimeout(effectTimers.friedLiver);
+                effectTimers.friedLiver = null;
+            }
+            // 移除冻结覆盖层
+            const freezeOverlay = document.querySelector('.freeze-overlay');
+            if (freezeOverlay && freezeOverlay.parentNode) {
+                freezeOverlay.remove();
+            }
+        }
+
+        // 清除流血天气效果
+        if (activeEffects.bloodyWeather) {
+            activeEffects.bloodyWeather = false;
+            activeEffects.bloodyWeatherCount = 0;
+            gameBoardElement.classList.remove('blood-weather');
+        }
+
+        // 清除冤魂效果
+        if (activeEffects.yuanGhost) {
+            activeEffects.yuanGhost = false;
+            if (effectTimers.yuanGhost) {
+                clearTimeout(effectTimers.yuanGhost);
+                effectTimers.yuanGhost = null;
+            }
+        }
+
+        // 重新绘制游戏板
+        drawBoard();
+    }
+
+    // 初始化游戏板
+    function createBoard() {
+        board = Array.from({ length: BOARD_HEIGHT }, () =>
+            Array.from({ length: BOARD_WIDTH }, () => EMPTY_CELL)
+        );
+
+        gameBoardElement.innerHTML = '';
+        gameBoardElement.classList.remove('night-fall', 'blood-weather', 'yuan-ghost');
+
+        for (let row = 0; row < BOARD_HEIGHT; row++) {
+            for (let col = 0; col < BOARD_WIDTH; col++) {
+                const cell = document.createElement('div');
+                cell.classList.add('cell');
+                cell.dataset.row = row;
+                cell.dataset.col = col;
+                gameBoardElement.appendChild(cell);
+            }
+        }
+
+        nextPieceBoardElement.innerHTML = '';
+        for (let row = 0; row < 4; row++) {
+            for (let col = 0; col < 4; col++) {
+                const cell = document.createElement('div');
+                cell.classList.add('cell');
+                nextPieceBoardElement.appendChild(cell);
+            }
+        }
+
+        updateItemDisplays();
+    }
+
+    // 获取随机方块
+    function getRandomPiece() {
+        const tetrominoNames = Object.keys(TETROMINOES);
+        const randomName = tetrominoNames[Math.floor(Math.random() * tetrominoNames.length)];
+        return {
+            name: randomName,
+            shape: TETROMINOES[randomName].shape,
+            className: TETROMINOES[randomName].className,
+            row: 0,
+            col: Math.floor(BOARD_WIDTH / 2) - Math.floor(TETROMINOES[randomName].shape[0].length / 2)
+        };
+    }
+
+    // 保存当前方块状态（用于史努比撤回）
+    function saveCurrentState() {
+        // 深拷贝当前游戏板
+        previousBoard = JSON.parse(JSON.stringify(board));
+        // 保存当前方块
+        previousPiece = currentPiece ? JSON.parse(JSON.stringify(currentPiece)) : null;
+    }
+
+    // 绘制游戏板
+    function drawBoard() {
+        const cells = document.querySelectorAll('#game-board .cell');
+
+        cells.forEach(cell => {
+            cell.className = 'cell';
+            cell.textContent = '';
+            cell.style.backgroundColor = '';
+            cell.style.borderColor = '';
+        });
+
+        // 应用流血天气效果
+        if (activeEffects.bloodyWeather) {
+            gameBoardElement.classList.add('blood-weather');
+        } else {
+            gameBoardElement.classList.remove('blood-weather');
+        }
+
+        // 应用冤魂效果（黑色方块）
+        if (activeEffects.yuanGhost) {
+            gameBoardElement.classList.add('yuan-ghost');
+        } else {
+            gameBoardElement.classList.remove('yuan-ghost');
+        }
+
+        for (let row = 0; row < BOARD_HEIGHT; row++) {
+            for (let col = 0; col < BOARD_WIDTH; col++) {
+                if (board[row][col] !== EMPTY_CELL) {
+                    const cellIndex = row * BOARD_WIDTH + col;
+                    cells[cellIndex].classList.add('filled', board[row][col]);
+
+                    // 如果处于冤魂状态，所有方块显示为黑色
+                    if (activeEffects.yuanGhost) {
+                        cells[cellIndex].style.backgroundColor = '#000000';
+                        cells[cellIndex].style.borderColor = '#444444';
+                    }
+                    // 如果处于流血天气状态，所有方块显示为红色
+                    else if (activeEffects.bloodyWeather) {
+                        cells[cellIndex].style.backgroundColor = '#ff2a2a';
+                        cells[cellIndex].style.borderColor = '#ff7a7a';
+                    }
+                }
+            }
+        }
+
+        if (currentPiece) {
+            for (let row = 0; row < currentPiece.shape.length; row++) {
+                for (let col = 0; col < currentPiece.shape[row].length; col++) {
+                    if (currentPiece.shape[row][col]) {
+                        const boardRow = currentPiece.row + row;
+                        const boardCol = currentPiece.col + col;
+
+                        if (boardRow >= 0 && boardRow < BOARD_HEIGHT &&
+                            boardCol >= 0 && boardCol < BOARD_WIDTH) {
+                            const cellIndex = boardRow * BOARD_WIDTH + boardCol;
+
+                            // 如果处于冤魂状态，当前方块也显示为黑色
+                            if (activeEffects.yuanGhost) {
+                                cells[cellIndex].classList.add('filled');
+                                cells[cellIndex].style.backgroundColor = '#000000';
+                                cells[cellIndex].style.borderColor = '#444444';
+                            }
+                            // 如果处于流血天气状态，当前方块也显示为红色
+                            else if (activeEffects.bloodyWeather) {
+                                cells[cellIndex].classList.add('filled');
+                                cells[cellIndex].style.backgroundColor = '#ff2a2a';
+                                cells[cellIndex].style.borderColor = '#ff7a7a';
+                            } else {
+                                cells[cellIndex].classList.add('filled', currentPiece.className);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // 绘制下一个方块预览
+    function drawNextPiece() {
+        const cells = document.querySelectorAll('#next-piece-board .cell');
+
+        cells.forEach(cell => {
+            cell.className = 'cell';
+            cell.textContent = '';
+            cell.style.backgroundColor = '';
+            cell.style.borderColor = '';
+        });
+
+        if (nextPiece) {
+            const offsetX = Math.floor((4 - nextPiece.shape[0].length) / 2);
+            const offsetY = Math.floor((4 - nextPiece.shape.length) / 2);
+
+            for (let row = 0; row < nextPiece.shape.length; row++) {
+                for (let col = 0; col < nextPiece.shape[row].length; col++) {
+                    if (nextPiece.shape[row][col]) {
+                        const previewRow = row + offsetY;
+                        const previewCol = col + offsetX;
+                        const cellIndex = previewRow * 4 + previewCol;
+
+                        if (cellIndex >= 0 && cellIndex < cells.length) {
+                            // 如果处于流血天气状态，预览方块也显示为红色
+                            if (activeEffects.bloodyWeather && activeEffects.bloodyWeatherCount > 0) {
+                                cells[cellIndex].classList.add('filled');
+                                cells[cellIndex].style.backgroundColor = '#ff2a2a';
+                                cells[cellIndex].style.borderColor = '#ff7a7a';
+                            } else {
+                                cells[cellIndex].classList.add('filled', nextPiece.className);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // 更新道具显示和状态
+    function updateItemDisplays() {
+        mojingCountElement.textContent = items.mojing;
+        haitangCountElement.textContent = items.haitang;
+        qingjunceCountElement.textContent = items.qingjunce;
+        sodawaterCountElement.textContent = items.sodawater;
+
+        // 更新恢复进度条
+        updateRecoveryBars();
+
+        // 更新道具项状态（是否可用）
+        updateItemStates();
+    }
+
+    // 更新恢复进度条
+    function updateRecoveryBars() {
+        mojingRecoveryElement.style.width = `${itemRecoveryProgress.mojing}%`;
+        haitangRecoveryElement.style.width = `${itemRecoveryProgress.haitang}%`;
+        qingjunceRecoveryElement.style.width = `${itemRecoveryProgress.qingjunce}%`;
+        sodawaterRecoveryElement.style.width = `${itemRecoveryProgress.sodawater}%`;
+    }
+
+    // 更新道具项状态（是否可用）
+    function updateItemStates() {
+        // 清君侧
+        if (items.qingjunce > 0) {
+            qingjunceItemElement.classList.remove('disabled');
+            qingjunceItemElement.classList.add('recovered');
+        } else {
+            qingjunceItemElement.classList.add('disabled');
+            qingjunceItemElement.classList.remove('recovered');
+        }
+
+        // 苏打水
+        if (items.sodawater > 0) {
+            sodawaterItemElement.classList.remove('disabled');
+            sodawaterItemElement.classList.add('recovered');
+        } else {
+            sodawaterItemElement.classList.add('disabled');
+            sodawaterItemElement.classList.remove('recovered');
+        }
+
+        // 海棠
+        if (items.haitang > 0) {
+            haitangItemElement.classList.remove('disabled');
+            haitangItemElement.classList.add('recovered');
+        } else {
+            haitangItemElement.classList.add('disabled');
+            haitangItemElement.classList.remove('recovered');
+        }
+
+        // 墨镜
+        if (items.mojing > 0) {
+            mojingItemElement.classList.remove('disabled');
+            mojingItemElement.classList.add('recovered');
+        } else {
+            mojingItemElement.classList.add('disabled');
+            mojingItemElement.classList.remove('recovered');
+        }
+    }
+
+    // 开始道具恢复计时器（暂停时会自动暂停）
+    function startItemRecovery(itemType) {
+        // 如果已经有计时器在运行，先清除
+        if (itemRecoveryTimers[itemType]) {
+            clearInterval(itemRecoveryTimers[itemType]);
+        }
+
+        // 重置恢复进度（如果已经有道具，则从100%开始）
+        if (items[itemType] > 0) {
+            itemRecoveryProgress[itemType] = 100;
+        } else {
+            itemRecoveryProgress[itemType] = 0;
+        }
+
+        // 立即更新一次进度条
+        updateRecoveryBars();
+
+        // 如果道具数已经大于0（表示已经有可用道具），不启动恢复计时器
+        if (items[itemType] > 0) {
+            return;
+        }
+
+        // 计算恢复间隔（每100毫秒更新一次）
+        const recoveryTime = ITEM_RECOVERY_TIMES[itemType];
+        const interval = 100;
+        const steps = recoveryTime / interval;
+        const increment = 100 / steps;
+
+        let accumulatedProgress = itemRecoveryProgress[itemType];
+        let lastUpdateTime = Date.now();
+
+        // 开始恢复计时器
+        itemRecoveryTimers[itemType] = setInterval(() => {
+            if (isPaused || !gameStarted) return;
+
+            const currentTime = Date.now();
+            const elapsed = currentTime - lastUpdateTime;
+            lastUpdateTime = currentTime;
+
+            // 根据实际经过的时间计算进度
+            const progressIncrement = (elapsed / recoveryTime) * 100;
+            accumulatedProgress += progressIncrement;
+
+            // 确保不超过100%
+            if (accumulatedProgress > 100) {
+                accumulatedProgress = 100;
+            }
+
+            itemRecoveryProgress[itemType] = accumulatedProgress;
+
+            // 更新进度条
+            updateRecoveryBars();
+
+            // 恢复完成
+            if (accumulatedProgress >= 100) {
+                clearInterval(itemRecoveryTimers[itemType]);
+                itemRecoveryTimers[itemType] = null;
+                // 保持100%
+                itemRecoveryProgress[itemType] = 100;
+                items[itemType]++;
+                updateItemDisplays();
+
+                // 显示获得提示
+                let itemName = '';
+                if (itemType === 'mojing') itemName = '墨镜';
+                else if (itemType === 'haitang') itemName = '海棠';
+                else if (itemType === 'qingjunce') itemName = '清君侧';
+                else if (itemType === 'sodawater') itemName = '苏打水';
+
+                showItemAddedMessage(itemName);
+            }
+        }, interval);
+    }
+
+    // 暂停所有道具恢复计时器
+    function pauseAllItemRecovery() {
+        for (const itemType in itemRecoveryTimers) {
+            if (itemRecoveryTimers[itemType]) {
+                // 不清除计时器，但在恢复函数中检查暂停状态
+                console.log(`暂停 ${itemType} 恢复`);
+            }
+        }
+    }
+
+    // 恢复所有道具恢复计时器
+    function resumeAllItemRecovery() {
+        for (const itemType in itemRecoveryTimers) {
+            if (itemRecoveryTimers[itemType]) {
+                // 恢复函数已经在检查暂停状态
+                console.log(`恢复 ${itemType} 恢复`);
+            }
+        }
+    }
+
+    // 使用道具（会触发恢复计时器）
+    function useItem(itemType) {
+        if (items[itemType] <= 0) {
+            // 道具不可用，给用户反馈
+            const itemElement = document.getElementById(`${itemType}-item`);
+            itemElement.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                itemElement.style.transform = '';
+            }, 300);
+            return false;
+        }
+
+        items[itemType]--;
+        updateItemDisplays();
+
+        // 道具使用后，立即将恢复进度重置为0
+        itemRecoveryProgress[itemType] = 0;
+        updateRecoveryBars();
+
+        // 开始恢复计时器（从0开始恢复）
+        startItemRecovery(itemType);
+
+        return true;
+    }
+
+    // 显示道具获得提示
+    function showItemAddedMessage(itemName) {
+        const message = document.createElement('div');
+        message.className = 'item-added';
+        message.textContent = `获得道具：${itemName}`;
+        document.body.appendChild(message);
+
+        // 3秒后移除提示
+        setTimeout(() => {
+            if (message.parentNode) {
+                message.remove();
+            }
+        }, 3000);
+    }
+
+    // 检查碰撞
+    function checkCollision(piece, rowOffset = 0, colOffset = 0) {
+        for (let row = 0; row < piece.shape.length; row++) {
+            for (let col = 0; col < piece.shape[row].length; col++) {
+                if (piece.shape[row][col]) {
+                    const newRow = piece.row + row + rowOffset;
+                    const newCol = piece.col + col + colOffset;
+
+                    if (
+                        newRow >= BOARD_HEIGHT ||
+                        newCol < 0 ||
+                        newCol >= BOARD_WIDTH ||
+                        (newRow >= 0 && board[newRow][newCol] !== EMPTY_CELL)
+                    ) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    // 移动方块（考虑炒肝冻结效果）
+    function movePiece(rowOffset, colOffset) {
+        if (!currentPiece || gameOver || isPaused || !gameStarted) return false;
+
+        // 炒肝效果：玩家不能操作，但游戏正常进行
+        if (activeEffects.friedLiver) return false;
+
+        if (!checkCollision(currentPiece, rowOffset, colOffset)) {
+            currentPiece.row += rowOffset;
+            currentPiece.col += colOffset;
+            drawBoard();
+            return true;
+        }
+
+        if (rowOffset > 0 && colOffset === 0) {
+            lockPiece();
+            return false;
+        }
+
+        return false;
+    }
+
+    // 旋转方块（考虑炒肝冻结效果）
+    function rotatePiece() {
+        if (!currentPiece || gameOver || isPaused || !gameStarted) return;
+
+        // 炒肝效果：玩家不能操作，但游戏正常进行
+        if (activeEffects.friedLiver) return;
+
+        const originalShape = currentPiece.shape;
+        const originalCol = currentPiece.col;
+        const originalRow = currentPiece.row;
+
+        const rotatedShape = [];
+        const rows = originalShape.length;
+        const cols = originalShape[0].length;
+
+        for (let col = 0; col < cols; col++) {
+            const newRow = [];
+            for (let row = rows - 1; row >= 0; row--) {
+                newRow.push(originalShape[row][col]);
+            }
+            rotatedShape.push(newRow);
+        }
+
+        currentPiece.shape = rotatedShape;
+
+        const kicks = [
+            [0, 0],
+            [0, -1],
+            [0, 1],
+            [-1, 0],
+            [1, 0]
+        ];
+
+        let canRotate = false;
+
+        for (const [rowOffset, colOffset] of kicks) {
+            currentPiece.row = originalRow + rowOffset;
+            currentPiece.col = originalCol + colOffset;
+
+            if (!checkCollision(currentPiece)) {
+                canRotate = true;
+                break;
+            }
+        }
+
+        if (!canRotate) {
+            currentPiece.shape = originalShape;
+            currentPiece.row = originalRow;
+            currentPiece.col = originalCol;
+        }
+
+        drawBoard();
+    }
+
+    // 直接落下方块（考虑炒肝冻结效果）
+    function dropPiece() {
+        if (!currentPiece || gameOver || isPaused || !gameStarted) return;
+
+        // 炒肝效果：玩家不能操作，但游戏正常进行
+        if (activeEffects.friedLiver) return;
+
+        while (movePiece(1, 0)) {
+            // 持续向下移动直到碰撞
+        }
+    }
+
+    // 固定方块到游戏板
+    function lockPiece() {
+        if (!currentPiece) return;
+
+        // 在固定方块前保存状态（用于史努比撤回）
+        saveCurrentState();
+
+        for (let row = 0; row < currentPiece.shape.length; row++) {
+            for (let col = 0; col < currentPiece.shape[row].length; col++) {
+                if (currentPiece.shape[row][col]) {
+                    const boardRow = currentPiece.row + row;
+                    const boardCol = currentPiece.col + col;
+
+                    if (boardRow >= 0) {
+                        // 如果处于流血天气状态，固定为红色方块
+                        if (activeEffects.bloodyWeather && activeEffects.bloodyWeatherCount > 0) {
+                            board[boardRow][boardCol] = 'z'; // 使用z类作为红色方块标识
+                        } else {
+                            board[boardRow][boardCol] = currentPiece.className;
+                        }
+                    }
+                }
+            }
+        }
+
+        // 减少流血天气计数器
+        if (activeEffects.bloodyWeather && activeEffects.bloodyWeatherCount > 0) {
+            activeEffects.bloodyWeatherCount--;
+            if (activeEffects.bloodyWeatherCount <= 0) {
+                activeEffects.bloodyWeather = false;
+                gameStatusElement.textContent = "流血天气结束";
+                setTimeout(() => {
+                    if (!gameOver && !isPaused && gameStarted) {
+                        gameStatusElement.textContent = "游戏中";
+                    }
+                }, 2000);
+            }
+        }
+
+        clearLines();
+
+        // 获取下一个方块
+        currentPiece = nextPiece;
+
+        // 如果处于流血天气状态，生成红色方块
+        if (activeEffects.bloodyWeather && activeEffects.bloodyWeatherCount > 0) {
+            nextPiece = {
+                name: 'Z',
+                shape: TETROMINOES.Z.shape,
+                className: 'z', // 红色方块
+                row: 0,
+                col: Math.floor(BOARD_WIDTH / 2) - Math.floor(TETROMINOES.Z.shape[0].length / 2)
+            };
+        } else {
+            nextPiece = getRandomPiece();
+        }
+
+        drawNextPiece();
+
+        // 检查游戏是否结束
+        if (checkCollision(currentPiece)) {
+            gameOver = true;
+            gameStatusElement.textContent = "游戏结束!";
+            clearInterval(dropInterval);
+            dropInterval = null;
+            pauseResumeButton.disabled = true;
+            pauseResumeButton.textContent = "暂停";
+            pauseBackgroundMusic();
+            stopOperaMusic();
+        }
+
+        drawBoard();
+    }
+
+    // 清除完整的行
+    function clearLines() {
+        let linesCleared = 0;
+
+        for (let row = BOARD_HEIGHT - 1; row >= 0; row--) {
+            if (board[row].every(cell => cell !== EMPTY_CELL)) {
+                board.splice(row, 1);
+                board.unshift(Array.from({ length: BOARD_WIDTH }, () => EMPTY_CELL));
+                linesCleared++;
+                row++;
+            }
+        }
+
+        if (linesCleared > 0) {
+            // 更新分数
+            score += linesCleared * 100;
+            scoreElement.textContent = score;
+
+            gameStatusElement.textContent = `消除了 ${linesCleared} 行!`;
+
+            // 每次消除都会触发随机剧情
+            setTimeout(() => {
+                triggerRandomStory();
+            }, 500);
+        } else {
+            if (!gameOver && !isPaused && gameStarted) {
+                gameStatusElement.textContent = "游戏中";
+            }
+        }
+    }
+
+    // 触发随机剧情
+    // 触发随机剧情
+    function triggerRandomStory() {
+        if (gameOver || isPaused) return;
+
+        console.log("触发随机剧情...");
+
+        // 暂停游戏
+        clearInterval(dropInterval);
+        isPaused = true;
+
+        // 获取下一个随机剧情（保证不重复）
+        const story = getNextRandomStory();
+
+        console.log("获取到剧情:", story.name);
+
+        // 显示剧情弹窗
+        showStoryModal(story);
+    }
+
+    // 显示剧情弹窗
+    function showStoryModal(story) {
+        console.log("显示剧情弹窗，剧情名称:", story.name);
+
+        eventTitleElement.textContent = story.name;
+        // 隐藏类型标签
+        if (eventTypeElement) {
+            eventTypeElement.style.display = 'none';
+        }
+        eventDescriptionElement.textContent = story.effect;
+        eventEffectDescElement.textContent = story.description;
+
+        // 如果是黄铜箱子，添加特殊样式
+        if (story.name.includes("黄铜箱子")) {
+            const eventContent = eventModal.querySelector('.event-content');
+            eventContent.classList.add('brass-box-special');
+        }
+
+        // 清空之前的动作按钮
+        eventActionsElement.innerHTML = '';
+
+        // 根据剧情类型添加不同的动作按钮
+        if (story.name.includes("食君之禄")) {
+            console.log("创建食君之禄按钮");
+            // 食君之禄：需要消耗海棠
+            const consumeButton = document.createElement('button');
+            consumeButton.className = 'event-button consume';
+            consumeButton.textContent = `支付1朵【海棠】🌸`;
+            consumeButton.onclick = () => {
+                console.log("点击支付海棠按钮");
+                if (items.haitang > 0) {
+                    items.haitang--;
+                    updateItemDisplays();
+                    // 开始海棠恢复计时器
+                    startItemRecovery('haitang');
+                    // 清除所有现有效果
+                    clearAllEffects();
+                    resumeGame();
+                } else {
+                    // 没有海棠，触发冤魂效果
+                    console.log("没有海棠，触发怨气效果");
+                    handleYuanGhost();
+                }
+            };
+
+            const cancelButton = document.createElement('button');
+            cancelButton.className = 'event-button cancel';
+            cancelButton.textContent = '拒绝支付';
+            cancelButton.onclick = () => {
+                console.log("点击拒绝支付按钮");
+                // 拒绝消耗海棠，触发冤魂效果
+                handleYuanGhost();
+            };
+
+            eventActionsElement.appendChild(consumeButton);
+            eventActionsElement.appendChild(cancelButton);
+
+        } else if (story.name.includes("夜幕降临")) {
+            console.log("创建夜幕降临按钮");
+            // 夜幕降临：需要消耗墨镜
+            const consumeButton = document.createElement('button');
+            consumeButton.className = 'event-button consume';
+            consumeButton.textContent = `使用1副【墨镜】🕶️`;
+            consumeButton.onclick = () => {
+                console.log("点击使用墨镜按钮");
+                if (items.mojing > 0) {
+                    items.mojing--;
+                    updateItemDisplays();
+                    // 开始墨镜恢复计时器
+                    startItemRecovery('mojing');
+                    // 清除所有现有效果
+                    clearAllEffects();
+                    resumeGame();
+                } else {
+                    // 没有墨镜，触发黑夜效果
+                    console.log("没有墨镜，触发黑夜效果");
+                    handleNightFallWithoutMojing();
+                }
+            };
+
+            const cancelButton = document.createElement('button');
+            cancelButton.className = 'event-button cancel';
+            cancelButton.textContent = '拒绝使用';
+            cancelButton.onclick = () => {
+                console.log("点击拒绝使用按钮");
+                // 拒绝消耗墨镜，触发黑夜效果
+                handleNightFallWithoutMojing();
+            };
+
+            eventActionsElement.appendChild(consumeButton);
+            eventActionsElement.appendChild(cancelButton);
+
+        } else if (story.name.includes("机票")) {
+            console.log("创建机票输入框");
+            // 机票：需要输入正确文本
+            const inputContainer = document.createElement('div');
+            inputContainer.className = 'input-container';
+
+            const inputText = document.createElement('div');
+            inputText.className = 'input-text';
+            inputText.textContent = '卑微的_____ ';
+
+            const textInput = document.createElement('input');
+            textInput.type = 'text';
+            textInput.className = 'text-input';
+            textInput.placeholder = '请输入答案';
+
+            const confirmButton = document.createElement('button');
+            confirmButton.className = 'event-button';
+            confirmButton.textContent = '确认';
+
+            confirmButton.onclick = () => {
+                console.log("点击确认按钮，输入值:", textInput.value);
+                if (textInput.value.trim() === '爱情') {
+                    console.log("输入正确");
+                    // 机票剧情不需要清除效果，直接恢复游戏
+                    // 不要调用 clearAllEffects(); ← 移除这行
+                    resumeGame();
+                    // 可以添加一些反馈
+                    gameStatusElement.textContent = "登机成功！";
+                    setTimeout(() => {
+                        if (!gameOver && !isPaused && gameStarted) {
+                            gameStatusElement.textContent = "游戏中";
+                        }
+                    }, 2000);
+                } else {
+                    console.log("输入错误");
+                    // 输入错误，保持弹窗显示，给出提示
+                    alert('❌ 输入错误！提示：友情/爱情/亲情');
+                    textInput.value = '';
+                    textInput.focus();
+                    // 不关闭弹窗，让用户继续尝试
+                }
+            };
+
+            inputContainer.appendChild(inputText);
+            inputContainer.appendChild(textInput);
+            eventActionsElement.appendChild(inputContainer);
+            eventActionsElement.appendChild(confirmButton);
+
+            // 添加回车键支持
+            textInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    confirmButton.click();
+                }
+            });
+
+            // 自动聚焦到输入框
+            setTimeout(() => {
+                textInput.focus();
+            }, 100);
+
+        } else {
+            console.log("创建默认确认按钮");
+            // 其他剧情：直接确认继续
+            const confirmButton = document.createElement('button');
+            confirmButton.className = 'event-button';
+            confirmButton.textContent = '确认继续';
+            confirmButton.onclick = () => {
+                console.log("点击确认继续按钮");
+                // 清除所有现有效果
+                clearAllEffects();
+                resumeGame();
+                // 触发剧情效果
+                story.effectFunc();
+            };
+
+            eventActionsElement.appendChild(confirmButton);
+        }
+
+        console.log("显示弹窗");
+        eventModal.classList.add('active');
+    }
+
+    // 恢复游戏
+    function resumeGame() {
+        eventModal.classList.remove('active');
+        // 移除黄铜箱子的特殊样式
+        const eventContent = eventModal.querySelector('.event-content');
+        eventContent.classList.remove('brass-box-special');
+
+        isPaused = false;
+        if (!gameOver && gameStarted) {
+            dropInterval = setInterval(() => {
+                movePiece(1, 0);
+            }, dropSpeed);
+            gameStatusElement.textContent = "游戏中";
+            updateMusicForPause();
+        }
+    }
+
+    // 处理食君之禄剧情
+    function handleShijunzhilu() {
+        // 这个函数不会被直接调用，因为食君之禄有特殊的弹窗处理
+        console.log("食君之禄剧情处理");
+    }
+
+    // 处理冤魂效果（没有海棠的情况）
+    // 处理冤魂效果（没有海棠的情况）
+    function handleYuanGhost() {
+        // 清除所有现有效果
+        clearAllEffects();
+
+        // 触发冤魂效果
+        activeEffects.yuanGhost = true;
+
+        // 显示冤字弹窗
+        eventModal.classList.remove('active');
+
+        // 创建冤字弹窗
+        const yuanModal = document.createElement('div');
+        yuanModal.className = 'event-modal active';
+        yuanModal.innerHTML = `
+        <div class="event-content">
+            <div class="yuan-character" style="color: white !important; text-shadow: 0 0 20px rgba(255, 255, 255, 0.7) !important;">冤</div>
+            <div class="event-description" style="color: #ff9ec9;">黑眼镜把发票贴成一个冤字</div>
+            <button class="confirm-button" id="confirm-yuan-button">确认</button>
+        </div>
+    `;
+
+        document.body.appendChild(yuanModal);
+
+        // 更新游戏板显示（黑色方块）
+        drawBoard();
+
+        // 设置定时器，20秒后自动清除效果
+        effectTimers.yuanGhost = setTimeout(() => {
+            activeEffects.yuanGhost = false;
+            drawBoard();
+            gameStatusElement.textContent = "冤魂散去";
+            setTimeout(() => {
+                if (!gameOver && !isPaused && gameStarted) {
+                    gameStatusElement.textContent = "游戏中";
+                }
+            }, 2000);
+        }, 20000);
+
+        // 确认按钮事件
+        document.getElementById('confirm-yuan-button').onclick = () => {
+            yuanModal.remove();
+            resumeGame();
+        };
+    }
+
+    // 处理夜幕降临剧情（有墨镜消耗）
+    function handleNightFall() {
+        // 这个函数不会被直接调用，因为夜幕降临有特殊的弹窗处理
+        console.log("夜幕降临剧情处理");
+    }
+
+    // 处理夜幕降临（没有墨镜的情况）
+    function handleNightFallWithoutMojing() {
+        // 清除所有现有效果
+        clearAllEffects();
+
+        eventModal.classList.remove('active');
+
+        // 触发夜幕降临效果（覆盖之前的效果）
+        activeEffects.nightFall = true;
+        gameBoardElement.classList.add('night-fall');
+
+        // 添加提示文字
+        const warning = document.createElement('div');
+        warning.className = 'night-warning';
+        warning.textContent = "夜幕降临，5秒后恢复";
+        gameBoardElement.appendChild(warning);
+
+        // 游戏正常进行，只是玩家看不到
+        resumeGame();
+
+        // 5秒后恢复
+        effectTimers.nightFall = setTimeout(() => {
+            activeEffects.nightFall = false;
+            gameBoardElement.classList.remove('night-fall');
+            if (warning.parentNode) {
+                warning.remove();
+            }
+            gameStatusElement.textContent = "夜幕散去";
+            setTimeout(() => {
+                if (!gameOver && !isPaused && gameStarted) {
+                    gameStatusElement.textContent = "游戏中";
+                }
+            }, 2000);
+        }, 5000);
+    }
+
+    // 长生者效果
+    function activateImmortal() {
+        // 清除之前的效果
+        clearAllEffects();
+
+        activeEffects.immortal = true;
+        originalDropSpeed = dropSpeed;
+        dropSpeed *= 2; // 速度减半
+        updateDropSpeed();
+        gameStatusElement.textContent = "方块下落速度变慢";
+
+        // 长生者效果持续20秒
+        effectTimers.immortal = setTimeout(() => {
+            if (activeEffects.immortal) {
+                activeEffects.immortal = false;
+                dropSpeed = originalDropSpeed;
+                updateDropSpeed();
+                gameStatusElement.textContent = "变慢效果结束";
+                setTimeout(() => {
+                    if (!gameOver && !isPaused && gameStarted) {
+                        gameStatusElement.textContent = "游戏中";
+                    }
+                }, 1000);
+            }
+        }, 10000);
+    }
+
+    // 炒肝效果 - 玩家不能操作，但游戏正常进行
+    // 炒肝效果 - 玩家不能操作，但游戏正常进行
+    function activateFriedLiver() {
+        // 清除之前的效果
+        clearAllEffects();
+
+        // 炒肝效果在确认后触发
+        setTimeout(() => {
+            if (activeEffects.friedLiver) return;
+
+            activeEffects.friedLiver = true;
+            gameStatusElement.textContent = "操作被冻结3秒";
+
+            // 创建冻结效果覆盖层
+            const freezeOverlay = document.createElement('div');
+            freezeOverlay.className = 'freeze-overlay';
+            const freezeText = document.createElement('div');
+            freezeText.className = 'freeze-text';
+            freezeText.textContent = "🌸 吃炒肝中";  // 修改这里的文字
+            freezeText.style.animation = 'none';  // 移除动画效果
+            freezeText.style.fontSize = '1rem';  // 调整字体大小
+            freezeText.style.color = '#ff9ec9';    // 粉色文字
+            freezeText.style.textShadow = '0 2px 4px rgba(0, 0, 0, 0.5)';
+            freezeOverlay.appendChild(freezeText);
+            gameBoardElement.appendChild(freezeOverlay);
+
+            // 3秒后解除冻结
+            effectTimers.friedLiver = setTimeout(() => {
+                activeEffects.friedLiver = false;
+                if (freezeOverlay.parentNode) {
+                    freezeOverlay.remove();
+                }
+                gameStatusElement.textContent = "炒肝吃完啦";
+                setTimeout(() => {
+                    if (!gameOver && !isPaused && gameStarted) {
+                        gameStatusElement.textContent = "游戏中";
+                    }
+                }, 2000);
+            }, 3000);
+        }, 100);
+    }
+
+    // 流血天气效果
+    function activateBloodyWeather() {
+        // 清除之前的效果
+        clearAllEffects();
+
+        activeEffects.bloodyWeather = true;
+        activeEffects.bloodyWeatherCount = 5; // 接下来的5个方块
+        gameStatusElement.textContent = "接下来5个方块变为红色";
+        drawBoard();
+        drawNextPiece();
+    }
+
+    // 戏曲效果
+    function activateOpera() {
+        gameStatusElement.textContent = "播放BGM《霸王别姬》";
+        playOperaMusic();
+        setTimeout(() => {
+            if (!gameOver && !isPaused && gameStarted) {
+                gameStatusElement.textContent = "游戏中";
+            }
+        }, 3000);
+    }
+
+    // 史努比效果 - 撤回这一步方块
+    function activateSnoopy() {
+        if (previousBoard && previousPiece) {
+            // 清除之前的效果
+            clearAllEffects();
+
+            // 恢复之前的游戏板状态
+            board = JSON.parse(JSON.stringify(previousBoard));
+            currentPiece = JSON.parse(JSON.stringify(previousPiece));
+
+            drawBoard();
+            gameStatusElement.textContent = "撤回了一步";
+            setTimeout(() => {
+                if (!gameOver && !isPaused && gameStarted) {
+                    gameStatusElement.textContent = "游戏中";
+                }
+            }, 2000);
+        } else {
+            gameStatusElement.textContent = "史努比出现，但没有可撤回的步骤";
+            setTimeout(() => {
+                if (!gameOver && !isPaused && gameStarted) {
+                    gameStatusElement.textContent = "游戏中";
+                }
+            }, 2000);
+        }
+    }
+
+    // 黄铜箱子效果 - 分数变成9999
+    function activateBrassBox() {
+        // 清除之前的效果
+        clearAllEffects();
+
+        score = 9999;
+        scoreElement.textContent = score;
+        gameStatusElement.textContent = "分数变为9999";
+        setTimeout(() => {
+            if (!gameOver && !isPaused && gameStarted) {
+                gameStatusElement.textContent = "游戏中";
+            }
+        }, 2000);
+    }
+
+    // 机票效果 - 需要输入正确文本（已在showStoryModal中处理）
+    function activateTicket() {
+        // 效果在showStoryModal中处理，这里只需记录
+        console.log("机票剧情激活");
+    }
+
+    // 易拉罐风车效果 - 随机消除3块已经存在的方块
+    function activateCanWindmill() {
+        // 清除之前的效果
+        clearAllEffects();
+
+        // 收集所有已填充的方块位置
+        const filledCells = [];
+        for (let row = 0; row < BOARD_HEIGHT; row++) {
+            for (let col = 0; col < BOARD_WIDTH; col++) {
+                if (board[row][col] !== EMPTY_CELL) {
+                    filledCells.push({ row, col });
+                }
+            }
+        }
+
+        if (filledCells.length === 0) {
+            gameStatusElement.textContent = "易拉罐风车转动，但没有方块可消除";
+            setTimeout(() => {
+                if (!gameOver && !isPaused && gameStarted) {
+                    gameStatusElement.textContent = "游戏中";
+                }
+            }, 2000);
+            return;
+        }
+
+        // 随机选择3个方块（如果总数不足9个，则选择所有）
+        const cellsToRemove = Math.min(9, filledCells.length);
+        const removedPositions = [];
+
+        for (let i = 0; i < cellsToRemove; i++) {
+            const randomIndex = Math.floor(Math.random() * filledCells.length);
+            const cell = filledCells[randomIndex];
+            removedPositions.push({ ...cell });
+            filledCells.splice(randomIndex, 1);
+
+            // 标记为需要移除
+            board[cell.row][cell.col] = EMPTY_CELL;
+        }
+
+        // 处理方块下落
+        for (const pos of removedPositions) {
+            // 从被移除的位置开始，上方的方块下落
+            for (let row = pos.row - 1; row >= 0; row--) {
+                if (board[row][pos.col] !== EMPTY_CELL) {
+                    board[row + 1][pos.col] = board[row][pos.col];
+                    board[row][pos.col] = EMPTY_CELL;
+                }
+            }
+        }
+
+        drawBoard();
+        gameStatusElement.textContent = `消除了${cellsToRemove}个方块`;
+        setTimeout(() => {
+            if (!gameOver && !isPaused && gameStarted) {
+                gameStatusElement.textContent = "游戏中";
+            }
+        }, 2000);
+    }
+
+    // 道具效果函数
+    function clearAllBlocks() {
+        // 清除所有方块
+        for (let row = 0; row < BOARD_HEIGHT; row++) {
+            for (let col = 0; col < BOARD_WIDTH; col++) {
+                board[row][col] = EMPTY_CELL;
+            }
+        }
+        drawBoard();
+        gameStatusElement.textContent = "所有方块已清除";
+        setTimeout(() => {
+            if (!gameOver && !isPaused && gameStarted) {
+                gameStatusElement.textContent = "游戏中";
+            }
+        }, 2000);
+    }
+
+    function randomizeNextPiece() {
+        // 随机改变下一个方块的形状
+        nextPiece = getRandomPiece();
+        drawNextPiece();
+        gameStatusElement.textContent = "下一个方块已改变";
+        setTimeout(() => {
+            if (!gameOver && !isPaused && gameStarted) {
+                gameStatusElement.textContent = "游戏中";
+            }
+        }, 2000);
+    }
+
+    // 更新下落速度
+    function updateDropSpeed() {
+        if (dropInterval) {
+            clearInterval(dropInterval);
+            dropInterval = setInterval(() => {
+                movePiece(1, 0);
+            }, dropSpeed);
+        }
+    }
+
+    // 开始/重新开始游戏
+    // 开始/重新开始游戏
+    function startOrRestartGame() {
+        console.log("点击开始/重新开始按钮，当前状态 - gameStarted:", gameStarted, "gameOver:", gameOver);
+
+        if (gameStarted && !gameOver) {
+            // 重新开始游戏：直接开始，不显示规则
+            console.log("重新开始游戏");
+            resetGame();
+            startGame();
+        } else {
+            // 第一次开始游戏：先显示规则
+            console.log("第一次开始游戏，显示规则");
+            resetGame();
+            showRulesModal();
+        }
+    }
+
+    // 显示规则弹窗
+    function showRulesModal() {
+        console.log("显示游戏规则弹窗");
+        rulesModal.classList.add('active');
+
+        // 禁用其他按钮
+        startRestartButton.disabled = true;
+        pauseResumeButton.disabled = true;
+    }
+
+    // 隐藏规则弹窗并开始游戏
+    function hideRulesModalAndStartGame() {
+        console.log("关闭规则弹窗，开始游戏");
+        rulesModal.classList.remove('active');
+
+        // 启用其他按钮
+        startRestartButton.disabled = false;
+
+        // 开始游戏
+        startGame();
+    }
+
+    // 开始游戏
+    // 开始游戏
+    function startGame() {
+        gameStarted = true;
+        gameOver = false;
+        isPaused = false;
+        gameStatusElement.textContent = "游戏中";
+        startRestartButton.textContent = "重新开始";
+        pauseResumeButton.disabled = false;
+
+        // 初始化剧情系统
+        initStorySystem();
+
+        // 初始化道具（初始值为0，会自动恢复）
+        items = {
+            mojing: 0,
+            haitang: 0,
+            qingjunce: 0,
+            sodawater: 0
+        };
+
+        // 清除所有恢复计时器
+        for (const itemType in itemRecoveryTimers) {
+            if (itemRecoveryTimers[itemType]) {
+                clearInterval(itemRecoveryTimers[itemType]);
+                itemRecoveryTimers[itemType] = null;
+            }
+            itemRecoveryProgress[itemType] = 0;
+        }
+
+        // 开始所有道具的恢复计时器
+        startItemRecovery('mojing');
+        startItemRecovery('haitang');
+        startItemRecovery('qingjunce');
+        startItemRecovery('sodawater');
+
+        updateItemDisplays();
+
+        // 清除所有效果
+        clearAllEffects();
+
+        gameBoardElement.classList.remove('night-fall', 'blood-weather', 'yuan-ghost');
+
+        // 确保有当前方块和下一个方块
+        if (!currentPiece) {
+            currentPiece = getRandomPiece();
+        }
+
+        if (!nextPiece) {
+            nextPiece = getRandomPiece();
+            drawNextPiece();
+        }
+
+        // 重置下落速度
+        dropSpeed = 1000;
+        originalDropSpeed = 1000;
+
+        // 清除之前的定时器
+        if (dropInterval) {
+            clearInterval(dropInterval);
+        }
+
+        // 开始新的定时器
+        dropInterval = setInterval(() => {
+            movePiece(1, 0);
+        }, dropSpeed);
+
+        // 开始播放背景音乐（从规则弹窗确认后播放）
+        playBackgroundMusic();
+
+        drawBoard();
+
+        console.log("游戏开始完成");
+    }
+
+    // 规则弹窗确认按钮事件
+    rulesConfirmButton.addEventListener('click', hideRulesModalAndStartGame);
+
+    // 也可以在规则弹窗区域点击其他地方关闭（可选）
+    rulesModal.addEventListener('click', function (e) {
+        if (e.target === rulesModal) {
+            hideRulesModalAndStartGame();
+        }
+    });
+
+    // 暂停/继续游戏
+    function togglePauseResume() {
+        if (gameOver || !gameStarted) return;
+
+        isPaused = !isPaused;
+
+        if (isPaused) {
+            clearInterval(dropInterval);
+            gameStatusElement.textContent = "已暂停";
+            pauseResumeButton.textContent = "继续";
+            pauseAllItemRecovery();
+        } else {
+            gameStatusElement.textContent = "游戏中";
+            pauseResumeButton.textContent = "暂停";
+
+            dropInterval = setInterval(() => {
+                movePiece(1, 0);
+            }, dropSpeed);
+            resumeAllItemRecovery();
+        }
+
+        updateMusicForPause();
+    }
+
+    // 重置游戏状态
+    // 重置游戏状态
+    function resetGame() {
+        // 清除定时器
+        if (dropInterval) {
+            clearInterval(dropInterval);
+            dropInterval = null;
+        }
+
+        // 清除道具恢复计时器
+        for (const itemType in itemRecoveryTimers) {
+            if (itemRecoveryTimers[itemType]) {
+                clearInterval(itemRecoveryTimers[itemType]);
+                itemRecoveryTimers[itemType] = null;
+            }
+            itemRecoveryProgress[itemType] = 0;
+        }
+
+        // 清除效果计时器
+        for (const timer in effectTimers) {
+            if (effectTimers[timer]) {
+                clearTimeout(effectTimers[timer]);
+                effectTimers[timer] = null;
+            }
+        }
+
+        // 重置游戏变量
+        score = 0;
+        gameOver = false;
+        isPaused = false;
+        gameStarted = false;
+        dropSpeed = 1000;
+
+        // 清除所有效果
+        clearAllEffects();
+
+        // 重置剧情状态
+        previousBoard = null;
+        previousPiece = null;
+
+        // 隐藏规则弹窗（如果显示的话）
+        rulesModal.classList.remove('active');
+
+        // 确保开始按钮可用
+        startRestartButton.disabled = false;
+
+        // 停止音乐
+        pauseBackgroundMusic();
+        stopOperaMusic();
+        isOperaPlaying = false;
+
+        // 更新UI
+        scoreElement.textContent = score;
+        gameStatusElement.textContent = "准备开始";
+        startRestartButton.textContent = "开始游戏";
+        pauseResumeButton.textContent = "暂停";
+        pauseResumeButton.disabled = true;
+
+        // 重置游戏板
+        createBoard();
+        currentPiece = getRandomPiece();
+        nextPiece = getRandomPiece();
+        drawNextPiece();
+        drawBoard();
+    }
+
+    // 键盘控制
+    function handleKeyDown(event) {
+        if (!gameStarted && event.key !== 'Enter') return;
+
+        switch (event.key) {
+            case 'ArrowLeft':
+                event.preventDefault();
+                movePiece(0, -1);
+                break;
+            case 'ArrowRight':
+                event.preventDefault();
+                movePiece(0, 1);
+                break;
+            case 'ArrowDown':
+                event.preventDefault();
+                movePiece(1, 0);
+                break;
+            case 'ArrowUp':
+                event.preventDefault();
+                rotatePiece();
+                break;
+            case ' ':
+                event.preventDefault();
+                dropPiece();
+                break;
+            case 'p':
+            case 'P':
+                event.preventDefault();
+                togglePauseResume();
+                break;
+            case 'r':
+            case 'R':
+                event.preventDefault();
+                resetGame();
+                startGame();
+                break;
+            case 'Enter':
+                event.preventDefault();
+                startOrRestartGame();
+                break;
+        }
+    }
+
+    // 设置触摸控制和道具点击
+    function setupTouchControls() {
+        // 旋转按钮
+        const rotateBtn = document.querySelector('.touch-btn.rotate');
+        if (rotateBtn) {
+            rotateBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                rotatePiece();
+            });
+
+            rotateBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                rotatePiece();
+            });
+        }
+
+        // 移动按钮
+        const leftBtn = document.querySelector('.touch-btn.left');
+        if (leftBtn) {
+            leftBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                movePiece(0, -1);
+            });
+
+            leftBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                movePiece(0, -1);
+            });
+        }
+
+        const rightBtn = document.querySelector('.touch-btn.right');
+        if (rightBtn) {
+            rightBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                movePiece(0, 1);
+            });
+
+            rightBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                movePiece(0, 1);
+            });
+        }
+
+        const downBtn = document.querySelector('.touch-btn.down');
+        if (downBtn) {
+            downBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                movePiece(1, 0);
+            });
+
+            downBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                movePiece(1, 0);
+            });
+        }
+
+        const dropBtn = document.querySelector('.touch-btn.drop');
+        if (dropBtn) {
+            dropBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                dropPiece();
+            });
+
+            dropBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                dropPiece();
+            });
+        }
+
+        // 道具点击事件
+        qingjunceItemElement.addEventListener('click', () => {
+            if (useItem('qingjunce')) {
+                ITEMS.QINGJUNCE.effectFunc();
+            }
+        });
+
+        sodawaterItemElement.addEventListener('click', () => {
+            if (useItem('sodawater')) {
+                ITEMS.SODAWATER.effectFunc();
+            }
+        });
+
+        // 防止触摸滚动
+        document.querySelectorAll('.touch-btn').forEach(btn => {
+            btn.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+            });
+        });
+
+        // 道具项也防止触摸滚动
+        document.querySelectorAll('.item').forEach(item => {
+            item.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+            });
         });
     }
 
-    const infoCard    = document.getElementById('info-card');
-    const overlay     = document.getElementById('overlay');
-    const infoTitle   = document.getElementById('info-title');
-    const textBody    = document.getElementById('text-body');
-    const textSource  = document.getElementById('text-source');
-    const switcher    = document.getElementById('text-switcher');
-    const textLabel   = document.getElementById('text-label');
-    const prevBtn     = document.getElementById('switch-prev');
-    const nextBtn     = document.getElementById('switch-next');
-    const roleTag     = document.getElementById('info-role-tag');
-    const roleTagText = document.getElementById('info-role-text');
-    const favBtn      = document.getElementById('fav-btn');
+    // 初始化游戏
+    function init() {
+        createBoard();
+        resetGame();
 
-    let currentName  = null;
-    let currentRole  = null;
-    let currentTexts = [];
-    let currentIdx   = 0;
-    let wasAutoRotating = true;
+        // 添加事件监听器
+        document.addEventListener('keydown', handleKeyDown);
+        startRestartButton.addEventListener('click', startOrRestartGame);
+        pauseResumeButton.addEventListener('click', togglePauseResume);
 
-    function updateFavBtn() {
-      if (!currentName) return;
-      if (isFaved(currentName, currentIdx)) {
-        favBtn.classList.add('faved');
-        favBtn.textContent = '★';
-      } else {
-        favBtn.classList.remove('faved');
-        favBtn.textContent = '☆';
-      }
+        // 设置触摸控制
+        setupTouchControls();
+
+        // 初始绘制
+        drawBoard();
+        drawNextPiece();
     }
 
-    function renderCurrent() {
-      if (!currentTexts.length) return;
-      const item = currentTexts[currentIdx];
-      textBody.textContent = item.content || '';
-      textSource.textContent = item.source || '';
-      textLabel.textContent = `${currentIdx + 1} / ${currentTexts.length}`;
-      prevBtn.disabled = currentIdx === 0;
-      nextBtn.disabled = currentIdx === currentTexts.length - 1;
-      if (currentTexts.length <= 1) switcher.classList.add('hidden');
-      else switcher.classList.remove('hidden');
-      document.getElementById('info-body-wrap').scrollTop = 0;
-      updateFavBtn();
-    }
+    // 页面加载完成后初始化游戏
+    window.addEventListener('DOMContentLoaded', init);
+</script>
 
-    function showCard(name, texts, role, country) {
-      currentName = name;
-      currentRole = role || '黑花';
-
-      let displayName = name;
-      if (isSoutheastAsia(name)) displayName = "Southeast Asia";
-
-      if (country) {
-        const zhCountry = COUNTRY_ZH[country] || country;
-        infoTitle.textContent = `${zhCountry} / ${name}`;
-      } else {
-        const zhCountry = COUNTRY_ZH[displayName] || displayName;
-        infoTitle.textContent = zhCountry;
-      }
-
-      roleTag.className = '';
-      roleTag.classList.add('role-' + currentRole);
-      roleTagText.textContent = currentRole;
-      currentTexts = texts || [];
-      currentIdx = 0;
-      renderCurrent();
-      const ctrl = world.controls();
-      wasAutoRotating = ctrl.autoRotate;
-      ctrl.autoRotate = false;
-      overlay.classList.add('show');
-      infoCard.classList.add('show');
-    }
-    function hideCard() {
-      overlay.classList.remove('show');
-      infoCard.classList.remove('show');
-      if (wasAutoRotating) world.controls().autoRotate = true;
-
-      hoveredCityName = null;
-      world.labelsData([]);
-      document.body.style.cursor = 'default';
-    }
-    prevBtn.addEventListener('click', () => { if (currentIdx > 0) { currentIdx--; renderCurrent(); } });
-    nextBtn.addEventListener('click', () => { if (currentIdx < currentTexts.length - 1) { currentIdx++; renderCurrent(); } });
-    document.getElementById('close-btn').addEventListener('click', hideCard);
-    overlay.addEventListener('click', hideCard);
-
-    favBtn.addEventListener('click', () => {
-      if (!currentName) return;
-      toggleFav(currentName, currentIdx, currentRole);
-      updateFavBtn();
-    });
-
-    document.getElementById('export-btn').addEventListener('click', () => {
-      if (!favorites.length) {
-        alert('暂无收藏内容。\n\n请先在地点弹窗中点击右上角的 ☆ 收藏你想要的段落，再点击导出。');
-        return;
-      }
-
-      const DIVIDER = '━'.repeat(36);
-
-      function resolveName(f) {
-        for (const country in countryCities) {
-          const city = countryCities[country].find(c => c.name === f.name);
-          if (city) return { country, place: f.name };
-        }
-        return { country: f.name, place: '' };
-      }
-
-      const parts = favorites.map(f => {
-        const { country, place } = resolveName(f);
-        const zhCountry = COUNTRY_ZH[country] || country;
-        const titleLine = place ? `【${zhCountry} / ${place}】` : `【${zhCountry}】`;
-        const lines = [];
-        lines.push(DIVIDER);
-        lines.push(titleLine);
-        lines.push('');
-        lines.push(f.content || '');
-        if (f.source) {
-          lines.push('');
-          lines.push(`—— ${f.source}`);
-        }
-        return lines.join('\n');
-      });
-
-      const header = [
-        '花夜前行 · Travel Map',
-        DIVIDER,
-        ''
-      ].join('\n');
-
-      const footer = [
-        DIVIDER,
-        '',
-        '仅供黑花CP同好交流参考。',
-        '所有原文版权归南派三叔及出版方所有。',
-        '',
-        DIVIDER,
-        ''
-      ].join('\n');
-
-      const text = header + '\n' + parts.join('\n\n') + '\n\n' + footer;
-
-      const now = new Date();
-      const pad = n => String(n).padStart(2, '0');
-      const dateStr = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
-      const filename = `花夜前行-收藏.txt`;
-
-      const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-
-      const shouldClear = confirm(`已导出 ${favorites.length} 条收藏。\n\n是否清空已收藏的数据？`);
-      if (shouldClear) {
-        favorites = [];
-        saveFavorites();
-        updateExportBtn();
-        updateFavBtn();
-      }
-    });
-
-    const hoverTip = document.getElementById('hover-tip');
-    document.addEventListener('mousemove', e => {
-      hoverTip.style.left = (e.clientX + 14) + 'px';
-      hoverTip.style.top  = (e.clientY + 14) + 'px';
-    });
-
-    document.addEventListener('keydown', e => {
-      if (e.key === 'Escape') {
-        if (document.getElementById('dev-panel').classList.contains('show')) {
-          document.getElementById('dev-panel').classList.remove('show'); return;
-        }
-        if (infoCard.classList.contains('show')) { hideCard(); return; }
-        selectedName = null; activeRole = null; selectedCityName = null;
-        document.querySelectorAll('.role-tab').forEach(b => b.classList.remove('active'));
-        select.value = '';
-        repaint();
-        refreshCities();
-        return;
-      }
-      if (e.key === '1') document.querySelector('[data-role="黑花"]').click();
-      if (e.key === '2') document.querySelector('[data-role="黑瞎子"]').click();
-      if (e.key === '3') document.querySelector('[data-role="解雨臣"]').click();
-      if (infoCard.classList.contains('show')) {
-        if (e.key === 'ArrowLeft' && currentIdx > 0) { currentIdx--; renderCurrent(); }
-        if (e.key === 'ArrowRight' && currentIdx < currentTexts.length - 1) { currentIdx++; renderCurrent(); }
-      }
-    });
-
-    const sidebar = document.getElementById('sidebar');
-    document.getElementById('collapse-btn').addEventListener('click', () => {
-      sidebar.classList.add('collapsed');
-      document.getElementById('toggle-btn').classList.add('show');
-    });
-    document.getElementById('toggle-btn').addEventListener('click', () => {
-      sidebar.classList.remove('collapsed');
-      document.getElementById('toggle-btn').classList.remove('show');
-    });
-
-    rotateBtn.addEventListener('click', () => {
-      const ctrl = world.controls();
-      ctrl.autoRotate = !ctrl.autoRotate;
-      if (ctrl.autoRotate) { rotateBtn.textContent = '⏸'; rotateBtn.classList.remove('paused'); }
-      else { rotateBtn.textContent = '▶'; rotateBtn.classList.add('paused'); }
-    });
-
-    window.addEventListener('dblclick', () => {
-      world.pointOfView({ lat: 20, lng: 100, altitude: 2.5 }, 800);
-    });
-
-    const input = document.getElementById('country-input');
-    const SEA_VALUE = "__SOUTHEAST_ASIA__";
-    const SEA_LABEL = "东南亚 / Southeast Asia";
-
-    // 东南亚国家列表（用于在左侧列表里过滤掉）
-    const SEA_COUNTRY_SET = new Set(
-      (typeof SOUTHEAST_ASIA_COUNTRIES !== 'undefined' ? SOUTHEAST_ASIA_COUNTRIES : [])
-    );
-
-    function fillSelect(filter) {
-      const kw = (filter || '').toLowerCase();
-      const allNames = new Set([
-        ...Object.keys(countryRoles),
-        ...Object.keys(countryCities),
-        ...Object.keys(countryTexts)
-      ]);
-      select.innerHTML = '';
-
-      // 加入“东南亚”伪条目
-      if (!kw || SEA_LABEL.toLowerCase().includes(kw) || "southeast asia".includes(kw)) {
-        const opt = document.createElement('option');
-        opt.value = SEA_VALUE;
-        opt.textContent = SEA_LABEL;
-        select.appendChild(opt);
-      }
-
-      Array.from(allNames)
-        // 过滤掉东南亚各国，只保留“东南亚”伪条目
-        .filter(name => !SEA_COUNTRY_SET.has(name))
-        .filter(name => {
-          const zh = COUNTRY_ZH[name] || '';
-          return name.toLowerCase().includes(kw) || zh.includes(kw);
-        })
-        .sort()
-        .forEach(name => {
-          const opt = document.createElement('option');
-          opt.value = name;
-          opt.textContent = COUNTRY_ZH[name] ? `${COUNTRY_ZH[name]} / ${name}` : name;
-          select.appendChild(opt);
-        });
-    }
-    input.addEventListener('input', e => fillSelect(e.target.value));
-    select.addEventListener('change', e => {
-      const name = e.target.value;
-      if (!name) return;
-
-      // 处理“东南亚”伪条目：只高亮，不弹窗
-      if (name === SEA_VALUE) {
-        selectedName = SEA_VALUE;
-        activeRole = null;
-        selectedCityName = null;
-        document.querySelectorAll('.role-tab').forEach(b => b.classList.remove('active'));
-
-        world.pointOfView({ lat: 10.0, lng: 105.0, altitude: 1.8 }, 1000);
-        world.controls().autoRotate = false;
-        rotateBtn.textContent = '▶';
-        rotateBtn.classList.add('paused');
-
-        repaint();
-        refreshCities();
-        return;
-      }
-
-      selectedName = name;
-      activeRole = null;
-      selectedCityName = null;
-      document.querySelectorAll('.role-tab').forEach(b => b.classList.remove('active'));
-      const c = countryCenters[name];
-      if (c) world.pointOfView({ lat: c.lat, lng: c.lng, altitude: 1.8 }, 1000);
-
-      world.controls().autoRotate = false;
-      rotateBtn.textContent = '▶';
-      rotateBtn.classList.add('paused');
-
-      repaint();
-      refreshCities();
-    });
-
-    document.querySelectorAll('.role-tab').forEach(btn => {
-      btn.addEventListener('click', e => {
-        const rect = btn.getBoundingClientRect();
-        const ripple = document.createElement('span');
-        ripple.className = 'ripple';
-        const size = Math.max(rect.width, rect.height);
-        ripple.style.width = ripple.style.height = size + 'px';
-        ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
-        ripple.style.top  = (e.clientY - rect.top  - size / 2) + 'px';
-        btn.appendChild(ripple);
-        setTimeout(() => ripple.remove(), 700);
-
-        const role = btn.dataset.role;
-        if (activeRole === role) { activeRole = null; btn.classList.remove('active'); }
-        else {
-          document.querySelectorAll('.role-tab').forEach(b => b.classList.remove('active'));
-          btn.classList.add('active');
-          activeRole = role;
-        }
-        selectedName = null;
-        selectedCityName = null;
-        select.value = '';
-        repaint();
-        refreshCities();
-      });
-    });
-
-    const devPanel = document.getElementById('dev-panel');
-    document.getElementById('dev-btn').addEventListener('click', () => devPanel.classList.add('show'));
-    document.getElementById('dev-close').addEventListener('click', () => devPanel.classList.remove('show'));
-    devPanel.addEventListener('click', e => { if (e.target === devPanel) devPanel.classList.remove('show'); });
-
-    function provinceToRings(feature) {
-      const g = feature.geometry;
-      const rings = [];
-      if (!g) return rings;
-      if (g.type === 'Polygon') g.coordinates.forEach(ring => rings.push(ring));
-      else if (g.type === 'MultiPolygon') g.coordinates.forEach(poly => poly.forEach(ring => rings.push(ring)));
-      return rings;
-    }
-
-    fillSelect('');
-    updateExportBtn();
-
-    Promise.all([
-      fetch('./110admin0.geojson').then(res => res.json()),
-      fetch('./china.geojson').then(res => res.json())
-    ])
-    .then(([worldData, provinceData]) => {
-      const toChina = ['Taiwan', 'Hong Kong S.A.R.', 'Macao S.A.R'];
-      worldData.features.forEach(f => {
-        if (toChina.includes(f.properties.NAME)) f.properties.NAME = 'China';
-      });
-
-      world
-        .polygonsData(worldData.features)
-        .polygonAltitude(0.01)
-        .polygonCapColor(polygonCapFor)
-        .polygonSideColor(polygonSideFor)
-        .polygonStrokeColor(polygonLineFor)
-        .onPolygonHover(polygon => {
-          if (!polygon) {
-            hoveredName = null;
-            hoverTip.classList.remove('show');
-            document.body.style.cursor = 'default';
-          } else {
-            const rawName = polygon.properties.NAME;
-            hoveredName = rawName;
-
-            let displayName = rawName;
-            if (isSoutheastAsia(rawName)) displayName = "Southeast Asia";
-
-            const zh = COUNTRY_ZH[displayName];
-            hoverTip.textContent = zh ? `${zh} / ${displayName}` : displayName;
-            hoverTip.classList.add('show');
-            document.body.style.cursor = 'pointer';
-          }
-          repaint();
-        })
-        .onPolygonClick(polygon => {
-          const name = polygon.properties.NAME;
-          if (!countryRoles[name]) return;
-
-          selectedName = name;
-          activeRole = null;
-          selectedCityName = null;
-          document.querySelectorAll('.role-tab').forEach(b => b.classList.remove('active'));
-
-          input.value = '';
-          fillSelect('');
-
-          let opt = Array.from(select.options).find(o => o.value === name);
-          if (!opt) {
-            opt = document.createElement('option');
-            opt.value = name;
-            opt.textContent = COUNTRY_ZH[name] ? `${COUNTRY_ZH[name]} / ${name}` : name;
-            select.appendChild(opt);
-          }
-          select.value = name;
-
-          const c = countryCenters[name];
-          if (c) world.pointOfView({ lat: c.lat, lng: c.lng, altitude: 1.8 }, 1000);
-          repaint();
-          refreshCities();
-
-          const texts = countryTexts[name];
-          const role = countryRoles[name];
-          if (texts && texts.length) {
-            showCard(name, texts, role, null);
-          }
-        });
-
-      const provincePaths = [];
-      provinceData.features.forEach(f => {
-        provinceToRings(f).forEach(ring => {
-          const pts = ring.map(([lng, lat]) => [lat, lng]);
-          provincePaths.push({ name: f.properties.name, coords: pts });
-        });
-      });
-
-      world
-        .pathsData(provincePaths)
-        .pathPoints(d => d.coords)
-        .pathPointLat(p => p[0])
-        .pathPointLng(p => p[1])
-        .pathColor(() => PROVINCE_LINE_COLOR)
-        .pathStroke(PROVINCE_LINE_WIDTH)
-        .pathPointAlt(PROVINCE_LINE_ALT)
-        .pathTransitionDuration(0);
-
-      repaint();
-      refreshCities();
-    })
-    .catch(err => {
-      console.error('数据加载失败：', err);
-    });
-  </script>
-</body>
 </html>
